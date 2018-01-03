@@ -6,8 +6,8 @@ import (
 
 func main() {
 	fmt.Println("Hello")
-	nLayers := [...]int{1, 1, 1}
-	network := Network{nLayers: nLayers[0:len(nLayers)]}
+	layers := [...]int{1, 1, 1}
+	network := Network{nLayers: len(layers), layers: layers[0:]}
 
 	fmt.Println("%v", network)
 }
