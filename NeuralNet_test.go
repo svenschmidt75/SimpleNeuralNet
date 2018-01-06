@@ -18,6 +18,7 @@ func TestNumberOfWeights(t *testing.T) {
 		nWeights int
 	}{
 		{[]int{1, 1, 1}, 2, 2},
+		{[]int{2, 1, 2}, 3, 4},
 	}
 
 	for _, item := range tables{
@@ -36,6 +37,7 @@ func TestNumberOfBiases(t *testing.T) {
 		nWeights int
 	}{
 		{[]int{1, 1, 1}, 2, 2},
+		{[]int{2, 1, 2}, 3, 4},
 	}
 
 	for _, item := range tables{
