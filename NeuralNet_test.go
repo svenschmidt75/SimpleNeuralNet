@@ -147,3 +147,32 @@ func TestWeightIndex(t *testing.T) {
 		}
 	}
 }
+
+func TestFeedforward(t *testing.T) {
+	network := CreateNetwork([]int{1, 1, 1})
+	network.weights[0] = 1
+	network.weights[0] = 2
+	network.weights[0] = 3
+	network.weights[0] = 4
+	network.weights[0] = 5
+	network.weights[0] = 6
+	network.weights[0] = 7
+	network.weights[0] = 8
+	network.weights[0] = 9
+	network.weights[0] = 10
+	network.weights[0] = 11
+	network.weights[0] = 12
+
+	network.biases[0] = 1
+	network.biases[0] = 2
+	network.biases[0] = 3
+	network.biases[0] = 4
+	network.biases[0] = 5
+
+	network.activations[0] = 1
+	network.activations[1] = 2
+
+	// initialize weights, biases with random numbers
+	network.Feedforward()
+
+}
