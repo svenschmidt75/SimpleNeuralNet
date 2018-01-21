@@ -77,7 +77,6 @@ func TestActivationIndex(t *testing.T) {
 			if ai != as.index {
 				t.Errorf("Expected %v, but is %v", as.index, ai)
 			}
-
 		}
 	}
 }
@@ -108,7 +107,6 @@ func TestBiasIndex(t *testing.T) {
 			if ai != as.index {
 				t.Errorf("Expected %v, but is %v", as.index, ai)
 			}
-
 		}
 	}
 }
@@ -143,34 +141,35 @@ func TestWeightIndex(t *testing.T) {
 			if ai != as.index {
 				t.Errorf("Expected %v, but is %v", as.index, ai)
 			}
-
 		}
 	}
 }
 
 func TestFeedforward(t *testing.T) {
 	network := CreateNetwork([]int{1, 1, 1})
-	network.weights[0] = 1
-	network.weights[0] = 2
-	network.weights[0] = 3
-	network.weights[0] = 4
-	network.weights[0] = 5
-	network.weights[0] = 6
-	network.weights[0] = 7
-	network.weights[0] = 8
-	network.weights[0] = 9
-	network.weights[0] = 10
-	network.weights[0] = 11
-	network.weights[0] = 12
 
-	network.biases[0] = 1
-	network.biases[0] = 2
-	network.biases[0] = 3
-	network.biases[0] = 4
-	network.biases[0] = 5
+	// use GeiWeightIndex...
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 3
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 4
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 5
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 6
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 7
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 8
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 9
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 10
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 11
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 12
 
-	network.activations[0] = 1
-	network.activations[1] = 2
+	network.biases[network.GetBiasIndex(0, 0)] = 1
+	network.biases[network.GetBiasIndex(0, 0)] = 2
+	network.biases[network.GetBiasIndex(0, 0)] = 3
+	network.biases[network.GetBiasIndex(0, 0)] = 4
+	network.biases[network.GetBiasIndex(0, 0)] = 5
+
+	network.activations[network.GetActivationIndex(0, 0)] = 1
+	network.activations[network.GetActivationIndex(0, 0)] = 2
 
 	// initialize weights, biases with random numbers
 	network.Feedforward()

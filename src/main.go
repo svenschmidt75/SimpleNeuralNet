@@ -30,5 +30,9 @@ func main() {
 	network.activations[0] = 1
 	network.activations[1] = 2
 
+	index := network.GetWeightIndex(0, 3, 1)
+	network.activations[index] = 2
+
+
 	network.Feedforward()
 }
