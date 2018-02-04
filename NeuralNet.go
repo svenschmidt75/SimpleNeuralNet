@@ -61,8 +61,8 @@ func (n Network) GetActivationBaseIndex(layer int) int {
 }
 
 func (n Network) GetActivationIndex(index int, layer int) int {
-	if index >= n.layers[layer - 1] {
-		panic(fmt.Sprintf("Index index=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer - 1], layer - 1))
+	if index >= n.layers[layer] {
+		panic(fmt.Sprintf("Index index=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
 	}
 	bi := n.GetActivationBaseIndex(layer)
 	return bi + index
@@ -90,12 +90,9 @@ func (n Network) GetBiasBaseIndex(layer int) int {
 }
 
 func (n Network) GetBiasIndex(index int, layer int) int {
-
-
-
-	if index >= n.biases[layer] {
-		panic(fmt.Sprintf("Index index=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer - 1], layer - 1))
-	}
+	//if index >= n.biases[layer] {
+	//	panic(fmt.Sprintf("Index index=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer - 1], layer - 1))
+	//}
 	bi := n.GetBiasBaseIndex(layer)
 	return bi + index
 }

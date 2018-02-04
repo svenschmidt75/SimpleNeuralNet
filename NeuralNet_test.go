@@ -146,7 +146,7 @@ func TestWeightIndex(t *testing.T) {
 }
 
 func TestFeedforward(t *testing.T) {
-	network := CreateNetwork([]int{1, 1, 1})
+	network := CreateNetwork([]int{2, 3, 2})
 
 	// use GeiWeightIndex...
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
@@ -169,7 +169,7 @@ func TestFeedforward(t *testing.T) {
 	network.biases[network.GetBiasIndex(0, 0)] = 5
 
 	network.activations[network.GetActivationIndex(0, 0)] = 1
-	network.activations[network.GetActivationIndex(0, 0)] = 2
+	network.activations[network.GetActivationIndex(1, 0)] = 2
 
 	// initialize weights, biases with random numbers
 	network.Feedforward()
