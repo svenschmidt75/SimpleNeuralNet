@@ -1,8 +1,8 @@
 package main
 
 import (
-	"math"
 	"fmt"
+	"math"
 )
 
 // weights: The weights w^{l}_ij are ordered by layer l, and for each layer,
@@ -119,11 +119,11 @@ func (n Network) GetWeightIndex(i int, j int, layer int) int {
 	if i >= n.layers[layer] {
 		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.layers[layer], layer))
 	}
-	if j >= n.layers[layer - 1] {
-		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer - 1], layer - 1))
+	if j >= n.layers[layer-1] {
+		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer-1], layer-1))
 	}
 	bi := n.getWeightBaseIndex(layer)
-	nl1 := n.layers[layer - 1]
+	nl1 := n.layers[layer-1]
 	bi = bi + i*nl1
 	return bi + j
 }
@@ -132,17 +132,17 @@ func (n Network) GetWeight(i int, j int, layer int) float64 {
 	return n.weights[n.GetWeightIndex(i, j, layer)]
 }
 
-func (n *Network) FeedforwardActivation(i int, layer int) {
-	if layer == 0 {
-		return
+func (n *Network) FeedforwardActivation(i int, layer int) float64 {
+	if layer == 0 || layer >= len(n.layers) {
+		panic(fmt.Sprintf("Activation layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, len(n.layers)))
 	}
 	b := n.GetBias(i, layer)
 	z := n.CalculateZ(i, layer)
 	z += b
 	a := Sigmoid(z)
-	a_i := n.GetActivation(i, layer)
-	*a_i = a
+	return a
 }
+
 func (n *Network) CalculateZ(i int, layer int) float64 {
 	var z float64
 	nPrevLayer := n.layers[layer-1]
@@ -160,12 +160,14 @@ func (n *Network) FeedforwardLayer(layer int) {
 	}
 	nLayer := n.layers[layer]
 	for i := 0; i < nLayer; i++ {
-		n.FeedforwardActivation(i, layer)
+		a := n.FeedforwardActivation(i, layer)
+		a_i := n.GetActivation(i, layer)
+		*a_i = a
 	}
 }
 
 func (n *Network) Feedforward() {
-	for layer, _ := range n.layers {
+	for layer := range n.layers {
 		if layer == 0 {
 			continue
 		}

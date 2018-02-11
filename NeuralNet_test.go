@@ -152,6 +152,47 @@ func TestWeightIndex(t *testing.T) {
 	}
 }
 
+func TestFeedforwardActivation(t *testing.T) {
+	network := CreateNetwork([]int{2, 3, 2})
+
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
+	network.weights[network.GetWeightIndex(0, 1, 1)] = 2
+	network.weights[network.GetWeightIndex(1, 0, 1)] = 3
+	network.weights[network.GetWeightIndex(1, 1, 1)] = 4
+	network.weights[network.GetWeightIndex(2, 0, 1)] = 5
+	network.weights[network.GetWeightIndex(2, 1, 1)] = 6
+	network.weights[network.GetWeightIndex(0, 0, 2)] = 7
+	network.weights[network.GetWeightIndex(0, 1, 2)] = 8
+	network.weights[network.GetWeightIndex(0, 2, 2)] = 9
+	network.weights[network.GetWeightIndex(1, 0, 2)] = 10
+	network.weights[network.GetWeightIndex(1, 1, 2)] = 11
+	network.weights[network.GetWeightIndex(1, 2, 2)] = 12
+
+	network.biases[network.GetBiasIndex(0, 1)] = 1
+	network.biases[network.GetBiasIndex(1, 1)] = 2
+	network.biases[network.GetBiasIndex(2, 1)] = 3
+	network.biases[network.GetBiasIndex(0, 2)] = 4
+	network.biases[network.GetBiasIndex(1, 2)] = 5
+
+	network.activations[network.GetActivationIndex(0, 0)] = 1
+	network.activations[network.GetActivationIndex(1, 0)] = 2
+
+	tables := []struct {
+		layer int
+		index int
+		value float64
+	}{
+		{1, 0, 1.0},
+	}
+
+	for _, ts := range tables {
+		v := network.FeedforwardActivation(ts.index, ts.layer)
+		if v != ts.value {
+			t.Errorf("Expected %v, but is %v", ts.value, v)
+		}
+	}
+}
+
 func TestFeedforward(t *testing.T) {
 	network := CreateNetwork([]int{2, 3, 2})
 
