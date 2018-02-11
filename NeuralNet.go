@@ -46,10 +46,7 @@ func Sigmoid(z float64) float64 {
 	return 1.0 / (1.0 + math.Exp(-z))
 }
 
-func (n Network) GetActivationBaseIndex(layer int) int {
-	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
-	}
+func (n Network) getActivationBaseIndex(layer int) int {
 	bi := 0
 	for idx, n := range n.layers {
 		if idx >= layer {
@@ -61,10 +58,13 @@ func (n Network) GetActivationBaseIndex(layer int) int {
 }
 
 func (n Network) GetActivationIndex(index int, layer int) int {
-	if index >= n.layers[layer] {
-		panic(fmt.Sprintf("Index index=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
+	if layer >= len(n.layers) {
+		panic(fmt.Sprintf("Activation layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
 	}
-	bi := n.GetActivationBaseIndex(layer)
+	if index >= n.layers[layer] {
+		panic(fmt.Sprintf("Activation index i=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
+	}
+	bi := n.getActivationBaseIndex(layer)
 	return bi + index
 }
 
@@ -72,10 +72,7 @@ func (n Network) GetActivation(index int, layer int) *float64 {
 	return &n.activations[n.GetActivationIndex(index, layer)]
 }
 
-func (n Network) GetBiasBaseIndex(layer int) int {
-	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
-	}
+func (n Network) getBiasBaseIndex(layer int) int {
 	bi := 0
 	for idx, n := range n.layers {
 		if idx == 0 {
@@ -90,10 +87,13 @@ func (n Network) GetBiasBaseIndex(layer int) int {
 }
 
 func (n Network) GetBiasIndex(index int, layer int) int {
-	//if index >= n.biases[layer] {
-	//	panic(fmt.Sprintf("Index index=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer - 1], layer - 1))
-	//}
-	bi := n.GetBiasBaseIndex(layer)
+	if layer >= len(n.layers) {
+		panic(fmt.Sprintf("Bias layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+	}
+	if index >= n.layers[layer] {
+		panic(fmt.Sprintf("Bias index i=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
+	}
+	bi := n.getBiasBaseIndex(layer)
 	return bi + index
 }
 
@@ -105,20 +105,23 @@ func (n Network) GetBias(index int, layer int) float64 {
 // n.weights
 func (n Network) GetWeightBaseIndex(layer int) int {
 	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
 	}
 	return getNumberOfWeights(n.layers[0:layer])
 }
 
 func (n Network) GetWeightIndex(i int, j int, layer int) int {
+	if layer == 0 {
+		panic(fmt.Sprintf("Weight layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, len(n.layers)))
+	}
 	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
 	}
 	if i >= n.layers[layer - 1] {
-		panic(fmt.Sprintf("Index i=%v must be smaller than the number of activations=%v in layer %v", i, n.layers[layer - 1], layer - 1))
+		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.layers[layer - 1], layer - 1))
 	}
 	if j >= n.layers[layer] {
-		panic(fmt.Sprintf("Index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer], layer))
+		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer], layer))
 	}
 	bi := n.GetWeightBaseIndex(layer)
 	nl1 := n.layers[layer]

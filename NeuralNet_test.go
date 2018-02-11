@@ -150,23 +150,23 @@ func TestFeedforward(t *testing.T) {
 
 	// use GeiWeightIndex...
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 3
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 4
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 5
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 6
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 7
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 8
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 9
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 10
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 11
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 12
+	network.weights[network.GetWeightIndex(0, 1, 1)] = 2
+	network.weights[network.GetWeightIndex(0, 2, 1)] = 3
+	network.weights[network.GetWeightIndex(1, 0, 1)] = 4
+	network.weights[network.GetWeightIndex(1, 1, 1)] = 5
+	network.weights[network.GetWeightIndex(1, 2, 1)] = 6
+	network.weights[network.GetWeightIndex(0, 0, 2)] = 7
+	network.weights[network.GetWeightIndex(0, 1, 2)] = 8
+	network.weights[network.GetWeightIndex(1, 0, 2)] = 9
+	network.weights[network.GetWeightIndex(1, 1, 2)] = 10
+	network.weights[network.GetWeightIndex(2, 0, 2)] = 11
+	network.weights[network.GetWeightIndex(2, 1, 2)] = 12
 
-	network.biases[network.GetBiasIndex(0, 0)] = 1
-	network.biases[network.GetBiasIndex(0, 0)] = 2
-	network.biases[network.GetBiasIndex(0, 0)] = 3
-	network.biases[network.GetBiasIndex(0, 0)] = 4
-	network.biases[network.GetBiasIndex(0, 0)] = 5
+	network.biases[network.GetBiasIndex(0, 1)] = 1
+	network.biases[network.GetBiasIndex(1, 1)] = 2
+	network.biases[network.GetBiasIndex(2, 1)] = 3
+	network.biases[network.GetBiasIndex(0, 2)] = 4
+	network.biases[network.GetBiasIndex(1, 2)] = 5
 
 	network.activations[network.GetActivationIndex(0, 0)] = 1
 	network.activations[network.GetActivationIndex(1, 0)] = 2
