@@ -179,5 +179,4 @@ func TestFeedforward(t *testing.T) {
 
 	// initialize weights, biases with random numbers
 	network.Feedforward()
-
 }
