@@ -103,28 +103,27 @@ func (n Network) GetBias(index int, layer int) float64 {
 
 // Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
 // n.weights
-func (n Network) GetWeightBaseIndex(layer int) int {
-	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
-	}
+func (n Network) getWeightBaseIndex(layer int) int {
 	return getNumberOfWeights(n.layers[0:layer])
 }
 
 func (n Network) GetWeightIndex(i int, j int, layer int) int {
+	// Remember the meaning of the indices: w_ij^{l) is the weight from
+	// neuron a_j^{l-1} to neuron a_i^{l}.
 	if layer == 0 {
 		panic(fmt.Sprintf("Weight layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, len(n.layers)))
 	}
 	if layer >= len(n.layers) {
 		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
 	}
-	if i >= n.layers[layer - 1] {
-		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.layers[layer - 1], layer - 1))
+	if i >= n.layers[layer] {
+		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.layers[layer], layer))
 	}
-	if j >= n.layers[layer] {
-		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer], layer))
+	if j >= n.layers[layer - 1] {
+		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer - 1], layer - 1))
 	}
-	bi := n.GetWeightBaseIndex(layer)
-	nl1 := n.layers[layer]
+	bi := n.getWeightBaseIndex(layer)
+	nl1 := n.layers[layer - 1]
 	bi = bi + i*nl1
 	return bi + j
 }
