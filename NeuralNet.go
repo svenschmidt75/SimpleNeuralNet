@@ -132,17 +132,6 @@ func (n Network) GetWeight(i int, j int, layer int) float64 {
 	return n.weights[n.GetWeightIndex(i, j, layer)]
 }
 
-func (n *Network) FeedforwardActivation(i int, layer int) float64 {
-	if layer == 0 || layer >= len(n.layers) {
-		panic(fmt.Sprintf("Activation layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, len(n.layers)))
-	}
-	b := n.GetBias(i, layer)
-	z := n.CalculateZ(i, layer)
-	z += b
-	a := Sigmoid(z)
-	return a
-}
-
 func (n *Network) CalculateZ(i int, layer int) float64 {
 	var z float64
 	nPrevLayer := n.layers[layer-1]
@@ -151,7 +140,18 @@ func (n *Network) CalculateZ(i int, layer int) float64 {
 		w_ij := n.GetWeight(i, j, layer)
 		z += w_ij * *a_j
 	}
+	b := n.GetBias(i, layer)
+	z += b
 	return z
+}
+
+func (n *Network) FeedforwardActivation(i int, layer int) float64 {
+	if layer == 0 || layer >= len(n.layers) {
+		panic(fmt.Sprintf("Activation layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, len(n.layers)))
+	}
+	z := n.CalculateZ(i, layer)
+	a := Sigmoid(z)
+	return a
 }
 
 func (n *Network) FeedforwardLayer(layer int) {

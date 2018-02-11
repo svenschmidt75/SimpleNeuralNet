@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"testing"
 )
 
@@ -152,7 +153,7 @@ func TestWeightIndex(t *testing.T) {
 	}
 }
 
-func TestFeedforwardActivation(t *testing.T) {
+func CreateTestNetwork() Network {
 	network := CreateNetwork([]int{2, 3, 2})
 
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
@@ -176,48 +177,86 @@ func TestFeedforwardActivation(t *testing.T) {
 
 	network.activations[network.GetActivationIndex(0, 0)] = 1
 	network.activations[network.GetActivationIndex(1, 0)] = 2
+
+	return network
+}
+
+func TestCalculateZ(t *testing.T) {
+	network := CreateTestNetwork()
 
 	tables := []struct {
 		layer int
 		index int
 		value float64
 	}{
-		{1, 0, 1.0},
+		{1, 0, 6.0},
+		{1, 1, 13.0},
+		{1, 2, 20.0},
+		{2, 0, 330.0},
+		{2, 1, 448.0},
 	}
 
 	for _, ts := range tables {
-		v := network.FeedforwardActivation(ts.index, ts.layer)
+		v := network.CalculateZ(ts.index, ts.layer)
+
+		// for this test, we assume the activation function is the identity
+		*network.GetActivation(ts.index, ts.layer) = v
 		if v != ts.value {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
 	}
 }
 
+var EPSILON = 0.00000001
+
+func floatEquals(a, b float64) bool {
+	return math.Abs(a-b) < EPSILON
+}
+
+func TestFeedforwardActivation(t *testing.T) {
+	network := CreateTestNetwork()
+
+	tables := []struct {
+		layer int
+		index int
+		value float64
+	}{
+		{1, 0, Sigmoid(6.0)},
+		{1, 1, Sigmoid(13.0)},
+		{1, 2, Sigmoid(20.0)},
+		{2, 0, Sigmoid(330.0)},
+		{2, 1, Sigmoid(448.0)},
+	}
+
+	for _, ts := range tables {
+		v := network.FeedforwardActivation(ts.index, ts.layer)
+		*network.GetActivation(ts.index, ts.layer) = v
+		if floatEquals(v, ts.value) == false {
+			t.Errorf("Expected %v, but is %v", ts.value, v)
+		}
+	}
+}
+
 func TestFeedforward(t *testing.T) {
-	network := CreateNetwork([]int{2, 3, 2})
-
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
-	network.weights[network.GetWeightIndex(0, 1, 1)] = 2
-	network.weights[network.GetWeightIndex(1, 0, 1)] = 3
-	network.weights[network.GetWeightIndex(1, 1, 1)] = 4
-	network.weights[network.GetWeightIndex(2, 0, 1)] = 5
-	network.weights[network.GetWeightIndex(2, 1, 1)] = 6
-	network.weights[network.GetWeightIndex(0, 0, 2)] = 7
-	network.weights[network.GetWeightIndex(0, 1, 2)] = 8
-	network.weights[network.GetWeightIndex(0, 2, 2)] = 9
-	network.weights[network.GetWeightIndex(1, 0, 2)] = 10
-	network.weights[network.GetWeightIndex(1, 1, 2)] = 11
-	network.weights[network.GetWeightIndex(1, 2, 2)] = 12
-
-	network.biases[network.GetBiasIndex(0, 1)] = 1
-	network.biases[network.GetBiasIndex(1, 1)] = 2
-	network.biases[network.GetBiasIndex(2, 1)] = 3
-	network.biases[network.GetBiasIndex(0, 2)] = 4
-	network.biases[network.GetBiasIndex(1, 2)] = 5
-
-	network.activations[network.GetActivationIndex(0, 0)] = 1
-	network.activations[network.GetActivationIndex(1, 0)] = 2
-
-	// initialize weights, biases with random numbers
+	network := CreateTestNetwork()
 	network.Feedforward()
+
+	tables := []struct {
+		layer int
+		index int
+		value float64
+	}{
+		{1, 0, Sigmoid(6.0)},
+		{1, 1, Sigmoid(13.0)},
+		{1, 2, Sigmoid(20.0)},
+		{2, 0, Sigmoid(330.0)},
+		{2, 1, Sigmoid(448.0)},
+	}
+
+	for _, ts := range tables {
+		v := *network.GetActivation(ts.index, ts.layer)
+		if floatEquals(v, ts.value) == false {
+			t.Errorf("Expected %v, but is %v", ts.value, v)
+		}
+	}
 }
