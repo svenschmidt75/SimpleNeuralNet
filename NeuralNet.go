@@ -235,8 +235,37 @@ type m struct {
 	nabla [][]float64
 }
 
-func (network *Network) UpdateNetwork(nablas []m) {
+func (n *Network) UpdateNetwork(nablas []m) {
+	eta := 0.1
+	miniBatchSize := len(nablas)
+	for layer := range n.layers {
+		if layer == 0 {
+			continue
+		}
 
+		// sum over activations a_j^l
+		for j := 0; j < n.layers[layer]; j++ {
+			dw := make([]float64, n.layers[layer-1])
+			var db float64
+			for batchIdx := range nablas {
+				nabla_j := nablas[batchIdx].nabla[layer-1][j]
+				for k := 0; k < n.layers[layer-1]; k++ {
+					a_k := n.GetActivation(k, layer-1)
+					dw[k] += *a_k * nabla_j
+				}
+				db += nabla_j
+			}
+			for k, v := range dw {
+				w_jk := n.GetWeight(j, k, layer)
+				dw := eta / float64(miniBatchSize) * v
+				w_jk -= dw
+				n.weights[n.GetWeightIndex(j, k, layer)] = w_jk
+			}
+			b_j := n.GetBias(j, layer)
+			n.biases[n.GetBiasIndex(j, layer)] = b_j - eta/float64(miniBatchSize)*db
+
+		}
+	}
 }
 
 func (n *Network) Solve(trainingSamples []TrainingSample) {

@@ -307,3 +307,7 @@ func TestBackpropagate(t *testing.T) {
 		t.Errorf("Number of error elements %v not equal to 3", l)
 	}
 }
+
+func TestUpdateNetwork(t *testing.T) {
+
+}
