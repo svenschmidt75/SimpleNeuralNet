@@ -46,6 +46,11 @@ func Sigmoid(z float64) float64 {
 	return 1.0 / (1.0 + math.Exp(-z))
 }
 
+func SigmoidPrime(z float64) float64 {
+	// derivative of the sigmoid function
+	return Sigmoid(z) * (1 - Sigmoid(z))
+}
+
 func (n Network) getActivationBaseIndex(layer int) int {
 	bi := 0
 	for idx, n := range n.layers {
@@ -175,16 +180,34 @@ func (n *Network) Feedforward() {
 	}
 }
 
-func (n *Network) CalculateOutputError() []float64 {
-
+func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64) []float64 {
+	outputLayerIdx := len(n.layers) - 1
+	if len(expectedOutputActivations) != n.layers[0] {
+		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in input layer", len(expectedOutputActivations), n.layers[outputLayerIdx]))
+	}
+	nActivations := n.layers[outputLayerIdx]
+	output := make([]float64, nActivations)
+	for i := 0; i < nActivations; i++ {
+		a_i := n.GetActivation(i, outputLayerIdx)
+		z_i := n.CalculateZ(i, outputLayerIdx)
+		output[i] = (*a_i - expectedOutputActivations[i]) * SigmoidPrime(z_i)
+	}
+	return output
 }
 
-func (n *Network) SetInputLayer(inputActivations []float64) {
-	// size check
+func (n *Network) SetInputActivations(inputActivations []float64) {
+	if len(inputActivations) != n.layers[0] {
+		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", len(inputActivations), n.layers[0]))
+	}
+	for idx, a := range inputActivations {
+		a_i := n.GetActivation(idx, 0)
+		*a_i = a
+	}
 }
 
 func (n *Network) Backpropagate(nabla_L []float64) [][]float64 {
 	// size check
+	return [][]float64{}
 }
 
 type m struct {
@@ -219,9 +242,9 @@ func (n *Network) Solve(trainingSamples []TrainingSample) {
 	for j := 0; j < numMiniBatches; j++ {
 		for i := 0; i < sizeMiniBatch; i++ {
 			x := trainingSamples[j*sizeMiniBatch+i]
-			n.SetInputLayer(x.inputActivations)
+			n.SetInputActivations(x.inputActivations)
 			n.Feedforward()
-			ms[i].nabla[lastLayerIdx] = n.CalculateOutputError()
+			ms[i].nabla[lastLayerIdx] = n.CalculateErrorInOutputLayer(x.outputActivations)
 			ms[i].nabla = n.Backpropagate(ms[i].nabla[lastLayerIdx])
 			// store
 		}

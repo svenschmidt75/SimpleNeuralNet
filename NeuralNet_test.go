@@ -260,3 +260,19 @@ func TestFeedforward(t *testing.T) {
 		}
 	}
 }
+
+func TestSetInputActivations(t *testing.T) {
+	network := CreateTestNetwork()
+
+	network.SetInputActivations([]float64{4.9, 3.2})
+
+	a := *network.GetActivation(0, 0)
+	if floatEquals(4.9, a) == false {
+		t.Errorf("Expected 4.9, but is %v", a)
+	}
+
+	a = *network.GetActivation(1, 0)
+	if floatEquals(3.2, a) == false {
+		t.Errorf("Expected 3.2, but is %v", a)
+	}
+}
