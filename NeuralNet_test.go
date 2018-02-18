@@ -266,13 +266,44 @@ func TestSetInputActivations(t *testing.T) {
 
 	network.SetInputActivations([]float64{4.9, 3.2})
 
-	a := *network.GetActivation(0, 0)
-	if floatEquals(4.9, a) == false {
+	if a := *network.GetActivation(0, 0); floatEquals(4.9, a) == false {
 		t.Errorf("Expected 4.9, but is %v", a)
 	}
 
-	a = *network.GetActivation(1, 0)
-	if floatEquals(3.2, a) == false {
+	if a := *network.GetActivation(1, 0); floatEquals(3.2, a) == false {
 		t.Errorf("Expected 3.2, but is %v", a)
+	}
+}
+
+func TestCalculateErrorInOutputLayer(t *testing.T) {
+	network := CreateTestNetwork()
+	network.Feedforward()
+
+	errorInOutputLayer := network.CalculateErrorInOutputLayer([]float64{0.1, 0.5})
+
+	if l := len(errorInOutputLayer); l != 2 {
+		t.Errorf("Number of error elements %v not equal to 2", l)
+	}
+
+	if floatEquals(errorInOutputLayer[0], 1E-13) == false {
+		t.Errorf("Expected %v, but is %v", errorInOutputLayer[0], 1E-13)
+	}
+}
+
+func TestBackpropagate(t *testing.T) {
+	network := CreateTestNetwork()
+	network.Feedforward()
+	nabla_L := network.CalculateErrorInOutputLayer([]float64{0.1, 0.5})
+
+	nablas := network.Backpropagate(nabla_L)
+
+	if l := len(nablas); l != 2 {
+		t.Errorf("Number of error elements %v not equal to 12", l)
+	}
+	if l := len(nablas[0]); l != 3 {
+		t.Errorf("Number of error elements %v not equal to 2", l)
+	}
+	if l := len(nablas[1]); l != 2 {
+		t.Errorf("Number of error elements %v not equal to 3", l)
 	}
 }

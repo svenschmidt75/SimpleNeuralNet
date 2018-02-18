@@ -182,8 +182,8 @@ func (n *Network) Feedforward() {
 
 func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64) []float64 {
 	outputLayerIdx := len(n.layers) - 1
-	if len(expectedOutputActivations) != n.layers[0] {
-		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in input layer", len(expectedOutputActivations), n.layers[outputLayerIdx]))
+	if len(expectedOutputActivations) != n.layers[outputLayerIdx] {
+		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in ouput layer", len(expectedOutputActivations), n.layers[outputLayerIdx]))
 	}
 	nActivations := n.layers[outputLayerIdx]
 	output := make([]float64, nActivations)
@@ -206,8 +206,29 @@ func (n *Network) SetInputActivations(inputActivations []float64) {
 }
 
 func (n *Network) Backpropagate(nabla_L []float64) [][]float64 {
-	// size check
-	return [][]float64{}
+	outputLayerIdx := len(n.layers) - 1
+	if len(nabla_L) != n.layers[outputLayerIdx] {
+		panic(fmt.Sprintf("Output error size %v does not match number of activations %v in output layer", len(nabla_L), n.layers[outputLayerIdx]))
+	}
+	nablas := make([][]float64, len(n.layers)-1)
+	nablas[outputLayerIdx-1] = nabla_L
+	for layer := outputLayerIdx - 1; layer > 0; layer-- {
+		nablas[layer-1] = make([]float64, n.layers[layer])
+		nActivations := n.layers[layer]
+		nNextActivations := n.layers[layer+1]
+		for j := 0; j < nActivations; j++ {
+			var tmp float64
+			for k := 0; k < nNextActivations; k++ {
+				weight_kj := n.GetWeight(k, j, layer+1)
+				nabla_k := nablas[layer][k]
+				tmp += weight_kj * nabla_k
+			}
+			z_j := n.CalculateZ(j, layer)
+			s := SigmoidPrime(z_j)
+			nablas[layer-1][j] = tmp * s
+		}
+	}
+	return nablas
 }
 
 type m struct {
@@ -237,16 +258,14 @@ func (n *Network) Solve(trainingSamples []TrainingSample) {
 	ms := make([]m, sizeMiniBatch)
 
 	//	ar opts = []struct
-	lastLayerIdx := len(n.layers) - 1
 
 	for j := 0; j < numMiniBatches; j++ {
 		for i := 0; i < sizeMiniBatch; i++ {
 			x := trainingSamples[j*sizeMiniBatch+i]
 			n.SetInputActivations(x.inputActivations)
 			n.Feedforward()
-			ms[i].nabla[lastLayerIdx] = n.CalculateErrorInOutputLayer(x.outputActivations)
-			ms[i].nabla = n.Backpropagate(ms[i].nabla[lastLayerIdx])
-			// store
+			nabla_L := n.CalculateErrorInOutputLayer(x.outputActivations)
+			ms[i].nabla = n.Backpropagate(nabla_L)
 		}
 		n.UpdateNetwork(ms)
 	}
