@@ -174,3 +174,69 @@ func (n *Network) Feedforward() {
 		n.FeedforwardLayer(layer)
 	}
 }
+
+func (n *Network) CalculateOutputError() []float64 {
+
+}
+
+func (n *Network) SetInputLayer(inputActivations []float64) {
+	// size check
+}
+
+func (n *Network) Backpropagate(nabla_L []float64) [][]float64 {
+	// size check
+}
+
+type m struct {
+	nabla [][]float64
+}
+
+func (network *Network) UpdateNetwork(nablas []m) {
+
+}
+
+func (n *Network) Solve(trainingSamples []TrainingSample) {
+	// multiple epochs (i.e. outer loop does this multiple times and checks when NN is good enough)
+
+	// randomize training samples (i.e. randomize arrays [1..size(training samples)]
+
+	// chunk training samples into size m
+
+	// for each x in m
+	// 		- feed forward x
+	// 		- calculate error for layer L
+	//		- backprop, gives errors for all layers
+	// update weights and biases for all x in m
+
+	sizeMiniBatch := 20
+	numMiniBatches := len(trainingSamples) / sizeMiniBatch
+
+	ms := make([]m, sizeMiniBatch)
+
+	//	ar opts = []struct
+	lastLayerIdx := len(n.layers) - 1
+
+	for j := 0; j < numMiniBatches; j++ {
+		for i := 0; i < sizeMiniBatch; i++ {
+			x := trainingSamples[j*sizeMiniBatch+i]
+			n.SetInputLayer(x.inputActivations)
+			n.Feedforward()
+			ms[i].nabla[lastLayerIdx] = n.CalculateOutputError()
+			ms[i].nabla = n.Backpropagate(ms[i].nabla[lastLayerIdx])
+			// store
+		}
+		n.UpdateNetwork(ms)
+	}
+
+	// the rest
+	//for i := numMiniBatches * sizeMiniBatch; i < len(trainingSamples); i++ {
+	//	x := trainingSamples[i]
+	//	n.SetInputLayer(x.inputActivations)
+	//	n.Feedforward()
+	//	nabla_L := n.CalculateOutputError()
+	//	nabla := n.Backpropagate(nabla_L)
+	//	// store
+	//}
+	//n.UpdateNetwork(nabla)
+
+}
