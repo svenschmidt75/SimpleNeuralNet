@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="update network functionality">
-      <change beforePath="" afterPath="$PROJECT_DIR$/Minibatch.go" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/NeuralNet.go" afterPath="$PROJECT_DIR$/NeuralNet.go" />
+      <change beforePath="$PROJECT_DIR$/Network.go" afterPath="$PROJECT_DIR$/Network.go" />
       <change beforePath="$PROJECT_DIR$/NeuralNet_test.go" afterPath="$PROJECT_DIR$/NeuralNet_test.go" />
-      <change beforePath="$PROJECT_DIR$/main.go" afterPath="$PROJECT_DIR$/main.go" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -37,11 +34,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="296" column="73" lean-forward="false" selection-start-line="296" selection-start-column="73" selection-end-line="296" selection-end-column="73" />
+            <state relative-caret-position="731">
+              <caret line="318" column="0" lean-forward="true" selection-start-line="318" selection-start-column="0" selection-end-line="318" selection-end-column="0" />
               <folding>
                 <element signature="e#14#53#0" expanded="true" />
               </folding>
@@ -59,11 +56,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Network.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="42" column="0" lean-forward="true" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+            <state relative-caret-position="442">
+              <caret line="44" column="31" lean-forward="false" selection-start-line="44" selection-start-column="31" selection-end-line="44" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -100,8 +97,8 @@
         <option value="$PROJECT_DIR$/Minibatch.go" />
         <option value="$PROJECT_DIR$/NeuralNet.go" />
         <option value="$PROJECT_DIR$/main.go" />
-        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
         <option value="$PROJECT_DIR$/Network.go" />
+        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
       </list>
     </option>
   </component>
@@ -167,7 +164,15 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go">
+  <component name="RunManager" selected="Go Test.NeuralNet_test.go">
+    <configuration name="NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
+      <module name="SimpleNeuralNet" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <framework value="gotest" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/NeuralNet_test.go" />
+    </configuration>
     <configuration name="TestCalculateErrorInOutputLayer in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
       <working_directory value="$PROJECT_DIR$" />
@@ -176,15 +181,6 @@
       <kind value="PACKAGE" />
       <package value="SimpleNeuralNet" />
       <pattern value="^TestCalculateErrorInOutputLayer$" />
-    </configuration>
-    <configuration name="TestCalculateZ in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
-      <module name="SimpleNeuralNet" />
-      <working_directory value="$PROJECT_DIR$" />
-      <go_parameters value="-i" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="SimpleNeuralNet" />
-      <pattern value="^TestCalculateZ$" />
     </configuration>
     <configuration name="TestFeedforward in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
@@ -214,19 +210,19 @@
       <pattern value="^TestSetInputActivations$" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Go Test.TestCalculateZ in NeuralNet_test.go" />
-      <item index="1" class="java.lang.String" itemvalue="Go Test.TestFeedforwardActivation in NeuralNet_test.go" />
-      <item index="2" class="java.lang.String" itemvalue="Go Test.TestFeedforward in NeuralNet_test.go" />
-      <item index="3" class="java.lang.String" itemvalue="Go Test.TestSetInputActivations in NeuralNet_test.go" />
-      <item index="4" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
+      <item index="0" class="java.lang.String" itemvalue="Go Test.TestFeedforwardActivation in NeuralNet_test.go" />
+      <item index="1" class="java.lang.String" itemvalue="Go Test.TestFeedforward in NeuralNet_test.go" />
+      <item index="2" class="java.lang.String" itemvalue="Go Test.TestSetInputActivations in NeuralNet_test.go" />
+      <item index="3" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
+      <item index="4" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
-        <item index="1" class="java.lang.String" itemvalue="Go Test.TestSetInputActivations in NeuralNet_test.go" />
-        <item index="2" class="java.lang.String" itemvalue="Go Test.TestFeedforward in NeuralNet_test.go" />
-        <item index="3" class="java.lang.String" itemvalue="Go Test.TestFeedforwardActivation in NeuralNet_test.go" />
-        <item index="4" class="java.lang.String" itemvalue="Go Test.TestCalculateZ in NeuralNet_test.go" />
+        <item index="0" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
+        <item index="1" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
+        <item index="2" class="java.lang.String" itemvalue="Go Test.TestSetInputActivations in NeuralNet_test.go" />
+        <item index="3" class="java.lang.String" itemvalue="Go Test.TestFeedforward in NeuralNet_test.go" />
+        <item index="4" class="java.lang.String" itemvalue="Go Test.TestFeedforwardActivation in NeuralNet_test.go" />
       </list>
     </recent_temporary>
   </component>
@@ -234,6 +230,9 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="TestHistory">
+    <history-entry file="NeuralNet_test_go - 2018.02.24 at 09h 36m 51s.xml">
+      <configuration name="NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
     <history-entry file="TestCalculateErrorInOutputLayer_in_NeuralNet_test_go - 2018.02.24 at 09h 09m 57s.xml">
       <configuration name="TestCalculateErrorInOutputLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
@@ -260,9 +259,6 @@
     </history-entry>
     <history-entry file="TestSetInputActivations_in_NeuralNet_test_go - 2018.02.24 at 09h 09m 54s.xml">
       <configuration name="TestSetInputActivations in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestWeightIndex_in_NeuralNet_test_go - 2018.02.24 at 09h 01m 50s.xml">
-      <configuration name="TestWeightIndex in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
@@ -635,16 +631,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="296" column="73" lean-forward="false" selection-start-line="296" selection-start-column="73" selection-end-line="296" selection-end-column="73" />
-          <folding>
-            <element signature="e#14#53#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Minibatch.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -653,11 +639,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/lib/go-1.9/src/builtin/builtin.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="256" column="0" lean-forward="true" selection-start-line="256" selection-start-column="0" selection-end-line="256" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Network.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="42" column="0" lean-forward="true" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+        <state relative-caret-position="442">
+          <caret line="44" column="31" lean-forward="false" selection-start-line="44" selection-start-column="31" selection-end-line="44" selection-end-column="31" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="318" column="0" lean-forward="true" selection-start-line="318" selection-start-column="0" selection-end-line="318" selection-end-column="0" />
+          <folding>
+            <element signature="e#14#53#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -25,8 +25,8 @@ func TestNumberOfWeights(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs, 1)
-		nWeights := len(network.batches[0].w)
+		network := CreateNetwork(item.xs)
+		nWeights := len(network.w)
 		if nWeights != item.nWeights {
 			t.Errorf("Expected 2, but is %v", nWeights)
 		}
@@ -45,7 +45,7 @@ func TestNumberOfBiases(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs, 1)
+		network := CreateNetwork(item.xs)
 		nBiases := len(network.biases)
 		if nBiases != item.nBiases {
 			t.Errorf("Expected 2, but is %v", nBiases)
@@ -73,7 +73,7 @@ func TestActivationIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 1)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetActivationIndex(as.i, as.layer)
 			if ai != as.index {
@@ -103,7 +103,7 @@ func TestBiasIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 1)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetBiasIndex(as.i, as.layer)
 			if ai != as.index {
@@ -144,7 +144,7 @@ func TestWeightIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 1)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetWeightIndex(as.i, as.j, as.layer)
 			if ai != as.index {
@@ -154,21 +154,22 @@ func TestWeightIndex(t *testing.T) {
 	}
 }
 
-func CreateTestNetwork(nMiniBatches int) Network {
-	network := CreateNetwork([]int{2, 3, 2}, nMiniBatches)
+func CreateTestNetwork() (Network, Minibatch) {
+	network := CreateNetwork([]int{2, 3, 2})
 
-	network.batches[0].w[network.GetWeightIndex(0, 0, 1)] = 1
-	network.batches[0].w[network.GetWeightIndex(0, 1, 1)] = 2
-	network.batches[0].w[network.GetWeightIndex(1, 0, 1)] = 3
-	network.batches[0].w[network.GetWeightIndex(1, 1, 1)] = 4
-	network.batches[0].w[network.GetWeightIndex(2, 0, 1)] = 5
-	network.batches[0].w[network.GetWeightIndex(2, 1, 1)] = 6
-	network.batches[0].w[network.GetWeightIndex(0, 0, 2)] = 7
-	network.batches[0].w[network.GetWeightIndex(0, 1, 2)] = 8
-	network.batches[0].w[network.GetWeightIndex(0, 2, 2)] = 9
-	network.batches[0].w[network.GetWeightIndex(1, 0, 2)] = 10
-	network.batches[0].w[network.GetWeightIndex(1, 1, 2)] = 11
-	network.batches[0].w[network.GetWeightIndex(1, 2, 2)] = 12
+	w := make([]float64, 12)
+	w[network.GetWeightIndex(0, 0, 1)] = 1
+	w[network.GetWeightIndex(0, 1, 1)] = 2
+	w[network.GetWeightIndex(1, 0, 1)] = 3
+	w[network.GetWeightIndex(1, 1, 1)] = 4
+	w[network.GetWeightIndex(2, 0, 1)] = 5
+	w[network.GetWeightIndex(2, 1, 1)] = 6
+	w[network.GetWeightIndex(0, 0, 2)] = 7
+	w[network.GetWeightIndex(0, 1, 2)] = 8
+	w[network.GetWeightIndex(0, 2, 2)] = 9
+	w[network.GetWeightIndex(1, 0, 2)] = 10
+	w[network.GetWeightIndex(1, 1, 2)] = 11
+	w[network.GetWeightIndex(1, 2, 2)] = 12
 
 	network.biases[network.GetBiasIndex(0, 1)] = 1
 	network.biases[network.GetBiasIndex(1, 1)] = 2
@@ -176,14 +177,18 @@ func CreateTestNetwork(nMiniBatches int) Network {
 	network.biases[network.GetBiasIndex(0, 2)] = 4
 	network.biases[network.GetBiasIndex(1, 2)] = 5
 
-	network.batches[0].a[network.GetActivationIndex(0, 0)] = 1
-	network.batches[0].a[network.GetActivationIndex(1, 0)] = 2
+	a := make([]float64, 7)
+	a[network.GetActivationIndex(0, 0)] = 1
+	a[network.GetActivationIndex(1, 0)] = 2
 
-	return network
+	z := make([]float64, 7)
+	mb := Minibatch{w:w, a:a, z:z}
+
+	return network, mb
 }
 
 func TestCalculateZ(t *testing.T) {
-	network := CreateTestNetwork(1)
+	network, mb := CreateTestNetwork()
 
 	tables := []struct {
 		layer int
@@ -198,10 +203,10 @@ func TestCalculateZ(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		v := network.CalculateZ(ts.index, ts.layer, 0)
+		v := network.CalculateZ(ts.index, ts.layer, &mb)
 
 		// for this test, we assume the activation function is the identity
-		*network.GetActivation(ts.index, ts.layer, 0) = v
+		*network.GetActivation(ts.index, ts.layer, &mb) = v
 		if v != ts.value {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -215,7 +220,7 @@ func floatEquals(a, b float64) bool {
 }
 
 func TestFeedforwardActivation(t *testing.T) {
-	network := CreateTestNetwork(1)
+	network, mb := CreateTestNetwork()
 
 	tables := []struct {
 		layer int
@@ -230,8 +235,8 @@ func TestFeedforwardActivation(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		v := network.FeedforwardActivation(ts.index, ts.layer, 0)
-		*network.GetActivation(ts.index, ts.layer, 0) = v
+		v := network.FeedforwardActivation(ts.index, ts.layer, &mb)
+		*network.GetActivation(ts.index, ts.layer, &mb) = v
 		if floatEquals(v, ts.value) == false {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -239,8 +244,8 @@ func TestFeedforwardActivation(t *testing.T) {
 }
 
 func TestFeedforward(t *testing.T) {
-	network := CreateTestNetwork(1)
-	network.Feedforward(0)
+	network, mb := CreateTestNetwork()
+	network.Feedforward(&mb)
 
 	tables := []struct {
 		layer int
@@ -255,7 +260,7 @@ func TestFeedforward(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		v := *network.GetActivation(ts.index, ts.layer, 0)
+		v := *network.GetActivation(ts.index, ts.layer, &mb)
 		if floatEquals(v, ts.value) == false {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -263,24 +268,24 @@ func TestFeedforward(t *testing.T) {
 }
 
 func TestSetInputActivations(t *testing.T) {
-	network := CreateTestNetwork(2)
+	network, mb := CreateTestNetwork()
 
-	network.SetInputActivations([]float64{4.9, 3.2}, 1)
+	network.SetInputActivations([]float64{4.9, 3.2}, &mb)
 
-	if a := *network.GetActivation(0, 0, 1); floatEquals(4.9, a) == false {
+	if a := *network.GetActivation(0, 0, &mb); floatEquals(4.9, a) == false {
 		t.Errorf("Expected 4.9, but is %v", a)
 	}
 
-	if a := *network.GetActivation(1, 0, 1); floatEquals(3.2, a) == false {
+	if a := *network.GetActivation(1, 0, &mb); floatEquals(3.2, a) == false {
 		t.Errorf("Expected 3.2, but is %v", a)
 	}
 }
 
 func TestCalculateErrorInOutputLayer(t *testing.T) {
-	network := CreateTestNetwork(1)
-	network.Feedforward(0)
+	network, mb := CreateTestNetwork()
+	network.Feedforward(&mb)
 
-	errorInOutputLayer := network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, 0)
+	errorInOutputLayer := network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 
 	if l := len(errorInOutputLayer); l != 2 {
 		t.Errorf("Number of error elements %v not equal to 2", l)
@@ -290,25 +295,25 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 		t.Errorf("Expected %v, but is %v", errorInOutputLayer[0], 1E-13)
 	}
 }
-
-func TestBackpropagate(t *testing.T) {
-	network := CreateTestNetwork(1)
-	network.Feedforward(0)
-	nabla_L := network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, 0)
-
-	nablas := network.Backpropagate(nabla_L)
-
-	if l := len(nablas); l != 2 {
-		t.Errorf("Number of error elements %v not equal to 12", l)
-	}
-	if l := len(nablas[0]); l != 3 {
-		t.Errorf("Number of error elements %v not equal to 2", l)
-	}
-	if l := len(nablas[1]); l != 2 {
-		t.Errorf("Number of error elements %v not equal to 3", l)
-	}
-}
-
-func TestUpdateNetwork(t *testing.T) {
-
-}
+//
+//func TestBackpropagate(t *testing.T) {
+//	network, mb := CreateTestNetwork()
+//	network.Feedforward(&mb)
+//	nabla_L := network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
+//
+//	nablas := network.Backpropagate(nabla_L)
+//
+//	if l := len(nablas); l != 2 {
+//		t.Errorf("Number of error elements %v not equal to 12", l)
+//	}
+//	if l := len(nablas[0]); l != 3 {
+//		t.Errorf("Number of error elements %v not equal to 2", l)
+//	}
+//	if l := len(nablas[1]); l != 2 {
+//		t.Errorf("Number of error elements %v not equal to 3", l)
+//	}
+//}
+//
+//func TestUpdateNetwork(t *testing.T) {
+//
+//}
