@@ -63,7 +63,7 @@ func (n *Network) getActivationBaseIndex(layer int) int {
 
 func (n *Network) GetActivationIndex(index int, layer int) int {
 	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Activation layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
 	}
 	if index >= n.layers[layer] {
 		panic(fmt.Sprintf("Activation index i=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
@@ -75,6 +75,26 @@ func (n *Network) GetActivationIndex(index int, layer int) int {
 func (n *Network) GetActivation(index int, layer int, mb *Minibatch) *float64 {
 	aIdx := n.GetActivationIndex(index, layer)
 	return &mb.a[aIdx]
+}
+
+func (n *Network) getNablaBaseIndex(layer int) int {
+	return n.getActivationBaseIndex(layer)
+}
+
+func (n *Network) GetNablaIndex(index int, layer int) int {
+	if l := len(n.layers); layer >= l {
+		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, l))
+	}
+	if l := n.layers[layer]; index >= l {
+		panic(fmt.Sprintf("Nabla index i=%v must be smaller than the number of activations=%v in layer %v", index, l, layer))
+	}
+	bi := n.getNablaBaseIndex(layer)
+	return bi + index
+}
+
+func (n *Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
+	nablaIdx := n.GetNablaIndex(index, layer)
+	return &mb.nabla[nablaIdx]
 }
 
 func (n *Network) getBiasBaseIndex(layer int) int {
@@ -176,20 +196,19 @@ func (n *Network) Feedforward(mb *Minibatch) {
 	}
 }
 
-func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64, mb *Minibatch) []float64 {
+func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := len(n.layers) - 1
 	if len(expectedOutputActivations) != n.layers[outputLayerIdx] {
 		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in ouput layer", len(expectedOutputActivations), n.layers[outputLayerIdx]))
 	}
 	nActivations := n.layers[outputLayerIdx]
-	output := make([]float64, nActivations)
+	output := mb.nabla[n.getActivationBaseIndex(outputLayerIdx):]
 	for i := 0; i < nActivations; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		output[i] = (*a_i - expectedOutputActivations[i]) * SigmoidPrime(z_i)
 	}
-	return output
 }
 
 func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch) {
@@ -201,115 +220,132 @@ func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch)
 		*a_i = a
 	}
 }
-//
-//func (n *Network) Backpropagate(nabla_L []float64) [][]float64 {
-//	// Equation (45), Chapter 2 of http://neuralnetworksanddeeplearning.com
-//	outputLayerIdx := len(n.layers) - 1
-//	if len(nabla_L) != n.layers[outputLayerIdx] {
-//		panic(fmt.Sprintf("Output error size %v does not match number of activations %v in output layer", len(nabla_L), n.layers[outputLayerIdx]))
-//	}
-//	nablas := make([][]float64, len(n.layers)-1)
-//	nablas[outputLayerIdx-1] = nabla_L
-//	for layer := outputLayerIdx - 1; layer > 0; layer-- {
-//		nablas[layer-1] = make([]float64, n.layers[layer])
-//		nActivations := n.layers[layer]
-//		nNextActivations := n.layers[layer+1]
-//		for j := 0; j < nActivations; j++ {
-//			var tmp float64
-//			for k := 0; k < nNextActivations; k++ {
-//				weight_kj := n.GetWeight(k, j, layer+1)
-//				nabla_k := nablas[layer][k]
-//				tmp += weight_kj * nabla_k
-//			}
-//			z_j := n.CalculateZ(j, layer)
-//			s := SigmoidPrime(z_j)
-//			nablas[layer-1][j] = tmp * s
-//		}
-//	}
-//	return nablas
-//}
-//
-//type m struct {
-//	nabla [][]float64
-//}
-//
-//func (n *Network) UpdateNetwork(nablas []m) {
-//	eta := 0.1
-//	miniBatchSize := len(nablas)
-//	for layer := range n.layers {
-//		if layer == 0 {
-//			continue
-//		}
-//
-//		// sum over activations a_j^l
-//		for j := 0; j < n.layers[layer]; j++ {
-//			// bias
-//			dw := make([]float64, n.layers[layer-1])
-//			var db float64
-//			for batchIdx := range nablas {
-//				nabla_j := nablas[batchIdx].nabla[layer-1][j]
-//				for k := 0; k < n.layers[layer-1]; k++ {
-//					a_k := n.GetActivation(k, layer-1)
-//					dw[k] += *a_k * nabla_j
-//				}
-//				db += nabla_j
-//			}
-//
-//			// weight
-//			for k, v := range dw {
-//				w_jk := n.GetWeight(j, k, layer)
-//				dw := eta / float64(miniBatchSize) * v
-//				w_jk -= dw
-//				n.weights[n.GetWeightIndex(j, k, layer)] = w_jk
-//			}
-//
-//			b_j := n.GetBias(j, layer)
-//			n.biases[n.GetBiasIndex(j, layer)] = b_j - eta/float64(miniBatchSize)*db
-//
-//		}
-//	}
-//}
-//
-//func (n *Network) Solve(trainingSamples []TrainingSample) {
-//	// multiple epochs (i.e. outer loop does this multiple times and checks when NN is good enough)
-//
-//	// randomize training samples (i.e. randomize arrays [1..size(training samples)]
-//
-//	// chunk training samples into size m
-//
-//	// for each x in m
-//	// 		- feed forward x
-//	// 		- calculate error for layer L
-//	//		- backprop, gives errors for all layers
-//	// update weights and biases for all x in m
-//
-//	sizeMiniBatch := 20
-//	numMiniBatches := len(trainingSamples) / sizeMiniBatch
-//
-//	ms := make([]m, sizeMiniBatch)
-//
-//	//	ar opts = []struct
-//
-//	for j := 0; j < numMiniBatches; j++ {
-//		for i := 0; i < sizeMiniBatch; i++ {
-//			x := trainingSamples[j*sizeMiniBatch+i]
-//			n.SetInputActivations(x.inputActivations)
-//			n.Feedforward()
-//			nabla_L := n.CalculateErrorInOutputLayer(x.outputActivations)
-//			ms[i].nabla = n.Backpropagate(nabla_L)
-//		}
-//		n.UpdateNetwork(ms)
-//	}
-//
-//	// the rest
-//	//for i := numMiniBatches * sizeMiniBatch; i < len(trainingSamples); i++ {
-//	//	x := trainingSamples[i]
-//	//	n.SetInputLayer(x.inputActivations)
-//	//	n.Feedforward()
-//	//	nabla_L := n.CalculateOutputError()
-//	//	nabla := n.Backpropagate(nabla_L)
-//	//	// store
-//	//}
-//	//n.UpdateNetwork(nabla)
-//
-//}
+
+func (n *Network) Backpropagate(mb *Minibatch) {
+	// Equation (45), Chapter 2 of http://neuralnetworksanddeeplearning.com
+	outputLayerIdx := len(n.layers) - 1
+	for layer := outputLayerIdx - 1; layer > 0; layer-- {
+		nActivations := n.layers[layer]
+		nNextActivations := n.layers[layer+1]
+		abi1 := n.getActivationBaseIndex(layer)
+		nabla := mb.nabla[abi1:abi1+nActivations]
+		abi2 := n.getActivationBaseIndex(layer+1)
+		nablaNext := mb.nabla[abi2:abi2+nNextActivations]
+		for j := 0; j < nActivations; j++ {
+			var tmp float64
+			for k := 0; k < nNextActivations; k++ {
+				weight_kj := n.GetWeight(k, j, layer+1, mb)
+				tmp += weight_kj * nablaNext[k]
+			}
+			z_j := n.CalculateZ(j, layer, mb)
+			s := SigmoidPrime(z_j)
+			nabla[j] = tmp * s
+		}
+	}
+}
+
+func (n *Network) UpdateNetwork(mbs []Minibatch) {
+	eta := 0.1
+	nMiniBatches := len(mbs)
+	for layer := range n.layers {
+		if layer == 0 {
+			continue
+		}
+
+		for j := 0; j < n.layers[layer]; j++ {
+			// w_j^l
+			w_jk := n.GetWeight()
+			dw := make([]float64, n.layers[layer-1])
+			var dw float64
+			for mbIdx := 0; mbIdx < nMiniBatches; mbIdx++ {
+				for aIdx := 0; aIdx < n.layers[layer]; aIdx++ {
+					a := n.GetActivation(aIdx, layer, &mbs[mbIdx])
+					nabla := n.GetNabla(aIdx, layer, &mbs[mbIdx])
+					dw += *a * nabla
+				}
+			}
+			dw := eta / float64(nMiniBatches) * dw
+			w_jk -= dw
+			n.weights[n.GetWeightIndex(j, k, layer)] = w_jk
+
+
+
+
+
+
+
+
+
+
+
+			// bias
+			dw := make([]float64, n.layers[layer-1])
+			var db float64
+			for batchIdx := range nablas {
+				nabla_j := nablas[batchIdx].nabla[layer-1][j]
+				for k := 0; k < n.layers[layer-1]; k++ {
+					a_k := n.GetActivation(k, layer-1)
+					dw[k] += *a_k * nabla_j
+				}
+				db += nabla_j
+			}
+
+			// weight
+			for k, v := range dw {
+				w_jk := n.GetWeight(j, k, layer)
+				dw := eta / float64(miniBatchSize) * v
+				w_jk -= dw
+				n.weights[n.GetWeightIndex(j, k, layer)] = w_jk
+			}
+
+			b_j := n.GetBias(j, layer)
+			n.biases[n.GetBiasIndex(j, layer)] = b_j - eta/float64(miniBatchSize)*db
+
+		}
+	}
+}
+
+func (n *Network) Solve(trainingSamples []TrainingSample) {
+	// multiple epochs (i.e. outer loop does this multiple times and checks when NN is good enough)
+
+	// randomize training samples (i.e. randomize arrays [1..size(training samples)]
+
+	// chunk training samples into size m
+
+	// for each x in m
+	// 		- feed forward x
+	// 		- calculate error for layer L
+	//		- backprop, gives errors for all layers
+	// update weights and biases for all x in m
+
+	sizeMiniBatch := 20
+	nMiniBatches := len(trainingSamples) / sizeMiniBatch
+	mbs := make([]Minibatch, nMiniBatches)
+	for j := 0; j < nMiniBatches; j++ {
+		for i := 0; i < sizeMiniBatch; i++ {
+			mb := mbs[j]
+			x := trainingSamples[j*sizeMiniBatch+i]
+
+			// TODO SS: also set weights from reference!
+
+
+			n.SetInputActivations(x.inputActivations, &mb)
+			n.Feedforward(&mb)
+			n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
+			n.Backpropagate(&mb)
+		}
+		n.UpdateNetwork(mbs)
+	}
+
+	// the rest
+	//for i := numMiniBatches * sizeMiniBatch; i < len(trainingSamples); i++ {
+	//	x := trainingSamples[i]
+	//	n.SetInputLayer(x.inputActivations)
+	//	n.Feedforward()
+	//	nabla_L := n.CalculateOutputError()
+	//	nabla := n.Backpropagate(nabla_L)
+	//	// store
+	//}
+	//n.UpdateNetwork(nabla)
+
+}
