@@ -217,7 +217,7 @@ func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch)
 	}
 }
 
-func (n *Network) Backpropagate(mb *Minibatch) {
+func (n *Network) BackpropagateError(mb *Minibatch) {
 	// Equation (45), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := len(n.layers) - 1
 	for layer := outputLayerIdx - 1; layer > 0; layer-- {
@@ -240,7 +240,7 @@ func (n *Network) Backpropagate(mb *Minibatch) {
 	}
 }
 
-func (n *Network) UpdateNetwork(mbs []Minibatch) ([]float64, []float64) {
+func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 
 	/*
 
@@ -293,6 +293,32 @@ func (n *Network) UpdateNetwork(mbs []Minibatch) ([]float64, []float64) {
 	return dw, db
 }
 
+func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
+	for layer := range n.layers {
+		if layer == 0 {
+			continue
+		}
+		nActivations := n.layers[layer]
+		nPrevActivations := n.layers[layer - 1]
+		for j := 0; j < nActivations; j++ {
+			for k := 0; k < nPrevActivations; k++ {
+				// w_jk^l
+				wIdx := n.GetWeightIndex(j, k, layer)
+				dw_jk := dw[wIdx]
+				w_jk := n.GetWeight(j, k, layer)
+				w_jk -= eta * dw_jk
+				n.weights[wIdx] = w_jk
+			}
+			// d_j^l
+			bIdx := n.GetActivationIndex(j, layer)
+			db_j := db[bIdx]
+			b_j := n.GetBias(j, layer)
+			b_j -= eta * db_j
+			n.biases[bIdx] = b_j
+		}
+	}
+}
+
 func (n *Network) Solve(trainingSamples []TrainingSample) {
 	// multiple epochs (i.e. outer loop does this multiple times and checks when NN is good enough)
 
@@ -306,6 +332,7 @@ func (n *Network) Solve(trainingSamples []TrainingSample) {
 	//		- backprop, gives errors for all layers
 	// update weights and biases for all x in m
 
+	eta := 0.1
 	sizeMiniBatch := 20
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := make([]Minibatch, nMiniBatches)
@@ -313,15 +340,13 @@ func (n *Network) Solve(trainingSamples []TrainingSample) {
 		for i := 0; i < sizeMiniBatch; i++ {
 			mb := mbs[j]
 			x := trainingSamples[j*sizeMiniBatch+i]
-
-			// TODO SS: also set weights from reference!
-
 			n.SetInputActivations(x.inputActivations, &mb)
 			n.Feedforward(&mb)
 			n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
-			n.Backpropagate(&mb)
+			n.BackpropagateError(&mb)
 		}
-		n.UpdateNetwork(mbs)
+		dw, db := n.CalculateDerivatives(mbs)
+		n.UpdateNetwork(eta, dw, db)
 	}
 
 	// the rest

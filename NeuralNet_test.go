@@ -295,7 +295,7 @@ func TestBackpropagate(t *testing.T) {
 	network, mb := CreateTestNetwork()
 	network.Feedforward(&mb)
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
-	network.Backpropagate(&mb)
+	network.BackpropagateError(&mb)
 	//
 	//if l := len(nablas); l != 2 {
 	//	t.Errorf("Number of error elements %v not equal to 12", l)
