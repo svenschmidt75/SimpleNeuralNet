@@ -282,30 +282,39 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 
-	//if l := len(errorInOutputLayer); l != 2 {
-	//	t.Errorf("Number of error elements %v not equal to 2", l)
-	//}
-	//
-	//if floatEquals(errorInOutputLayer[0], 1E-13) == false {
-	//	t.Errorf("Expected %v, but is %v", errorInOutputLayer[0], 1E-13)
-	//}
+	if nabla := network.GetNabla(0, 2, &mb); floatEquals(0, nabla) == false  {
+		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
+	}
+	if nabla := network.GetNabla(1, 2, &mb); floatEquals(0, nabla) == false  {
+		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
+	}
 }
 
-func TestBackpropagate(t *testing.T) {
+func TestBackpropagateError(t *testing.T) {
 	network, mb := CreateTestNetwork()
 	network.Feedforward(&mb)
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 	network.BackpropagateError(&mb)
-	//
-	//if l := len(nablas); l != 2 {
-	//	t.Errorf("Number of error elements %v not equal to 12", l)
-	//}
-	//if l := len(nablas[0]); l != 3 {
-	//	t.Errorf("Number of error elements %v not equal to 2", l)
-	//}
-	//if l := len(nablas[1]); l != 2 {
-	//	t.Errorf("Number of error elements %v not equal to 3", l)
-	//}
+
+	if nabla := network.GetNabla(0, 0, &mb); floatEquals(0, nabla) == false  {
+		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
+	}
+}
+
+func TestCalculateDerivatives(t *testing.T) {
+	network, mb := CreateTestNetwork()
+	network.Feedforward(&mb)
+	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
+	network.BackpropagateError(&mb)
+
+	dw, db := network.CalculateDerivatives([]Minibatch{mb})
+
+	if wIdx := network.GetWeightIndex(0, 0, 1); floatEquals(0, dw[wIdx]) == false  {
+		t.Errorf("dw(%v, %v), layer %v, does not equal to %v, but instead %v", 0, 0, 1, 0, dw[wIdx])
+	}
+	if bIdx := network.GetBiasIndex(0, 1); floatEquals(0, db[bIdx]) == false  {
+		t.Errorf("db(%v), layer %v, does not equal to %v, but instead %v", 0, 0, 0, db[bIdx])
+	}
 }
 
 func TestUpdateNetwork(t *testing.T) {

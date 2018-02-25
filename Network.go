@@ -83,14 +83,7 @@ func (n *Network) getNablaBaseIndex(layer int) int {
 }
 
 func (n *Network) GetNablaIndex(index int, layer int) int {
-	if l := len(n.layers); layer >= l {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, l))
-	}
-	if l := n.layers[layer]; index >= l {
-		panic(fmt.Sprintf("Nabla index i=%v must be smaller than the number of activations=%v in layer %v", index, l, layer))
-	}
-	bi := n.getNablaBaseIndex(layer)
-	return bi + index
+	return n.GetActivationIndex(index, layer)
 }
 
 func (n *Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
@@ -241,13 +234,27 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 }
 
 func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
-
-	/*
-
-	add formulas
-
-
-	*/
+	/* We use Stochastic Gradient Descent to update the weights and biases.
+	 * The idea is that we sample m trainings samples from the entire set
+	 * and feed forward, then backpropagate. We then update the weights and
+	 * biases based on those m samples instead of updating after all training
+	 * samples. The assumption is that those m samples are representative of
+	 * all the training samples, which then saves time.
+	 *
+	 * So, we have
+	 *
+	 * w_{jk}^{l} -> w_{jk}^{l} - \eta \frac{\partial C}{\partial w_{jk}^{l}}
+	 * and
+	 * b_{j}^{l} -> b_{j}^{l} - \eta \frac{\partial C}{\partial b_{j}^{l}}
+	 *
+	 * Since we use Stochastic Gradient Decent, we approximate
+	 * w_{jk}^{l} -> w_{jk}^{l} - \eta \frac{\partial C_{x}}{\partial w_{jk}^{l}}
+	 * and
+	 * b_{j}^{l} -> b_{j}^{l} - \eta \frac{\partial C_{x}}{\partial b_{j}^{l}}
+	 * where
+	 * \frac{\partial C}{\partial w_{jk}^{l}} \approx \frac{1}{m} \sum_{x} \frac{\partial C_{x}}{\partial b_{j}^{l}}
+	 * and \frac{\partial C_{x}}{\partial b_{j}^{l}} = a_{k}^{l-1, x} \delta_{j}^{l, x}
+	 */
 
 	// d C_x / d_wjk^l
 	dw := make([]float64, nWeights(n.layers))
@@ -319,26 +326,21 @@ func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
 	}
 }
 
-func (n *Network) Solve(trainingSamples []TrainingSample) {
+func (n *Network) Solve(trainingSamples []TrainingSample, eta float64) {
 	// multiple epochs (i.e. outer loop does this multiple times and checks when NN is good enough)
-
 	// randomize training samples (i.e. randomize arrays [1..size(training samples)]
 
-	// chunk training samples into size m
-
-	// for each x in m
-	// 		- feed forward x
-	// 		- calculate error for layer L
-	//		- backprop, gives errors for all layers
-	// update weights and biases for all x in m
-
-	eta := 0.1
 	sizeMiniBatch := 20
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := make([]Minibatch, nMiniBatches)
+
+
+	// outer loop: until error small enough, or fixed number of epochs
+
+
 	for j := 0; j < nMiniBatches; j++ {
 		for i := 0; i < sizeMiniBatch; i++ {
-			mb := mbs[j]
+			mb := mbs[i]
 			x := trainingSamples[j*sizeMiniBatch+i]
 			n.SetInputActivations(x.inputActivations, &mb)
 			n.Feedforward(&mb)
@@ -348,16 +350,16 @@ func (n *Network) Solve(trainingSamples []TrainingSample) {
 		dw, db := n.CalculateDerivatives(mbs)
 		n.UpdateNetwork(eta, dw, db)
 	}
-
 	// the rest
-	//for i := numMiniBatches * sizeMiniBatch; i < len(trainingSamples); i++ {
-	//	x := trainingSamples[i]
-	//	n.SetInputLayer(x.inputActivations)
-	//	n.Feedforward()
-	//	nabla_L := n.CalculateOutputError()
-	//	nabla := n.Backpropagate(nabla_L)
-	//	// store
-	//}
-	//n.UpdateNetwork(nabla)
-
+	nRest := len(trainingSamples) - sizeMiniBatch * nMiniBatches
+	for i := 0; i < nRest; i++ {
+		mb := mbs[i]
+		x := trainingSamples[nMiniBatches*sizeMiniBatch+i]
+		n.SetInputActivations(x.inputActivations, &mb)
+		n.Feedforward(&mb)
+		n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
+		n.BackpropagateError(&mb)
+	}
+	dw, db := n.CalculateDerivatives(mbs)
+	n.UpdateNetwork(eta, dw, db)
 }
