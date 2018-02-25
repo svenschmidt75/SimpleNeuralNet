@@ -4,19 +4,20 @@ import (
 	"fmt"
 	"math"
 )
+
 // weights: The weights w_ij^{l} are ordered by layer l, and for each layer,
 // by i, then j.
 // Example: w_00^{1}, w_01^{1}, ..., w_0m^{1}, w_10^{1}, ..., w_1m^{1}, ..., w_n0^{1}, ..., w_nm^{1},
 //          w_00^{2}, w_01^{2}, ..., w_0m^{2}, w_10^{2}, ..., w_1m^{2}, ..., w_n0^{2}, ..., w_nm^{2},
 type Network struct {
 	// how many activations per layer
-	layers  []int
+	layers []int
 
 	// biases, ordered by layer, then index of activation
-	biases  []float64
+	biases []float64
 
-	// the unmodified weights that the minibatches are initialized with
-	w []float64
+	// weights
+	weights []float64
 }
 
 func sum(xs []int) int {
@@ -44,7 +45,7 @@ func nActivations(xs []int) int {
 
 func CreateNetwork(layers []int) Network {
 	nBiases := sum(layers[1:])
-	return Network{layers: layers, biases: make([]float64, nBiases), w: make([]float64, nWeights(layers))}
+	return Network{layers: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
 }
 
 func Sigmoid(z float64) float64 {
@@ -94,7 +95,7 @@ func (n *Network) GetNablaIndex(index int, layer int) int {
 
 func (n *Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
 	nablaIdx := n.GetNablaIndex(index, layer)
-	return &mb.nabla[nablaIdx]
+	return mb.nabla[nablaIdx]
 }
 
 func (n *Network) getBiasBaseIndex(layer int) int {
@@ -144,13 +145,8 @@ func (n *Network) GetWeightIndex(i int, j int, layer int) int {
 	return bi + j
 }
 
-func (n *Network) GetRefWeight(i int, j int, layer int) float64 {
-	return n.w[n.GetWeightIndex(i, j, layer)]
-}
-
-func (n *Network) GetWeight(i int, j int, layer int, mb *Minibatch) float64 {
-	wIdx := n.GetWeightIndex(i, j, layer)
-	return mb.w[wIdx]
+func (n *Network) GetWeight(i int, j int, layer int) float64 {
+	return n.weights[n.GetWeightIndex(i, j, layer)]
 }
 
 func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
@@ -158,7 +154,7 @@ func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 	nPrevLayer := n.layers[layer-1]
 	for j := 0; j < nPrevLayer; j++ {
 		a_j := n.GetActivation(j, layer-1, mb)
-		w_ij := n.GetWeight(i, j, layer, mb)
+		w_ij := n.GetWeight(i, j, layer)
 		z += w_ij * *a_j
 	}
 	b := n.GetBias(i, layer)
@@ -228,13 +224,13 @@ func (n *Network) Backpropagate(mb *Minibatch) {
 		nActivations := n.layers[layer]
 		nNextActivations := n.layers[layer+1]
 		abi1 := n.getActivationBaseIndex(layer)
-		nabla := mb.nabla[abi1:abi1+nActivations]
-		abi2 := n.getActivationBaseIndex(layer+1)
-		nablaNext := mb.nabla[abi2:abi2+nNextActivations]
+		nabla := mb.nabla[abi1 : abi1+nActivations]
+		abi2 := n.getActivationBaseIndex(layer + 1)
+		nablaNext := mb.nabla[abi2 : abi2+nNextActivations]
 		for j := 0; j < nActivations; j++ {
 			var tmp float64
 			for k := 0; k < nNextActivations; k++ {
-				weight_kj := n.GetWeight(k, j, layer+1, mb)
+				weight_kj := n.GetWeight(k, j, layer+1)
 				tmp += weight_kj * nablaNext[k]
 			}
 			z_j := n.CalculateZ(j, layer, mb)
@@ -244,65 +240,57 @@ func (n *Network) Backpropagate(mb *Minibatch) {
 	}
 }
 
-func (n *Network) UpdateNetwork(mbs []Minibatch) {
-	eta := 0.1
+func (n *Network) UpdateNetwork(mbs []Minibatch) ([]float64, []float64) {
+
+	/*
+
+	add formulas
+
+
+	*/
+
+	// d C_x / d_wjk^l
+	dw := make([]float64, nWeights(n.layers))
+
+	// d C_x / d_bj^l
+	db := make([]float64, nActivations(n.layers))
+
 	nMiniBatches := len(mbs)
 	for layer := range n.layers {
 		if layer == 0 {
 			continue
 		}
 
-		for j := 0; j < n.layers[layer]; j++ {
-			// w_j^l
-			w_jk := n.GetWeight()
-			dw := make([]float64, n.layers[layer-1])
-			var dw float64
-			for mbIdx := 0; mbIdx < nMiniBatches; mbIdx++ {
-				for aIdx := 0; aIdx < n.layers[layer]; aIdx++ {
-					a := n.GetActivation(aIdx, layer, &mbs[mbIdx])
-					nabla := n.GetNabla(aIdx, layer, &mbs[mbIdx])
-					dw += *a * nabla
+		nActivations := n.layers[layer]
+		nPrevActivations := n.layers[layer - 1]
+
+		for j := 0; j < nActivations; j++ {
+			for k := 0; k < nPrevActivations; k++ {
+				// w_jk^l
+				var dw_jk float64
+				for mbIdx := range mbs {
+					mb := mbs[mbIdx]
+					a := n.GetActivation(k, layer - 1, &mb)
+					nabla := n.GetNabla(j, layer, &mb)
+					dw_jk += *a * nabla
 				}
+				dw_jk /= 1 / float64(nMiniBatches)
+				wIdx := n.GetWeightIndex(j, k, layer)
+				dw[wIdx] = dw_jk
 			}
-			dw := eta / float64(nMiniBatches) * dw
-			w_jk -= dw
-			n.weights[n.GetWeightIndex(j, k, layer)] = w_jk
-
-
-
-
-
-
-
-
-
-
-
-			// bias
-			dw := make([]float64, n.layers[layer-1])
-			var db float64
-			for batchIdx := range nablas {
-				nabla_j := nablas[batchIdx].nabla[layer-1][j]
-				for k := 0; k < n.layers[layer-1]; k++ {
-					a_k := n.GetActivation(k, layer-1)
-					dw[k] += *a_k * nabla_j
-				}
-				db += nabla_j
+			// d_j^l
+			var db_j float64
+			for mbIdx := range mbs {
+				mb := mbs[mbIdx]
+				nabla := n.GetNabla(j, layer, &mb)
+				db_j += nabla
 			}
-
-			// weight
-			for k, v := range dw {
-				w_jk := n.GetWeight(j, k, layer)
-				dw := eta / float64(miniBatchSize) * v
-				w_jk -= dw
-				n.weights[n.GetWeightIndex(j, k, layer)] = w_jk
-			}
-
-			b_j := n.GetBias(j, layer)
-			n.biases[n.GetBiasIndex(j, layer)] = b_j - eta/float64(miniBatchSize)*db
-
+			db_j /= 1 / float64(nMiniBatches)
+			bIdx := n.GetActivationIndex(j, layer)
+			db[bIdx] = db_j
 		}
 	}
+	return dw, db
 }
 
 func (n *Network) Solve(trainingSamples []TrainingSample) {
@@ -327,7 +315,6 @@ func (n *Network) Solve(trainingSamples []TrainingSample) {
 			x := trainingSamples[j*sizeMiniBatch+i]
 
 			// TODO SS: also set weights from reference!
-
 
 			n.SetInputActivations(x.inputActivations, &mb)
 			n.Feedforward(&mb)
