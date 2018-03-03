@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/rand"
+	"time"
 )
 
 // weights: The weights w_ij^{l} are ordered by layer l, and for each layer,
@@ -39,10 +41,6 @@ func nWeights(xs []int) int {
 	return n
 }
 
-func nActivations(xs []int) int {
-	return sum(xs)
-}
-
 func CreateNetwork(layers []int) Network {
 	nBiases := sum(layers[1:])
 	return Network{layers: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
@@ -55,6 +53,14 @@ func Sigmoid(z float64) float64 {
 func SigmoidPrime(z float64) float64 {
 	// derivative of the sigmoid function
 	return Sigmoid(z) * (1 - Sigmoid(z))
+}
+
+func (n *Network) nWeights() int {
+	return nWeights(n.layers)
+}
+
+func (n *Network) nActivations() int {
+	return sum(n.layers)
 }
 
 func (n *Network) getActivationBaseIndex(layer int) int {
@@ -257,10 +263,10 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 	 */
 
 	// d C_x / d_wjk^l
-	dw := make([]float64, nWeights(n.layers))
+	dw := make([]float64, n.nWeights())
 
 	// d C_x / d_bj^l
-	db := make([]float64, nActivations(n.layers))
+	db := make([]float64, n.nActivations())
 
 	nMiniBatches := len(mbs)
 	for layer := range n.layers {
@@ -269,7 +275,7 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 		}
 
 		nActivations := n.layers[layer]
-		nPrevActivations := n.layers[layer - 1]
+		nPrevActivations := n.layers[layer-1]
 
 		for j := 0; j < nActivations; j++ {
 			for k := 0; k < nPrevActivations; k++ {
@@ -277,7 +283,7 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 				var dw_jk float64
 				for mbIdx := range mbs {
 					mb := mbs[mbIdx]
-					a := n.GetActivation(k, layer - 1, &mb)
+					a := n.GetActivation(k, layer-1, &mb)
 					nabla := n.GetNabla(j, layer, &mb)
 					dw_jk += *a * nabla
 				}
@@ -306,7 +312,7 @@ func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
 			continue
 		}
 		nActivations := n.layers[layer]
-		nPrevActivations := n.layers[layer - 1]
+		nPrevActivations := n.layers[layer-1]
 		for j := 0; j < nActivations; j++ {
 			for k := 0; k < nPrevActivations; k++ {
 				// w_jk^l
@@ -317,7 +323,7 @@ func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
 				n.weights[wIdx] = w_jk
 			}
 			// d_j^l
-			bIdx := n.GetActivationIndex(j, layer)
+			bIdx := n.GetBiasIndex(j, layer)
 			db_j := db[bIdx]
 			b_j := n.GetBias(j, layer)
 			b_j -= eta * db_j
@@ -326,40 +332,62 @@ func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
 	}
 }
 
-func (n *Network) Solve(trainingSamples []TrainingSample, eta float64) {
-	// multiple epochs (i.e. outer loop does this multiple times and checks when NN is good enough)
-	// randomize training samples (i.e. randomize arrays [1..size(training samples)]
+func generateRandomIndices(size int) []int {
+	rand.Seed(time.Now().UTC().UnixNano())
+	// generate random permutation
+	perm := rand.Perm(size)
+	return perm
+}
 
-	sizeMiniBatch := 20
+func max(lhs int, rhs int) int {
+	if lhs < rhs {
+		return rhs
+	}
+	return lhs
+}
+
+func min(lhs int, rhs int) int {
+	if lhs < rhs {
+		return lhs
+	}
+	return rhs
+}
+
+func (n *Network) Solve(trainingSamples []TrainingSample, epochs int, eta float64) {
+	// Stochastic Gradient Decent
+	sizeMiniBatch := min(len(trainingSamples), 20)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
-	mbs := make([]Minibatch, nMiniBatches)
+	mbs := CreateMiniBatches(sizeMiniBatch, n.nActivations(), n.nWeights())
 
-
-	// outer loop: until error small enough, or fixed number of epochs
-
-
-	for j := 0; j < nMiniBatches; j++ {
-		for i := 0; i < sizeMiniBatch; i++ {
-			mb := mbs[i]
-			x := trainingSamples[j*sizeMiniBatch+i]
-			n.SetInputActivations(x.inputActivations, &mb)
-			n.Feedforward(&mb)
-			n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
-			n.BackpropagateError(&mb)
+	for epoch := 0; epoch < epochs; epoch++ {
+		indices := generateRandomIndices(len(trainingSamples))
+		for j := 0; j < nMiniBatches; j++ {
+			for i := 0; i < sizeMiniBatch; i++ {
+				mb := mbs[i]
+				index := indices[j*sizeMiniBatch+i]
+				x := trainingSamples[index]
+				n.SetInputActivations(x.inputActivations, &mb)
+				n.Feedforward(&mb)
+				n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
+				n.BackpropagateError(&mb)
+			}
+			dw, db := n.CalculateDerivatives(mbs)
+			n.UpdateNetwork(eta, dw, db)
 		}
-		dw, db := n.CalculateDerivatives(mbs)
-		n.UpdateNetwork(eta, dw, db)
+		// the rest
+		nRest := len(trainingSamples) - sizeMiniBatch*nMiniBatches
+		if nRest > 0 {
+			for i := 0; i < nRest; i++ {
+				mb := mbs[i]
+				index := indices[nMiniBatches*sizeMiniBatch+i]
+				x := trainingSamples[index]
+				n.SetInputActivations(x.inputActivations, &mb)
+				n.Feedforward(&mb)
+				n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
+				n.BackpropagateError(&mb)
+			}
+			dw, db := n.CalculateDerivatives(mbs)
+			n.UpdateNetwork(eta, dw, db)
+		}
 	}
-	// the rest
-	nRest := len(trainingSamples) - sizeMiniBatch * nMiniBatches
-	for i := 0; i < nRest; i++ {
-		mb := mbs[i]
-		x := trainingSamples[nMiniBatches*sizeMiniBatch+i]
-		n.SetInputActivations(x.inputActivations, &mb)
-		n.Feedforward(&mb)
-		n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
-		n.BackpropagateError(&mb)
-	}
-	dw, db := n.CalculateDerivatives(mbs)
-	n.UpdateNetwork(eta, dw, db)
 }

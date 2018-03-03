@@ -2,8 +2,8 @@ package main
 
 import (
 	//"math"
-	"testing"
 	"math"
+	"testing"
 )
 
 func TestSigmoid(t *testing.T) {
@@ -282,10 +282,10 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 
-	if nabla := network.GetNabla(0, 2, &mb); floatEquals(0, nabla) == false  {
+	if nabla := network.GetNabla(0, 2, &mb); floatEquals(0, nabla) == false {
 		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
 	}
-	if nabla := network.GetNabla(1, 2, &mb); floatEquals(0, nabla) == false  {
+	if nabla := network.GetNabla(1, 2, &mb); floatEquals(0, nabla) == false {
 		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
 	}
 }
@@ -296,7 +296,7 @@ func TestBackpropagateError(t *testing.T) {
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 	network.BackpropagateError(&mb)
 
-	if nabla := network.GetNabla(0, 0, &mb); floatEquals(0, nabla) == false  {
+	if nabla := network.GetNabla(0, 0, &mb); floatEquals(0, nabla) == false {
 		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
 	}
 }
@@ -309,14 +309,23 @@ func TestCalculateDerivatives(t *testing.T) {
 
 	dw, db := network.CalculateDerivatives([]Minibatch{mb})
 
-	if wIdx := network.GetWeightIndex(0, 0, 1); floatEquals(0, dw[wIdx]) == false  {
+	if wIdx := network.GetWeightIndex(0, 0, 1); floatEquals(0, dw[wIdx]) == false {
 		t.Errorf("dw(%v, %v), layer %v, does not equal to %v, but instead %v", 0, 0, 1, 0, dw[wIdx])
 	}
-	if bIdx := network.GetBiasIndex(0, 1); floatEquals(0, db[bIdx]) == false  {
+	if bIdx := network.GetBiasIndex(0, 1); floatEquals(0, db[bIdx]) == false {
 		t.Errorf("db(%v), layer %v, does not equal to %v, but instead %v", 0, 0, 0, db[bIdx])
 	}
 }
 
 func TestUpdateNetwork(t *testing.T) {
 
+}
+
+func TestSolve(t *testing.T) {
+	network, _ := CreateTestNetwork()
+
+	ts := []TrainingSample{CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), CreateTrainingSample([]float64{0.14, 0.03}, []float64{1, 1})}
+	network.Solve(ts, 2, 0.001)
+
+	// Assert
 }

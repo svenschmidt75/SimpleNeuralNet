@@ -7,3 +7,8 @@ type TrainingSample struct {
 	// Expected output
 	outputActivations []float64
 }
+
+func CreateTrainingSample(inputActivations []float64, outputActivations []float64) TrainingSample {
+	ts := TrainingSample{inputActivations, outputActivations}
+	return ts
+}

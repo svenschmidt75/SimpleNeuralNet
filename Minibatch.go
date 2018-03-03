@@ -16,3 +16,11 @@ func CreateMiniBatch(nActivations int, nWeights int) Minibatch {
 	nabla := make([]float64, nActivations)
 	return Minibatch{z, a, nabla}
 }
+
+func CreateMiniBatches(size int, nActivations int, nWeights int) []Minibatch {
+	mbs := make([]Minibatch, size)
+	for idx, _ := range mbs {
+		mbs[idx] = CreateMiniBatch(nActivations, nWeights)
+	}
+	return mbs
+}
