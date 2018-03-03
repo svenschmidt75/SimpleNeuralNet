@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+
+/* TODO:
+ * - function that returns output layer index
+ */
+
+
 // weights: The weights w_ij^{l} are ordered by layer l, and for each layer,
 // by i, then j.
 // Example: w_00^{1}, w_01^{1}, ..., w_0m^{1}, w_10^{1}, ..., w_1m^{1}, ..., w_n0^{1}, ..., w_nm^{1},
@@ -52,7 +58,8 @@ func Sigmoid(z float64) float64 {
 
 func SigmoidPrime(z float64) float64 {
 	// derivative of the sigmoid function
-	return Sigmoid(z) * (1 - Sigmoid(z))
+	s := Sigmoid(z)
+	return s * (1.0 - s)
 }
 
 func (n *Network) nWeights() int {
@@ -201,8 +208,10 @@ func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float6
 	output := mb.nabla[n.getActivationBaseIndex(outputLayerIdx):]
 	for i := 0; i < nActivations; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
+		da := *a_i - expectedOutputActivations[i]
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
-		output[i] = (*a_i - expectedOutputActivations[i]) * SigmoidPrime(z_i)
+		ds := SigmoidPrime(z_i)
+		output[i] = da * ds
 	}
 }
 
@@ -273,10 +282,8 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 		if layer == 0 {
 			continue
 		}
-
 		nActivations := n.layers[layer]
 		nPrevActivations := n.layers[layer-1]
-
 		for j := 0; j < nActivations; j++ {
 			for k := 0; k < nPrevActivations; k++ {
 				// w_jk^l
@@ -285,21 +292,22 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 					mb := mbs[mbIdx]
 					a := n.GetActivation(k, layer-1, &mb)
 					nabla := n.GetNabla(j, layer, &mb)
-					dw_jk += *a * nabla
+					dCx_dw := *a * nabla
+					dw_jk += dCx_dw
 				}
-				dw_jk /= 1 / float64(nMiniBatches)
+				dw_jk /= float64(nMiniBatches)
 				wIdx := n.GetWeightIndex(j, k, layer)
 				dw[wIdx] = dw_jk
 			}
-			// d_j^l
+			// b_j^l
 			var db_j float64
 			for mbIdx := range mbs {
 				mb := mbs[mbIdx]
 				nabla := n.GetNabla(j, layer, &mb)
 				db_j += nabla
 			}
-			db_j /= 1 / float64(nMiniBatches)
-			bIdx := n.GetActivationIndex(j, layer)
+			db_j /= float64(nMiniBatches)
+			bIdx := n.GetBiasIndex(j, layer)
 			db[bIdx] = db_j
 		}
 	}
@@ -353,7 +361,7 @@ func min(lhs int, rhs int) int {
 	return rhs
 }
 
-func (n *Network) Solve(trainingSamples []TrainingSample, epochs int, eta float64) {
+func (n *Network) Train(trainingSamples []TrainingSample, epochs int, eta float64) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), 20)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch

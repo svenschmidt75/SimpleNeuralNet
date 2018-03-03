@@ -182,6 +182,30 @@ func CreateTestNetwork() (Network, Minibatch) {
 	return network, mb
 }
 
+func CreateTestNetwork2() Network {
+	network := CreateNetwork([]int{2, 3, 2})
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.03645
+	network.weights[network.GetWeightIndex(0, 1, 1)] = 0.3645
+	network.weights[network.GetWeightIndex(1, 0, 1)] = 0.14352
+	network.weights[network.GetWeightIndex(1, 1, 1)] = 0.03645
+	network.weights[network.GetWeightIndex(2, 0, 1)] = 0.028346
+	network.weights[network.GetWeightIndex(2, 1, 1)] = 0.5363
+	network.weights[network.GetWeightIndex(0, 0, 2)] = 0.2534
+	network.weights[network.GetWeightIndex(0, 1, 2)] = 0.4132
+	network.weights[network.GetWeightIndex(0, 2, 2)] = 0.823746
+	network.weights[network.GetWeightIndex(1, 0, 2)] = 0.0374
+	network.weights[network.GetWeightIndex(1, 1, 2)] = 0.6153
+	network.weights[network.GetWeightIndex(1, 2, 2)] = 0.243
+
+	network.biases[network.GetBiasIndex(0, 1)] = 0.23
+	network.biases[network.GetBiasIndex(1, 1)] = 0.2635
+	network.biases[network.GetBiasIndex(2, 1)] = 0.03756
+	network.biases[network.GetBiasIndex(0, 2)] = 0.3746
+	network.biases[network.GetBiasIndex(1, 2)] = 0.063
+
+	return network
+}
+
 func TestCalculateZ(t *testing.T) {
 	network, mb := CreateTestNetwork()
 
@@ -277,27 +301,53 @@ func TestSetInputActivations(t *testing.T) {
 }
 
 func TestCalculateErrorInOutputLayer(t *testing.T) {
-	network, mb := CreateTestNetwork()
-	network.Feedforward(&mb)
+	network := CreateTestNetwork2()
+	mb := CreateMiniBatch(7, 12)
+	*network.GetActivation(0, 1, &mb) = 1
+	*network.GetActivation(1, 1, &mb) = 2
+	*network.GetActivation(2, 1, &mb) = 3
+	outputLayerIdx := 2
 
-	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
-
-	if nabla := network.GetNabla(0, 2, &mb); floatEquals(0, nabla) == false {
-		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
+	tables := []struct {
+		outputActivations []float64
+		expectedOutputActivations []float64
+		error []float64
+	}{
+		{[]float64{1, 1}, []float64{1, 1}, []float64{0, 0}},
+		{[]float64{0, 0}, []float64{1, 1}, []float64{-0.01897348347524417, -0.10026647037539357}},
+		{[]float64{0.24, 0.21}, []float64{1, 1}, []float64{-0.014419847441185569, -0.07921051159656092}},
 	}
-	if nabla := network.GetNabla(1, 2, &mb); floatEquals(0, nabla) == false {
-		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
+
+	for _, ts := range tables {
+		*network.GetActivation(0, outputLayerIdx, &mb) = ts.outputActivations[0]
+		*network.GetActivation(1, outputLayerIdx, &mb) = ts.outputActivations[1]
+		network.CalculateErrorInOutputLayer(ts.expectedOutputActivations, &mb)
+		if nabla := network.GetNabla(0, 2, &mb); floatEquals(ts.error[0], nabla) == false {
+			t.Errorf("Expected %v, but was %v", ts.error[0], nabla)
+		}
+		if nabla := network.GetNabla(1, 2, &mb); floatEquals(ts.error[1], nabla) == false {
+			t.Errorf("Expected %v, but was %v", ts.error[1], nabla)
+		}
 	}
 }
 
 func TestBackpropagateError(t *testing.T) {
-	network, mb := CreateTestNetwork()
+	network := CreateTestNetwork2()
+	mb := CreateMiniBatch(7, 12)
+	*network.GetActivation(0, 0, &mb) = 0.32
+	*network.GetActivation(1, 0, &mb) = 0.56
 	network.Feedforward(&mb)
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 	network.BackpropagateError(&mb)
 
-	if nabla := network.GetNabla(0, 0, &mb); floatEquals(0, nabla) == false {
-		t.Errorf("Error nabla with index %v in layer %v does not equal to %v, but instead %v", 0, 2, 0, nabla)
+	if nabla := network.GetNabla(0, 1, &mb); floatEquals(0.007357185735347161, nabla) == false {
+		t.Errorf("Expected %v, but was %v", 0.007357185735347161, nabla)
+	}
+	if nabla := network.GetNabla(1, 1, &mb); floatEquals(0.016680036100361194, nabla) == false {
+		t.Errorf("Expected %v, but was %v", 0.016680036100361194, nabla)
+	}
+	if nabla := network.GetNabla(2, 1, &mb); floatEquals(0.025347427582781648, nabla) == false {
+		t.Errorf("Expected %v, but was %v", 0.025347427582781648, nabla)
 	}
 }
 
@@ -321,11 +371,11 @@ func TestUpdateNetwork(t *testing.T) {
 
 }
 
-func TestSolve(t *testing.T) {
+func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
 	ts := []TrainingSample{CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), CreateTrainingSample([]float64{0.14, 0.03}, []float64{1, 1})}
-	network.Solve(ts, 2, 0.001)
+	network.Train(ts, 2, 0.001)
 
 	// Assert
 	mb := CreateMiniBatch(12, 7)
