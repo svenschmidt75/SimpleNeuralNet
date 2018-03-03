@@ -330,7 +330,7 @@ func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
 				w_jk -= eta * dw_jk
 				n.weights[wIdx] = w_jk
 			}
-			// d_j^l
+			// b_j^l
 			bIdx := n.GetBiasIndex(j, layer)
 			db_j := db[bIdx]
 			b_j := n.GetBias(j, layer)

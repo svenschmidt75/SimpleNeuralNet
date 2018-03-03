@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="update network functionality">
-      <change beforePath="" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport_test.go" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
       <change beforePath="$PROJECT_DIR$/Network.go" afterPath="$PROJECT_DIR$/Network.go" />
       <change beforePath="$PROJECT_DIR$/NeuralNet_test.go" afterPath="$PROJECT_DIR$/NeuralNet_test.go" />
     </list>
@@ -19,18 +20,20 @@
       <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="384" column="0" lean-forward="false" selection-start-line="384" selection-start-column="0" selection-end-line="384" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="493">
+              <caret line="29" column="20" lean-forward="false" selection-start-line="29" selection-start-column="14" selection-end-line="29" selection-end-column="20" />
+              <folding>
+                <element signature="e#14#43#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Network.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-765">
-              <caret line="312" column="0" lean-forward="false" selection-start-line="312" selection-start-column="0" selection-end-line="312" selection-end-column="0" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
                 <element signature="e#14#60#0" expanded="true" />
               </folding>
@@ -38,11 +41,35 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+            <state relative-caret-position="246">
+              <caret line="36" column="34" lean-forward="true" selection-start-line="36" selection-start-column="34" selection-end-line="36" selection-end-column="34" />
+              <folding>
+                <element signature="e#21#123#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MNISTImport_test.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport_test.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding>
+                <element signature="e#21#37#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TrainingSample.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TrainingSample.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="4" lean-forward="true" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -81,9 +108,10 @@
         <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/TrainingSample.go" />
         <option value="$PROJECT_DIR$/Minibatch.go" />
-        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
-        <option value="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
         <option value="$PROJECT_DIR$/Network.go" />
+        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
+        <option value="$PROJECT_DIR$/MNISTImport/MNISTImport_test.go" />
+        <option value="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
       </list>
     </option>
   </component>
@@ -124,6 +152,11 @@
               <item name="SimpleNeuralNet" type="b2602c69:ProjectViewProjectNode" />
               <item name="SimpleNeuralNet" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="SimpleNeuralNet" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SimpleNeuralNet" type="462c0819:PsiDirectoryNode" />
+              <item name="MNISTImport" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -149,7 +182,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Test.TestTrain in NeuralNet_test.go">
+  <component name="RunManager" selected="Go Test.TestNumberOfWeights in MNISTImport_test.go">
     <configuration name="NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
       <working_directory value="$PROJECT_DIR$" />
@@ -176,14 +209,14 @@
       <package value="SimpleNeuralNet" />
       <pattern value="^TestCalculateErrorInOutputLayer$" />
     </configuration>
-    <configuration name="TestSolve in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
+    <configuration name="TestNumberOfWeights in MNISTImport_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
-      <working_directory value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$/MNISTImport" />
       <go_parameters value="-i" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="SimpleNeuralNet" />
-      <pattern value="^TestSolve$" />
+      <package value="SimpleNeuralNet/MNISTImport" />
+      <pattern value="^TestNumberOfWeights$" />
     </configuration>
     <configuration name="TestTrain in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
@@ -196,18 +229,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
-      <item index="1" class="java.lang.String" itemvalue="Go Test.TestSolve in NeuralNet_test.go" />
-      <item index="2" class="java.lang.String" itemvalue="Go Test.TestTrain in NeuralNet_test.go" />
-      <item index="3" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
-      <item index="4" class="java.lang.String" itemvalue="Go Test.TestBackpropagateError in NeuralNet_test.go" />
+      <item index="1" class="java.lang.String" itemvalue="Go Test.TestTrain in NeuralNet_test.go" />
+      <item index="2" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
+      <item index="3" class="java.lang.String" itemvalue="Go Test.TestBackpropagateError in NeuralNet_test.go" />
+      <item index="4" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeights in MNISTImport_test.go" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Go Test.TestTrain in NeuralNet_test.go" />
-        <item index="1" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
-        <item index="2" class="java.lang.String" itemvalue="Go Test.TestBackpropagateError in NeuralNet_test.go" />
-        <item index="3" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
-        <item index="4" class="java.lang.String" itemvalue="Go Test.TestSolve in NeuralNet_test.go" />
+        <item index="0" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeights in MNISTImport_test.go" />
+        <item index="1" class="java.lang.String" itemvalue="Go Test.TestTrain in NeuralNet_test.go" />
+        <item index="2" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
+        <item index="3" class="java.lang.String" itemvalue="Go Test.TestBackpropagateError in NeuralNet_test.go" />
+        <item index="4" class="java.lang.String" itemvalue="Go Test.TestCalculateErrorInOutputLayer in NeuralNet_test.go" />
       </list>
     </recent_temporary>
   </component>
@@ -215,29 +248,29 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="TestHistory">
-    <history-entry file="NeuralNet_test_go - 2018.03.03 at 11h 00m 58s.xml">
-      <configuration name="NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 22m 52s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 08h 44m 28s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 29m 34s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 08h 55m 15s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 30m 09s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 08h 58m 22s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 32m 56s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 08h 59m 15s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 49m 55s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 08h 59m 33s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 51m 00s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 08h 59m 55s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 51m 52s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestBackpropagateError_in_NeuralNet_test_go - 2018.03.03 at 09h 00m 24s.xml">
-      <configuration name="TestBackpropagateError in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    <history-entry file="TestNumberOfWeights_in_MNISTImport_test_go - 2018.03.03 at 11h 54m 38s.xml">
+      <configuration name="TestNumberOfWeights in MNISTImport_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
     <history-entry file="TestTrain_in_NeuralNet_test_go - 2018.03.03 at 11h 08m 52s.xml">
       <configuration name="TestTrain in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
@@ -256,11 +289,11 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960477" sideWeight="0.4985972" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32885906" sideWeight="0.4937876" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32885906" sideWeight="0.4937876" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.398956" sideWeight="0.49539077" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.398956" sideWeight="0.49539077" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32960477" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -322,27 +355,19 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="39" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/MNISTImport/MNISTImport_test.go</url>
+          <line>5</line>
+          <properties />
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="47" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5168">
-          <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Minibatch.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="1" lean-forward="true" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Network.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5083">
@@ -365,7 +390,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5168">
           <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -399,7 +426,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5253">
           <caret line="312" column="1" lean-forward="true" selection-start-line="312" selection-start-column="1" selection-end-line="312" selection-end-column="1" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -416,7 +445,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4726">
           <caret line="281" column="0" lean-forward="true" selection-start-line="281" selection-start-column="0" selection-end-line="281" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -440,7 +471,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3961">
           <caret line="236" column="5" lean-forward="true" selection-start-line="236" selection-start-column="5" selection-end-line="236" selection-end-column="5" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -465,7 +498,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4182">
           <caret line="249" column="30" lean-forward="true" selection-start-line="249" selection-start-column="30" selection-end-line="249" selection-end-column="30" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -481,7 +516,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3043">
           <caret line="181" column="0" lean-forward="false" selection-start-line="181" selection-start-column="0" selection-end-line="181" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -500,7 +537,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2628">
           <caret line="148" column="42" lean-forward="false" selection-start-line="148" selection-start-column="42" selection-end-line="148" selection-end-column="42" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -520,7 +559,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2628">
           <caret line="148" column="42" lean-forward="false" selection-start-line="148" selection-start-column="42" selection-end-line="148" selection-end-column="42" />
-          <folding />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -540,26 +581,10 @@
     <entry file="file://$PROJECT_DIR$/NeuralNet.go" />
     <entry file="file:///usr/lib/go-1.9/src/testing/testing.go" />
     <entry file="file:///usr/lib/go-1.9/src/runtime/panic.go" />
-    <entry file="file://$PROJECT_DIR$/TrainingSample.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/go-1.10/src/runtime/panic.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
           <caret line="590" column="0" lean-forward="false" selection-start-line="590" selection-start-column="0" selection-end-line="590" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/go-1.10/src/testing/testing.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="782" column="0" lean-forward="false" selection-start-line="782" selection-start-column="0" selection-end-line="782" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -580,28 +605,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Network.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#14#60#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TrainingSample.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="4" lean-forward="true" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/go-1.10/src/io/ioutil/ioutil.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="51" column="5" lean-forward="false" selection-start-line="51" selection-start-column="5" selection-end-line="51" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="384" column="0" lean-forward="false" selection-start-line="384" selection-start-column="0" selection-end-line="384" selection-end-column="0" />
+        <state relative-caret-position="493">
+          <caret line="29" column="20" lean-forward="false" selection-start-line="29" selection-start-column="14" selection-end-line="29" selection-end-column="20" />
+          <folding>
+            <element signature="e#14#43#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/go-1.10/src/testing/testing.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="778" column="0" lean-forward="false" selection-start-line="778" selection-start-column="0" selection-end-line="778" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding>
+            <element signature="e#21#37#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Network.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-765">
-          <caret line="312" column="0" lean-forward="false" selection-start-line="312" selection-start-column="0" selection-end-line="312" selection-end-column="0" />
+        <state relative-caret-position="246">
+          <caret line="36" column="34" lean-forward="true" selection-start-line="36" selection-start-column="34" selection-end-line="36" selection-end-column="34" />
           <folding>
-            <element signature="e#14#60#0" expanded="true" />
+            <element signature="e#21#123#0" expanded="true" />
           </folding>
         </state>
       </provider>
