@@ -328,4 +328,13 @@ func TestSolve(t *testing.T) {
 	network.Solve(ts, 2, 0.001)
 
 	// Assert
+	mb := CreateMiniBatch(12, 7)
+	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
+	network.Feedforward(&mb)
+	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, *a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, *a)
+	}
+	if a := network.GetActivation(1, 2, &mb); floatEquals(0.43, *a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.43, *a)
+	}
 }
