@@ -92,14 +92,14 @@ func Import(dir string) MNISTData {
 	output.trainingInputActivations = ImportImageFile(dir + "train-images.idx3-ubyte")
 	output.trainingExpectedResult = ImportLabelFile(dir + "train-labels.idx1-ubyte")
 	output.testInputActivations = ImportImageFile(dir + "t10k-images.idx3-ubyte")
-	output.trainingExpectedResult = ImportLabelFile(dir + "t10k-labels.idx1-ubyte")
+	output.testExpectedResult = ImportLabelFile(dir + "t10k-labels.idx1-ubyte")
 	return output
 }
 
 func (m *MNISTData) GenerateTrainingSamples() []TrainingSample {
 	tss := make([]TrainingSample, len(m.trainingInputActivations))
 	for idx, _ := range m.trainingInputActivations {
-		ts := tss[idx]
+		ts := &tss[idx]
 		ts.InputActivations = m.trainingInputActivations[idx]
 		ts.OutputActivations = make([]float64, 10)
 		digit := m.trainingExpectedResult[idx]

@@ -388,3 +388,15 @@ func TestTrain(t *testing.T) {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.43, *a)
 	}
 }
+
+func TestTrainWithMNIST(t *testing.T) {
+	network := CreateNetwork([]int{784, 3, 10})
+
+
+	dir := "/home/svenschmidt75/Develop/Go/MNIST/"
+	MNISTData := MNISTImport.Import(dir)
+	tss := MNISTData.GenerateTrainingSamples()
+	network.Train(tss, 2, 0.001)
+
+	// Assert
+}
