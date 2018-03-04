@@ -54,7 +54,7 @@ func BuildFromLabelFile(nLabels int, data []byte) []byte {
 	output := make([]byte, nLabels)
 	for labelIdx := 0; labelIdx < nLabels; labelIdx++ {
 		value := data[labelIdx]
-		output[value] = 1
+		output[labelIdx] = value
 	}
 	return output
 }

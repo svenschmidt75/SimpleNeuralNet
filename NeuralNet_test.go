@@ -392,11 +392,18 @@ func TestTrain(t *testing.T) {
 func TestTrainWithMNIST(t *testing.T) {
 	network := CreateNetwork([]int{784, 3, 10})
 
+	// TODO: Initialize weights and biases
 
-	dir := "/home/svenschmidt75/Develop/Go/MNIST/"
-	MNISTData := MNISTImport.Import(dir)
-	tss := MNISTData.GenerateTrainingSamples()
-	network.Train(tss, 2, 0.001)
+//	dir := "/home/svenschmidt75/Develop/Go/MNIST/"
+//	MNISTData := MNISTImport.Import(dir)
+
+	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/small-images.idx3-ubyte")
+	trainingExpectedResult := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/small-labels.idx1-ubyte")
+
+	expectedOutput := make([]float64, 10)
+	expectedOutput[trainingExpectedResult[0]]=1
+	ts := MNISTImport.TrainingSample{trainingInputActivations[0], expectedOutput}
+	network.Train([]MNISTImport.TrainingSample{ts}, 2, 0.001)
 
 	// Assert
 }
