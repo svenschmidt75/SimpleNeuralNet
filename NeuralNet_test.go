@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 	"testing"
+	"SimpleNeuralNet/MNISTImport"
 )
 
 func TestSigmoid(t *testing.T) {
@@ -373,7 +374,7 @@ func TestUpdateNetwork(t *testing.T) {
 func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
-	ts := []TrainingSample{CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), CreateTrainingSample([]float64{0.14, 0.03}, []float64{1, 1})}
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, []float64{1, 1})}
 	network.Train(ts, 2, 0.001)
 
 	// Assert

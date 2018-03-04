@@ -1,11 +1,11 @@
-package main
+package MNISTImport
 
 type TrainingSample struct {
 	// Input layer activations
-	inputActivations []float64
+	InputActivations []float64
 
 	// Expected output
-	outputActivations []float64
+	OutputActivations []float64
 }
 
 func CreateTrainingSample(inputActivations []float64, outputActivations []float64) TrainingSample {

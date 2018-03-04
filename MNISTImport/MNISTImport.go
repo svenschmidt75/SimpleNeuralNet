@@ -13,16 +13,16 @@ import (
 
 type MNISTData struct {
 	// all training samples
-	trainingSamples [][]float64
+	trainingInputActivations [][]float64
 
 	// labels for each training sample
-	trainingInputActivations []byte
+	trainingExpectedResult []byte
 
 	// all test samples
-	testSamples [][]float64
+	testInputActivations [][]float64
 
 	// labels for each test sample
-	testInputActivations []byte
+	testExpectedResult []byte
 }
 
 func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]float64 {
@@ -85,4 +85,25 @@ func ImportLabelFile(fileName string) []byte {
 	}
 	nLabels := int(binary.BigEndian.Uint32(data[4:8]))
 	return BuildFromLabelFile(nLabels, data[8:])
+}
+
+func Import(dir string) MNISTData {
+	var output MNISTData
+	output.trainingInputActivations = ImportImageFile(dir + "train-images.idx3-ubyte")
+	output.trainingExpectedResult = ImportLabelFile(dir + "train-labels.idx1-ubyte")
+	output.testInputActivations = ImportImageFile(dir + "t10k-images.idx3-ubyte")
+	output.trainingExpectedResult = ImportLabelFile(dir + "t10k-labels.idx1-ubyte")
+	return output
+}
+
+func (m *MNISTData) GenerateTrainingSamples() []TrainingSample {
+	tss := make([]TrainingSample, len(m.trainingInputActivations))
+	for idx, _ := range m.trainingInputActivations {
+		ts := tss[idx]
+		ts.InputActivations = m.trainingInputActivations[idx]
+		ts.OutputActivations = make([]float64, 10)
+		digit := m.trainingExpectedResult[idx]
+		ts.OutputActivations[digit] = 1
+	}
+	return tss
 }

@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/rand"
 	"time"
+	"SimpleNeuralNet/MNISTImport"
 )
 
 
@@ -361,7 +362,7 @@ func min(lhs int, rhs int) int {
 	return rhs
 }
 
-func (n *Network) Train(trainingSamples []TrainingSample, epochs int, eta float64) {
+func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float64) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), 20)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
@@ -374,9 +375,9 @@ func (n *Network) Train(trainingSamples []TrainingSample, epochs int, eta float6
 				mb := mbs[i]
 				index := indices[j*sizeMiniBatch+i]
 				x := trainingSamples[index]
-				n.SetInputActivations(x.inputActivations, &mb)
+				n.SetInputActivations(x.InputActivations, &mb)
 				n.Feedforward(&mb)
-				n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
+				n.CalculateErrorInOutputLayer(x.OutputActivations, &mb)
 				n.BackpropagateError(&mb)
 			}
 			dw, db := n.CalculateDerivatives(mbs)
@@ -389,9 +390,9 @@ func (n *Network) Train(trainingSamples []TrainingSample, epochs int, eta float6
 				mb := mbs[i]
 				index := indices[nMiniBatches*sizeMiniBatch+i]
 				x := trainingSamples[index]
-				n.SetInputActivations(x.inputActivations, &mb)
+				n.SetInputActivations(x.InputActivations, &mb)
 				n.Feedforward(&mb)
-				n.CalculateErrorInOutputLayer(x.outputActivations, &mb)
+				n.CalculateErrorInOutputLayer(x.OutputActivations, &mb)
 				n.BackpropagateError(&mb)
 			}
 			dw, db := n.CalculateDerivatives(mbs)
