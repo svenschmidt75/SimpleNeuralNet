@@ -1,9 +1,9 @@
 package main
 
 import (
+	"SimpleNeuralNet/MNISTImport"
 	"math"
 	"testing"
-	"SimpleNeuralNet/MNISTImport"
 )
 
 func TestSigmoid(t *testing.T) {
@@ -309,9 +309,9 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	outputLayerIdx := 2
 
 	tables := []struct {
-		outputActivations []float64
+		outputActivations         []float64
 		expectedOutputActivations []float64
-		error []float64
+		error                     []float64
 	}{
 		{[]float64{1, 1}, []float64{1, 1}, []float64{0, 0}},
 		{[]float64{0, 0}, []float64{1, 1}, []float64{-0.01897348347524417, -0.10026647037539357}},
@@ -379,7 +379,7 @@ func TestTrain(t *testing.T) {
 
 	// Assert
 	mb := CreateMiniBatch(12, 7)
-	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
+	network.SetInputActivations([]float64{0.34, 0.43}, &mba)
 	network.Feedforward(&mb)
 	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, *a) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, *a)
@@ -394,14 +394,14 @@ func TestTrainWithMNIST(t *testing.T) {
 
 	// TODO: Initialize weights and biases
 
-//	dir := "/home/svenschmidt75/Develop/Go/MNIST/"
-//	MNISTData := MNISTImport.Import(dir)
+	//	dir := "/home/svenschmidt75/Develop/Go/MNIST/"
+	//	MNISTData := MNISTImport.Import(dir)
 
 	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/small-images.idx3-ubyte")
 	trainingExpectedResult := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/small-labels.idx1-ubyte")
 
 	expectedOutput := make([]float64, 10)
-	expectedOutput[trainingExpectedResult[0]]=1
+	expectedOutput[trainingExpectedResult[0]] = 1
 	ts := MNISTImport.TrainingSample{trainingInputActivations[0], expectedOutput}
 	network.Train([]MNISTImport.TrainingSample{ts}, 2, 0.001)
 
