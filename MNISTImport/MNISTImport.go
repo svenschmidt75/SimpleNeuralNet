@@ -3,9 +3,6 @@ package MNISTImport
 import (
 	"io/ioutil"
 	"encoding/binary"
-	"os"
-	"fmt"
-	"image/png"
 	"image/color"
 	"image"
 )
@@ -40,12 +37,12 @@ func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]floa
 				m.Set(colIdx, rowIdx, color.RGBA{value, 0, 0, 255})
 			}
 		}
-		outputFile, err := os.Create(fmt.Sprintf("/home/svenschmidt75/Downloads/MNISTDecoded/test%d.png", imageIdx))
-		if err != nil {
-			panic("error")
-		}
-		png.Encode(outputFile, m)
-		outputFile.Close()
+		//outputFile, err := os.Create(fmt.Sprintf("/home/svenschmidt75/Downloads/MNISTDecoded/test%d.png", imageIdx))
+		//if err != nil {
+		//	panic("error")
+		//}
+		//png.Encode(outputFile, m)
+		//outputFile.Close()
 	}
 	return output
 }
