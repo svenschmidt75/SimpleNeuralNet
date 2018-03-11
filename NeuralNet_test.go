@@ -398,9 +398,26 @@ func TestTrainWithMNIST(t *testing.T) {
 //	MNISTData := MNISTImport.Import(dir)
 
 	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
-	trainingExpectedResult := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
+	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
 
-	ts := MNISTImport.TrainingSample{trainingInputActivations[0], trainingExpectedResult}
+	// convert training data
+	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
+
+
+
+
+
+
+	expectedOutputActivations := make([]float64, 10 * len(trainingResults))
+	for idx, label := range trainingResults {
+		expectedOutputActivations[idx]
+	}
+
+
+
+
+	expectedOutputActivations[trainingResults[0]]=1
+	ts := MNISTImport.TrainingSample{trainingInputActivations[0], trainingResults}
 	network.Train([]MNISTImport.TrainingSample{ts}, 2, 0.001)
 
 	// Assert

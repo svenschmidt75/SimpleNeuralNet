@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
       <change beforePath="$PROJECT_DIR$/NeuralNet_test.go" afterPath="$PROJECT_DIR$/NeuralNet_test.go" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,11 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="535">
-              <caret line="400" column="48" lean-forward="false" selection-start-line="400" selection-start-column="48" selection-end-line="400" selection-end-column="48" />
+            <state relative-caret-position="365">
+              <caret line="399" column="48" lean-forward="true" selection-start-line="399" selection-start-column="48" selection-end-line="399" selection-end-column="48" />
               <folding>
                 <element signature="e#14#74#0" expanded="true" />
               </folding>
@@ -30,8 +28,8 @@
       <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="365" column="33" lean-forward="true" selection-start-line="365" selection-start-column="33" selection-end-line="365" selection-end-column="33" />
+            <state relative-caret-position="450">
+              <caret line="375" column="51" lean-forward="true" selection-start-line="375" selection-start-column="51" selection-end-line="375" selection-end-column="51" />
               <folding>
                 <element signature="e#14#91#0" expanded="true" />
               </folding>
@@ -39,11 +37,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="535">
-              <caret line="99" column="28" lean-forward="true" selection-start-line="99" selection-start-column="28" selection-end-line="99" selection-end-column="28" />
+            <state relative-caret-position="620">
+              <caret line="95" column="43" lean-forward="false" selection-start-line="95" selection-start-column="20" selection-end-line="95" selection-end-column="43" />
               <folding>
                 <element signature="e#21#87#0" expanded="true" />
               </folding>
@@ -76,9 +74,11 @@
       <file leaf-file-name="TrainingSample.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MNISTImport/TrainingSample.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="5" lean-forward="false" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-              <folding />
+            <state relative-caret-position="170">
+              <caret line="10" column="66" lean-forward="true" selection-start-line="10" selection-start-column="66" selection-end-line="10" selection-end-column="66" />
+              <folding>
+                <element signature="n#!!block;n#CreateTrainingSample#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -119,8 +119,8 @@
         <option value="$PROJECT_DIR$/MNISTImport/MNISTImport_test.go" />
         <option value="$PROJECT_DIR$/MNISTImport/TrainingSample.go" />
         <option value="$PROJECT_DIR$/Network.go" />
-        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
         <option value="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
+        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
       </list>
     </option>
   </component>
@@ -372,12 +372,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/NeuralNet_test.go</url>
-          <line>403</line>
+          <line>420</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/NeuralNet_test.go</url>
-          <line>402</line>
+          <line>419</line>
           <properties />
           <option name="timeStamp" value="56" />
         </line-breakpoint>
@@ -618,14 +618,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MNISTImport/TrainingSample.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="5" lean-forward="false" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport_test.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
@@ -644,32 +636,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/MNISTImport/TrainingSample.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="66" lean-forward="true" selection-start-line="10" selection-start-column="66" selection-end-line="10" selection-end-column="66" />
+          <folding>
+            <element signature="n#!!block;n#CreateTrainingSample#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Network.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="365" column="33" lean-forward="true" selection-start-line="365" selection-start-column="33" selection-end-line="365" selection-end-column="33" />
+        <state relative-caret-position="450">
+          <caret line="375" column="51" lean-forward="true" selection-start-line="375" selection-start-column="51" selection-end-line="375" selection-end-column="51" />
           <folding>
             <element signature="e#14#91#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
+    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="535">
-          <caret line="99" column="28" lean-forward="true" selection-start-line="99" selection-start-column="28" selection-end-line="99" selection-end-column="28" />
+        <state relative-caret-position="365">
+          <caret line="399" column="48" lean-forward="true" selection-start-line="399" selection-start-column="48" selection-end-line="399" selection-end-column="48" />
           <folding>
-            <element signature="e#21#87#0" expanded="true" />
+            <element signature="e#14#74#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
+    <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="535">
-          <caret line="400" column="48" lean-forward="false" selection-start-line="400" selection-start-column="48" selection-end-line="400" selection-end-column="48" />
+        <state relative-caret-position="620">
+          <caret line="95" column="43" lean-forward="false" selection-start-line="95" selection-start-column="20" selection-end-line="95" selection-end-column="43" />
           <folding>
-            <element signature="e#14#74#0" expanded="true" />
+            <element signature="e#21#87#0" expanded="true" />
           </folding>
         </state>
       </provider>
