@@ -1,18 +1,16 @@
 package main
 
 import (
+	"SimpleNeuralNet/MNISTImport"
 	"fmt"
 	"math"
 	"math/rand"
 	"time"
-	"SimpleNeuralNet/MNISTImport"
 )
-
 
 /* TODO:
  * - function that returns output layer index
  */
-
 
 // weights: The weights w_ij^{l} are ordered by layer l, and for each layer,
 // by i, then j.
@@ -46,6 +44,15 @@ func nWeights(xs []int) int {
 		x1 = x2
 	}
 	return n
+}
+
+func (n Network) nWeightsInLayer(layer int) int {
+	if layer == 0 {
+		panic("Layer 0 has no weights")
+	}
+	idx1 := nWeights(n.layers[0:layer])
+	idx2 := nWeights(n.layers[0 : layer+1])
+	return idx2 - idx1
 }
 
 func CreateNetwork(layers []int) Network {
@@ -196,6 +203,29 @@ func (n *Network) Feedforward(mb *Minibatch) {
 			continue
 		}
 		n.FeedforwardLayer(layer, mb)
+	}
+}
+
+func (n *Network) InitializeNetworkWeightsAndBiasesLayer(layer int) {
+	if layer == 0 {
+		return
+	}
+	nLayer := n.layers[layer]
+	for i := 0; i < nLayer; i++ {
+
+		// number of weights in this layer
+
+		// number of biases in this layer (= number of activations)
+
+	}
+}
+
+func (n *Network) InitializeNetworkWeightsAndBiases() {
+	for layer := range n.layers {
+		if layer == 0 {
+			continue
+		}
+		n.InitializeNetworkWeightsAndBiasesLayer(layer)
 	}
 }
 

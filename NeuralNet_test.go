@@ -154,6 +154,37 @@ func TestWeightIndex(t *testing.T) {
 	}
 }
 
+func TestNumberOfWeightsPerLayer(t *testing.T) {
+	type Layer struct {
+		layer    int
+		expected int
+	}
+
+	tables := []struct {
+		xs  []int
+		ais []Layer
+	}{
+		{[]int{2, 3, 2}, []Layer{
+			{1, 6},
+			{2, 6},
+		}},
+		{[]int{28 * 28, 100, 10}, []Layer{
+			{1, 100 * 28 * 28},
+			{2, 10 * 100},
+		}},
+	}
+
+	for _, ts := range tables {
+		network := CreateNetwork(ts.xs)
+		for _, as := range ts.ais {
+			ai := network.nWeightsInLayer(as.layer)
+			if ai != as.expected {
+				t.Errorf("Expected %v weights in layer %v, but is %v", as.expected, as.layer, ai)
+			}
+		}
+	}
+}
+
 func CreateTestNetwork() (Network, Minibatch) {
 	network := CreateNetwork([]int{2, 3, 2})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
