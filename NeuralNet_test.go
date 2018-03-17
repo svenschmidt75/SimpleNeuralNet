@@ -1,9 +1,9 @@
 package main
 
 import (
+	"SimpleNeuralNet/MNISTImport"
 	"math"
 	"testing"
-	"SimpleNeuralNet/MNISTImport"
 )
 
 func TestSigmoid(t *testing.T) {
@@ -309,9 +309,9 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	outputLayerIdx := 2
 
 	tables := []struct {
-		outputActivations []float64
+		outputActivations         []float64
 		expectedOutputActivations []float64
-		error []float64
+		error                     []float64
 	}{
 		{[]float64{1, 1}, []float64{1, 1}, []float64{0, 0}},
 		{[]float64{0, 0}, []float64{1, 1}, []float64{-0.01897348347524417, -0.10026647037539357}},
@@ -394,31 +394,22 @@ func TestTrainWithMNIST(t *testing.T) {
 
 	// TODO: Initialize weights and biases
 
-//	dir := "/home/svenschmidt75/Develop/Go/MNIST/"
-//	MNISTData := MNISTImport.Import(dir)
-
 	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
-	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
+	//trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
 
 	// convert training data
 	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
-
-
-
-
-
-
-	expectedOutputActivations := make([]float64, 10 * len(trainingResults))
-	for idx, label := range trainingResults {
-		expectedOutputActivations[idx]
+	for idx := range ts {
+		ts[idx].InputActivations = trainingInputActivations[idx]
 	}
 
+	//expectedOutputActivations := make([]float64, 10 * len(trainingResults))
+	//for idx, label := range trainingResults {
+	//	expectedOutputActivations[idx]
+	//}
+	//	expectedOutputActivations[trainingResults[0]]=1
 
-
-
-	expectedOutputActivations[trainingResults[0]]=1
-	ts := MNISTImport.TrainingSample{trainingInputActivations[0], trainingResults}
-	network.Train([]MNISTImport.TrainingSample{ts}, 2, 0.001)
+	network.Train(ts, 2, 0.001)
 
 	// Assert
 }
