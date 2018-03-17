@@ -2,6 +2,7 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
+	"fmt"
 	"math"
 	"testing"
 )
@@ -438,4 +439,13 @@ func TestTrainWithMNIST(t *testing.T) {
 	network.Train(ts, 2, 0.001)
 
 	// Assert
+
+	mb := CreateMiniBatch(network.nActivations(), network.nWeights())
+	network.SetInputActivations(ts[45].InputActivations, &mb)
+	network.Feedforward(&mb)
+	idx := network.getActivationBaseIndex(2)
+	as := mb.a[idx:]
+
+	fmt.Print(as[0])
+
 }

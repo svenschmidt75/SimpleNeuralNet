@@ -170,7 +170,9 @@ func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 		a_j := n.GetActivation(j, layer-1, mb)
 		w_ij := n.GetWeight(i, j, layer)
 		z += w_ij * *a_j
+		//fmt.Printf("%v, %v, %v\n", *a_j, w_ij, z)
 	}
+	//	fmt.Printf("z: %v\n", z)
 	b := n.GetBias(i, layer)
 	z += b
 	return z
@@ -215,12 +217,12 @@ func (n *Network) InitializeNetworkWeightsAndBiasesLayer(layer int) {
 	weightBaseIdx := n.getWeightBaseIndex(layer)
 	nWeights := n.nWeightsInLayer(layer)
 	for widx := 0; widx < nWeights; widx++ {
-		n.weights[weightBaseIdx+widx] = rand.Float64()
+		n.weights[weightBaseIdx+widx] = rand.Float64() / 100.0
 	}
 	biasBaseIdx := n.getBiasBaseIndex(layer)
 	nBiases := n.layers[layer]
 	for bidx := 0; bidx < nBiases; bidx++ {
-		n.biases[biasBaseIdx+bidx] = rand.Float64()
+		n.biases[biasBaseIdx+bidx] = rand.Float64() / 100.0
 	}
 }
 
@@ -280,6 +282,7 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 			s := SigmoidPrime(z_j)
 			error := tmp * s
 			nabla[j] = error
+			//			fmt.Printf("%v, %v, %v\n", z_j, s, error)
 		}
 	}
 }
