@@ -210,13 +210,17 @@ func (n *Network) InitializeNetworkWeightsAndBiasesLayer(layer int) {
 	if layer == 0 {
 		return
 	}
-	nLayer := n.layers[layer]
-	for i := 0; i < nLayer; i++ {
-
-		// number of weights in this layer
-
-		// number of biases in this layer (= number of activations)
-
+	rand.Seed(time.Now().Unix())
+	// number of weights in this layer
+	weightBaseIdx := n.getWeightBaseIndex(layer)
+	nWeights := n.nWeightsInLayer(layer)
+	for widx := 0; widx < nWeights; widx++ {
+		n.weights[weightBaseIdx+widx] = rand.Float64()
+	}
+	biasBaseIdx := n.getBiasBaseIndex(layer)
+	nBiases := n.layers[layer]
+	for bidx := 0; bidx < nBiases; bidx++ {
+		n.biases[biasBaseIdx+bidx] = rand.Float64()
 	}
 }
 
@@ -274,7 +278,8 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 			}
 			z_j := n.CalculateZ(j, layer, mb)
 			s := SigmoidPrime(z_j)
-			nabla[j] = tmp * s
+			error := tmp * s
+			nabla[j] = error
 		}
 	}
 }

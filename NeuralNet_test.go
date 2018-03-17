@@ -421,25 +421,20 @@ func TestTrain(t *testing.T) {
 }
 
 func TestTrainWithMNIST(t *testing.T) {
-	network := CreateNetwork([]int{784, 3, 10})
-
-	// TODO: Initialize weights and biases
+	network := CreateNetwork([]int{28 * 28, 100, 10})
+	network.InitializeNetworkWeightsAndBiases()
 
 	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
-	//trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
+	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
 
-	// convert training data
 	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
 	for idx := range ts {
 		ts[idx].InputActivations = trainingInputActivations[idx]
+
+		ts[idx].OutputActivations = make([]float64, 10)
+		expectedResult := trainingResults[idx]
+		ts[idx].OutputActivations[expectedResult] = 1
 	}
-
-	//expectedOutputActivations := make([]float64, 10 * len(trainingResults))
-	//for idx, label := range trainingResults {
-	//	expectedOutputActivations[idx]
-	//}
-	//	expectedOutputActivations[trainingResults[0]]=1
-
 	network.Train(ts, 2, 0.001)
 
 	// Assert

@@ -15,21 +15,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="572">
-              <caret line="180" column="0" lean-forward="false" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
+            <state relative-caret-position="1121">
+              <caret line="437" column="0" lean-forward="false" selection-start-line="437" selection-start-column="0" selection-end-line="437" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Network.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="612">
-              <caret line="57" column="1" lean-forward="true" selection-start-line="57" selection-start-column="1" selection-end-line="57" selection-end-column="1" />
+            <state relative-caret-position="623">
+              <caret line="282" column="0" lean-forward="false" selection-start-line="282" selection-start-column="0" selection-end-line="282" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -73,6 +73,7 @@
       <find>Sigm</find>
       <find>Act</find>
       <find>nActivations</find>
+      <find>random</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -110,7 +111,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-2496" />
+    <option name="x" value="64" />
     <option name="y" value="-11" />
     <option name="width" value="2497" />
     <option name="height" value="1452" />
@@ -175,7 +176,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Test.TestNumberOfWeightsPerLayer in NeuralNet_test.go">
+  <component name="RunManager" selected="Go Test.TestTrainWithMNIST in NeuralNet_test.go">
     <configuration name="NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
       <working_directory value="$PROJECT_DIR$" />
@@ -193,15 +194,6 @@
       <package value="SimpleNeuralNet/MNISTImport" />
       <pattern value="^TestImportLabelFile$" />
     </configuration>
-    <configuration name="TestNumberOfWeights in MNISTImport_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
-      <module name="SimpleNeuralNet" />
-      <working_directory value="$PROJECT_DIR$/MNISTImport" />
-      <go_parameters value="-i" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="SimpleNeuralNet/MNISTImport" />
-      <pattern value="^TestNumberOfWeights$" />
-    </configuration>
     <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
       <working_directory value="$PROJECT_DIR$" />
@@ -210,6 +202,15 @@
       <kind value="PACKAGE" />
       <package value="SimpleNeuralNet" />
       <pattern value="^TestNumberOfWeightsPerLayer$" />
+    </configuration>
+    <configuration name="TestTrain in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
+      <module name="SimpleNeuralNet" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="SimpleNeuralNet" />
+      <pattern value="^TestTrain$" />
     </configuration>
     <configuration name="TestTrainWithMNIST in NeuralNet_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true">
       <module name="SimpleNeuralNet" />
@@ -222,18 +223,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
-      <item index="1" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeights in MNISTImport_test.go" />
-      <item index="2" class="java.lang.String" itemvalue="Go Test.TestImportLabelFile in MNISTImport_test.go" />
-      <item index="3" class="java.lang.String" itemvalue="Go Test.TestTrainWithMNIST in NeuralNet_test.go" />
-      <item index="4" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeightsPerLayer in NeuralNet_test.go" />
+      <item index="1" class="java.lang.String" itemvalue="Go Test.TestImportLabelFile in MNISTImport_test.go" />
+      <item index="2" class="java.lang.String" itemvalue="Go Test.TestTrainWithMNIST in NeuralNet_test.go" />
+      <item index="3" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeightsPerLayer in NeuralNet_test.go" />
+      <item index="4" class="java.lang.String" itemvalue="Go Test.TestTrain in NeuralNet_test.go" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeightsPerLayer in NeuralNet_test.go" />
-        <item index="1" class="java.lang.String" itemvalue="Go Test.TestTrainWithMNIST in NeuralNet_test.go" />
-        <item index="2" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
-        <item index="3" class="java.lang.String" itemvalue="Go Test.TestImportLabelFile in MNISTImport_test.go" />
-        <item index="4" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeights in MNISTImport_test.go" />
+        <item index="0" class="java.lang.String" itemvalue="Go Test.TestTrainWithMNIST in NeuralNet_test.go" />
+        <item index="1" class="java.lang.String" itemvalue="Go Test.TestTrain in NeuralNet_test.go" />
+        <item index="2" class="java.lang.String" itemvalue="Go Test.TestNumberOfWeightsPerLayer in NeuralNet_test.go" />
+        <item index="3" class="java.lang.String" itemvalue="Go Test.NeuralNet_test.go" />
+        <item index="4" class="java.lang.String" itemvalue="Go Test.TestImportLabelFile in MNISTImport_test.go" />
       </list>
     </recent_temporary>
   </component>
@@ -241,39 +242,39 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 00m 30s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 01m 26s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 02m 21s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 04m 17s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 05m 31s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 06m 23s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestNumberOfWeightsPerLayer_in_NeuralNet_test_go - 2018.03.17 at 09h 06m 40s.xml">
-      <configuration name="TestNumberOfWeightsPerLayer in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.11 at 08h 30m 10s.xml">
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 49m 10s.xml">
       <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.11 at 08h 32m 21s.xml">
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 50m 11s.xml">
       <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
-    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 08h 42m 04s.xml">
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 50m 14s.xml">
       <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 51m 25s.xml">
+      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 54m 18s.xml">
+      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 55m 17s.xml">
+      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 55m 23s.xml">
+      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.17 at 09h 56m 04s.xml">
+      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrain_in_NeuralNet_test_go - 2018.03.17 at 09h 49m 54s.xml">
+      <configuration name="TestTrain in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrain_in_NeuralNet_test_go - 2018.03.17 at 09h 52m 42s.xml">
+      <configuration name="TestTrain in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-2496" y="-11" width="2497" height="1452" extended-state="6" />
+    <frame x="64" y="-11" width="2497" height="1452" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15511023" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -342,7 +343,8 @@
     <MESSAGE value="test backpropagation" />
     <MESSAGE value="update network functionality" />
     <MESSAGE value="initialize input activations" />
-    <option name="LAST_COMMIT_MESSAGE" value="initialize input activations" />
+    <MESSAGE value="get number of weights per layer" />
+    <option name="LAST_COMMIT_MESSAGE" value="get number of weights per layer" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -352,13 +354,74 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/NeuralNet_test.go</url>
-          <line>442</line>
+          <line>437</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="60" />
+      <option name="time" value="71" />
     </breakpoint-manager>
     <watches-manager />
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>mb.nabla[250:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.nabla[150:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.nabla[50:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.nabla[0:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.nabla[0&quot;]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.a[110:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.a[0:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.a[100:]</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mb.a</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+    </expressions>
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>*inputActivations.toString()</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>*inputActivations*.toString()</expression-string>
+        <language-id>go</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Network.go">
@@ -533,13 +596,6 @@
     <entry file="file://$PROJECT_DIR$/NeuralNet.go" />
     <entry file="file:///usr/lib/go-1.9/src/runtime/asm_amd64.s" />
     <entry file="file://$PROJECT_DIR$/Network2.go" />
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/go-1.9/src/builtin/builtin.go" />
     <entry file="file://$PROJECT_DIR$/NeuralNet.go" />
     <entry file="file:///usr/lib/go-1.9/src/testing/testing.go" />
@@ -575,18 +631,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/lib/go-1.10/src/testing/testing.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1257">
-          <caret line="728" column="0" lean-forward="false" selection-start-line="728" selection-start-column="0" selection-end-line="728" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/TrainingSample.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="7" column="9" lean-forward="false" selection-start-line="7" selection-start-column="9" selection-end-line="7" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/go-1.10/src/runtime/panic.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="590" column="0" lean-forward="false" selection-start-line="590" selection-start-column="0" selection-end-line="590" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/go-1.10/src/testing/testing.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="610">
+          <caret line="732" column="0" lean-forward="false" selection-start-line="732" selection-start-column="0" selection-end-line="732" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -601,26 +665,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/lib/go-1.10/src/runtime/panic.go">
+    <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="504" column="0" lean-forward="false" selection-start-line="504" selection-start-column="0" selection-end-line="504" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Network.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="612">
-          <caret line="57" column="1" lean-forward="true" selection-start-line="57" selection-start-column="1" selection-end-line="57" selection-end-column="1" />
+        <state relative-caret-position="34">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="572">
-          <caret line="180" column="0" lean-forward="false" selection-start-line="180" selection-start-column="0" selection-end-line="180" selection-end-column="0" />
+        <state relative-caret-position="1121">
+          <caret line="437" column="0" lean-forward="false" selection-start-line="437" selection-start-column="0" selection-end-line="437" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Network.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="623">
+          <caret line="282" column="0" lean-forward="false" selection-start-line="282" selection-start-column="0" selection-end-line="282" selection-end-column="0" />
           <folding />
         </state>
       </provider>
