@@ -72,6 +72,13 @@ func (n Network) nNodes() int {
 	return sum(n.nodes)
 }
 
+func (n Network) nNodesInLayer(layer int) int {
+	if l := len(n.nodes); layer >= l {
+		panic(fmt.Sprintf("Layer index %v must be <= %v", layer, l))
+	}
+	return sum(n.nodes[layer : layer+1])
+}
+
 func (n Network) getNodeBaseIndex(layer int) int {
 	bi := sum(n.nodes[0:layer])
 	return bi
@@ -96,6 +103,10 @@ func (n Network) GetActivation(index int, layer int, mb *Minibatch) float64 {
 func (n *Network) SetActivation(a float64, index int, layer int, mb *Minibatch) {
 	aIdx := n.GetNodeIndex(index, layer)
 	mb.a[aIdx] = a
+}
+
+func (n Network) getNablaBaseIndex(layer int) int {
+	return n.getNodeBaseIndex(layer)
 }
 
 func (n Network) getNablaIndex(index int, layer int) int {
@@ -191,7 +202,7 @@ func SigmoidPrime(z float64) float64 {
 
 func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 	var z float64
-	nPrevLayer := n.nodes[layer-1]
+	nPrevLayer := n.nNodesInLayer(layer - 1)
 	for j := 0; j < nPrevLayer; j++ {
 		a_j := n.GetActivation(j, layer-1, mb)
 		w_ij := n.GetWeight(i, j, layer)
@@ -217,7 +228,7 @@ func (n *Network) FeedforwardLayer(layer int, mb *Minibatch) {
 	if layer == 0 {
 		return
 	}
-	nLayer := n.nodes[layer]
+	nLayer := n.nNodesInLayer(layer)
 	for i := 0; i < nLayer; i++ {
 		a := n.FeedforwardActivation(i, layer, mb)
 		n.SetActivation(a, i, layer, mb)
@@ -242,7 +253,6 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 		for widx := 0; widx < nWeights; widx++ {
 			n.weights[widx] = rand.Float64() / 100.0
 		}
-
 		nBiases := n.nBiases()
 		for bidx := 0; bidx < nBiases; bidx++ {
 			n.biases[bidx] = rand.Float64() / 100.0
@@ -252,18 +262,18 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 
 func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
-	outputLayerIdx := len(n.nodes) - 1
+	outputLayerIdx := n.getOutputLayerIndex()
 	if len(expectedOutputActivations) != n.nodes[outputLayerIdx] {
-		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in ouput layer", len(expectedOutputActivations), n.nodes[outputLayerIdx]))
+		panic(fmt.Sprintf("Expected number of expected output layer nodes %v does not match number of nodes %v in ouput layer", len(expectedOutputActivations), n.nodes[outputLayerIdx]))
 	}
-	nActivations := n.nodes[outputLayerIdx]
-	output := mb.nabla[n.getNodeBaseIndex(outputLayerIdx):]
-	for i := 0; i < nActivations; i++ {
+	nNodes := n.nNodesInLayer(outputLayerIdx)
+	for i := 0; i < nNodes; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
-		da := a_i - expectedOutputActivations[i]
+		dCda := a_i - expectedOutputActivations[i]
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		ds := SigmoidPrime(z_i)
-		output[i] = da * ds
+		nabla := dCda * ds
+		n.SetNabla(nabla, i, outputLayerIdx, mb)
 	}
 }
 
@@ -278,24 +288,21 @@ func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch)
 
 func (n *Network) BackpropagateError(mb *Minibatch) {
 	// Equation (45), Chapter 2 of http://neuralnetworksanddeeplearning.com
-	outputLayerIdx := len(n.nodes) - 1
+	outputLayerIdx := n.getOutputLayerIndex()
 	for layer := outputLayerIdx - 1; layer > 0; layer-- {
-		nActivations := n.nodes[layer]
-		nNextActivations := n.nodes[layer+1]
-		abi1 := n.getNodeBaseIndex(layer)
-		nabla := mb.nabla[abi1 : abi1+nActivations]
-		abi2 := n.getNodeBaseIndex(layer + 1)
-		nablaNext := mb.nabla[abi2 : abi2+nNextActivations]
-		for j := 0; j < nActivations; j++ {
+		nNodes := n.nNodesInLayer(layer)
+		nNextNodes := n.nNodesInLayer(layer + 1)
+		for j := 0; j < nNodes; j++ {
 			var tmp float64
-			for k := 0; k < nNextActivations; k++ {
+			for k := 0; k < nNextNodes; k++ {
 				weight_kj := n.GetWeight(k, j, layer+1)
-				tmp += weight_kj * nablaNext[k]
+				nabla_k := n.GetNabla(k, layer+1, mb)
+				tmp += weight_kj * nabla_k
 			}
 			z_j := n.CalculateZ(j, layer, mb)
 			s := SigmoidPrime(z_j)
 			error := tmp * s
-			nabla[j] = error
+			n.SetNabla(error, j, layer, mb)
 			//			fmt.Printf("%v, %v, %v\n", z_j, s, error)
 		}
 	}
