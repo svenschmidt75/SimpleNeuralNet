@@ -430,8 +430,8 @@ func TestTrainWithMNIST(t *testing.T) {
 	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/train-images.idx3-ubyte")
 	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/train-labels.idx1-ubyte")
 
-	//	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
-	ts := make([]MNISTImport.TrainingSample, 5000)
+	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
+	//	ts := make([]MNISTImport.TrainingSample, 5000)
 	for idx := range ts {
 		ts[idx].InputActivations = trainingInputActivations[idx]
 
@@ -439,7 +439,7 @@ func TestTrainWithMNIST(t *testing.T) {
 		expectedResult := trainingResults[idx]
 		ts[idx].OutputActivations[expectedResult] = 1
 	}
-	network.Train(ts, 2, 0.001)
+	network.Train(ts, 2, 0.01)
 
 	// Assert
 

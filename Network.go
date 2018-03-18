@@ -27,6 +27,11 @@ type Network struct {
 	weights []float64
 }
 
+func CreateNetwork(layers []int) Network {
+	nBiases := sum(layers[1:])
+	return Network{layers: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
+}
+
 func sum(xs []int) int {
 	sum := 0
 	for _, i := range xs {
@@ -46,6 +51,14 @@ func nWeights(xs []int) int {
 	return n
 }
 
+func (n Network) getOutputLayerIndex() int {
+	return len(n.layers) - 1
+}
+
+func (n Network) nWeights() int {
+	return nWeights(n.layers)
+}
+
 func (n Network) nWeightsInLayer(layer int) int {
 	if layer == 0 {
 		panic("Layer 0 has no weights")
@@ -53,25 +66,6 @@ func (n Network) nWeightsInLayer(layer int) int {
 	idx1 := nWeights(n.layers[0:layer])
 	idx2 := nWeights(n.layers[0 : layer+1])
 	return idx2 - idx1
-}
-
-func CreateNetwork(layers []int) Network {
-	nBiases := sum(layers[1:])
-	return Network{layers: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
-}
-
-func Sigmoid(z float64) float64 {
-	return 1.0 / (1.0 + math.Exp(-z))
-}
-
-func SigmoidPrime(z float64) float64 {
-	// derivative of the sigmoid function
-	s := Sigmoid(z)
-	return s * (1.0 - s)
-}
-
-func (n *Network) nWeights() int {
-	return nWeights(n.layers)
 }
 
 func (n *Network) nActivations() int {
@@ -132,12 +126,6 @@ func (n *Network) GetBias(index int, layer int) float64 {
 	return n.biases[n.GetBiasIndex(index, layer)]
 }
 
-// Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
-// n.weights
-func (n *Network) getWeightBaseIndex(layer int) int {
-	return nWeights(n.layers[0:layer])
-}
-
 func (n *Network) GetWeightIndex(i int, j int, layer int) int {
 	// Remember the meaning of the indices: w_ij^{l) is the weight from
 	// neuron a_j^{l-1} to neuron a_i^{l}.
@@ -161,6 +149,22 @@ func (n *Network) GetWeightIndex(i int, j int, layer int) int {
 
 func (n *Network) GetWeight(i int, j int, layer int) float64 {
 	return n.weights[n.GetWeightIndex(i, j, layer)]
+}
+
+// Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
+// n.weights
+func (n *Network) getWeightBaseIndex(layer int) int {
+	return nWeights(n.layers[0:layer])
+}
+
+func Sigmoid(z float64) float64 {
+	return 1.0 / (1.0 + math.Exp(-z))
+}
+
+func SigmoidPrime(z float64) float64 {
+	// derivative of the sigmoid function
+	s := Sigmoid(z)
+	return s * (1.0 - s)
 }
 
 func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
@@ -353,7 +357,7 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 	return dw, db
 }
 
-func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
+func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 	for layer := range n.layers {
 		if layer == 0 {
 			continue
@@ -366,14 +370,14 @@ func (n *Network) UpdateNetwork(eta float64, dw []float64, db []float64) {
 				wIdx := n.GetWeightIndex(j, k, layer)
 				dw_jk := dw[wIdx]
 				w_jk := n.GetWeight(j, k, layer)
-				w_jk -= eta * dw_jk
+				w_jk -= float64(eta) * dw_jk
 				n.weights[wIdx] = w_jk
 			}
 			// b_j^l
 			bIdx := n.GetBiasIndex(j, layer)
 			db_j := db[bIdx]
 			b_j := n.GetBias(j, layer)
-			b_j -= eta * db_j
+			b_j -= float64(eta) * db_j
 			n.biases[bIdx] = b_j
 		}
 	}
@@ -400,7 +404,7 @@ func min(lhs int, rhs int) int {
 	return rhs
 }
 
-func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float64) {
+func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float32) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), 20)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
@@ -408,7 +412,8 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int
 
 	fmt.Printf("Training batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
-	fmt.Printf("Number of minibatches: %d\n\n", nMiniBatches)
+	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
+	fmt.Printf("Learning rate: %f\n\n", eta)
 
 	for epoch := 0; epoch < epochs; epoch++ {
 		indices := generateRandomIndices(len(trainingSamples))
