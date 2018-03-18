@@ -425,10 +425,13 @@ func TestTrainWithMNIST(t *testing.T) {
 	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
-	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
-	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
+	//trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
+	//trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
+	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/train-images.idx3-ubyte")
+	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/train-labels.idx1-ubyte")
 
-	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
+	//	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
+	ts := make([]MNISTImport.TrainingSample, 5000)
 	for idx := range ts {
 		ts[idx].InputActivations = trainingInputActivations[idx]
 
@@ -446,6 +449,7 @@ func TestTrainWithMNIST(t *testing.T) {
 	idx := network.getActivationBaseIndex(2)
 	as := mb.a[idx:]
 
-	fmt.Print(as[0])
+	fmt.Printf("\n%v\n", ts[45].OutputActivations)
+	fmt.Printf("%v\n", as)
 
 }

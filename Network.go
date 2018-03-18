@@ -406,9 +406,15 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := CreateMiniBatches(sizeMiniBatch, n.nActivations(), n.nWeights())
 
+	fmt.Printf("Training batch size: %d\n", len(trainingSamples))
+	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
+	fmt.Printf("Number of minibatches: %d\n\n", nMiniBatches)
+
 	for epoch := 0; epoch < epochs; epoch++ {
 		indices := generateRandomIndices(len(trainingSamples))
 		for j := 0; j < nMiniBatches; j++ {
+			fmt.Printf("Minibatch %d of %d, epoch %d of %d...\n", j+1, nMiniBatches, epoch+1, epochs)
+
 			for i := 0; i < sizeMiniBatch; i++ {
 				mb := mbs[i]
 				index := indices[j*sizeMiniBatch+i]
