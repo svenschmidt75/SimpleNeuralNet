@@ -257,7 +257,7 @@ func TestCalculateZ(t *testing.T) {
 		v := network.CalculateZ(ts.index, ts.layer, &mb)
 
 		// for this test, we assume the activation function is the identity
-		*network.GetActivation(ts.index, ts.layer, &mb) = v
+		network.SetActivation(v, ts.index, ts.layer, &mb)
 		if v != ts.value {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -287,7 +287,7 @@ func TestFeedforwardActivation(t *testing.T) {
 
 	for _, ts := range tables {
 		v := network.FeedforwardActivation(ts.index, ts.layer, &mb)
-		*network.GetActivation(ts.index, ts.layer, &mb) = v
+		network.SetActivation(v, ts.index, ts.layer, &mb)
 		if floatEquals(v, ts.value) == false {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -311,7 +311,7 @@ func TestFeedforward(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		v := *network.GetActivation(ts.index, ts.layer, &mb)
+		v := network.GetActivation(ts.index, ts.layer, &mb)
 		if floatEquals(v, ts.value) == false {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -323,11 +323,11 @@ func TestSetInputActivations(t *testing.T) {
 
 	network.SetInputActivations([]float64{4.9, 3.2}, &mb)
 
-	if a := *network.GetActivation(0, 0, &mb); floatEquals(4.9, a) == false {
+	if a := network.GetActivation(0, 0, &mb); floatEquals(4.9, a) == false {
 		t.Errorf("Expected 4.9, but is %v", a)
 	}
 
-	if a := *network.GetActivation(1, 0, &mb); floatEquals(3.2, a) == false {
+	if a := network.GetActivation(1, 0, &mb); floatEquals(3.2, a) == false {
 		t.Errorf("Expected 3.2, but is %v", a)
 	}
 }
@@ -335,9 +335,9 @@ func TestSetInputActivations(t *testing.T) {
 func TestCalculateErrorInOutputLayer(t *testing.T) {
 	network := CreateTestNetwork2()
 	mb := CreateMiniBatch(7, 12)
-	*network.GetActivation(0, 1, &mb) = 1
-	*network.GetActivation(1, 1, &mb) = 2
-	*network.GetActivation(2, 1, &mb) = 3
+	network.SetActivation(1, 0, 1, &mb)
+	network.SetActivation(2, 1, 1, &mb)
+	network.SetActivation(3, 2, 1, &mb)
 	outputLayerIdx := 2
 
 	tables := []struct {
@@ -351,8 +351,8 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		*network.GetActivation(0, outputLayerIdx, &mb) = ts.outputActivations[0]
-		*network.GetActivation(1, outputLayerIdx, &mb) = ts.outputActivations[1]
+		network.SetActivation(ts.outputActivations[0], 0, outputLayerIdx, &mb)
+		network.SetActivation(ts.outputActivations[1], 1, outputLayerIdx, &mb)
 		network.CalculateErrorInOutputLayer(ts.expectedOutputActivations, &mb)
 		if nabla := network.GetNabla(0, 2, &mb); floatEquals(ts.error[0], nabla) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], nabla)
@@ -366,8 +366,8 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 func TestBackpropagateError(t *testing.T) {
 	network := CreateTestNetwork2()
 	mb := CreateMiniBatch(7, 12)
-	*network.GetActivation(0, 0, &mb) = 0.32
-	*network.GetActivation(1, 0, &mb) = 0.56
+	network.SetActivation(0.32, 0, 0, &mb)
+	network.SetActivation(0.56, 1, 0, &mb)
 	network.Feedforward(&mb)
 	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
 	network.BackpropagateError(&mb)
@@ -413,11 +413,11 @@ func TestTrain(t *testing.T) {
 	mb := CreateMiniBatch(12, 7)
 	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
 	network.Feedforward(&mb)
-	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, *a) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, *a)
+	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, a)
 	}
-	if a := network.GetActivation(1, 2, &mb); floatEquals(0.43, *a) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.43, *a)
+	if a := network.GetActivation(1, 2, &mb); floatEquals(0.43, a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.43, a)
 	}
 }
 

@@ -68,16 +68,16 @@ func (n Network) getOutputLayerIndex() int {
 	return len(n.nodes) - 1
 }
 
-func (n *Network) nNodes() int {
+func (n Network) nNodes() int {
 	return sum(n.nodes)
 }
 
-func (n *Network) getNodeBaseIndex(layer int) int {
+func (n Network) getNodeBaseIndex(layer int) int {
 	bi := sum(n.nodes[0:layer])
 	return bi
 }
 
-func (n *Network) GetNodeIndex(index int, layer int) int {
+func (n Network) GetNodeIndex(index int, layer int) int {
 	if layer >= len(n.nodes) {
 		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
 	}
@@ -88,18 +88,32 @@ func (n *Network) GetNodeIndex(index int, layer int) int {
 	return bi + index
 }
 
-func (n *Network) GetActivation(index int, layer int, mb *Minibatch) *float64 {
+func (n Network) GetActivation(index int, layer int, mb *Minibatch) float64 {
 	aIdx := n.GetNodeIndex(index, layer)
-	return &mb.a[aIdx]
+	return mb.a[aIdx]
 }
 
-func (n *Network) GetNablaIndex(index int, layer int) int {
+func (n *Network) SetActivation(a float64, index int, layer int, mb *Minibatch) {
+	aIdx := n.GetNodeIndex(index, layer)
+	mb.a[aIdx] = a
+}
+
+func (n Network) getNablaIndex(index int, layer int) int {
 	return n.GetNodeIndex(index, layer)
 }
 
-func (n *Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
-	nablaIdx := n.GetNablaIndex(index, layer)
+func (n Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
+	nablaIdx := n.getNablaIndex(index, layer)
 	return mb.nabla[nablaIdx]
+}
+
+func (n *Network) SetNabla(nabla float64, index int, layer int, mb *Minibatch) {
+	nablaIdx := n.getNablaIndex(index, layer)
+	mb.nabla[nablaIdx] = nabla
+}
+
+func (n Network) nBiases() int {
+	return sum(n.nodes[1:])
 }
 
 func (n *Network) getBiasBaseIndex(layer int) int {
@@ -118,17 +132,23 @@ func (n *Network) GetBiasIndex(index int, layer int) int {
 	return bi + index
 }
 
-func (n *Network) GetBias(index int, layer int) float64 {
-	return n.biases[n.GetBiasIndex(index, layer)]
+func (n Network) GetBias(index int, layer int) float64 {
+	biasIndex := n.GetBiasIndex(index, layer)
+	return n.biases[biasIndex]
+}
+
+func (n *Network) SetBias(b float64, index int, layer int) {
+	biasIndex := n.GetBiasIndex(index, layer)
+	n.biases[biasIndex] = b
 }
 
 // Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
 // n.weights
-func (n *Network) getWeightBaseIndex(layer int) int {
+func (n Network) getWeightBaseIndex(layer int) int {
 	return nWeights(n.nodes[0:layer])
 }
 
-func (n *Network) GetWeightIndex(i int, j int, layer int) int {
+func (n Network) GetWeightIndex(i int, j int, layer int) int {
 	// Remember the meaning of the indices: w_ij^{l) is the weight from
 	// neuron a_j^{l-1} to neuron a_i^{l}.
 	if layer == 0 {
@@ -149,8 +169,14 @@ func (n *Network) GetWeightIndex(i int, j int, layer int) int {
 	return bi + j
 }
 
-func (n *Network) GetWeight(i int, j int, layer int) float64 {
-	return n.weights[n.GetWeightIndex(i, j, layer)]
+func (n Network) GetWeight(i int, j int, layer int) float64 {
+	weightIndex := n.GetWeightIndex(i, j, layer)
+	return n.weights[weightIndex]
+}
+
+func (n *Network) SetWeight(w float64, i int, j int, layer int) {
+	weightIndex := n.GetWeightIndex(i, j, layer)
+	n.weights[weightIndex] = w
 }
 
 func Sigmoid(z float64) float64 {
@@ -169,7 +195,7 @@ func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 	for j := 0; j < nPrevLayer; j++ {
 		a_j := n.GetActivation(j, layer-1, mb)
 		w_ij := n.GetWeight(i, j, layer)
-		z += w_ij * *a_j
+		z += w_ij * a_j
 		//fmt.Printf("%v, %v, %v\n", *a_j, w_ij, z)
 	}
 	//	fmt.Printf("z: %v\n", z)
@@ -180,7 +206,7 @@ func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 
 func (n *Network) FeedforwardActivation(i int, layer int, mb *Minibatch) float64 {
 	if l := len(n.nodes); layer == 0 || layer >= l {
-		panic(fmt.Sprintf("Activation layer index=%v must be bigger than 0 and smaller than the number of nodes=%v", layer, l))
+		panic(fmt.Sprintf("Node layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, l))
 	}
 	z := n.CalculateZ(i, layer, mb)
 	a := Sigmoid(z)
@@ -194,8 +220,7 @@ func (n *Network) FeedforwardLayer(layer int, mb *Minibatch) {
 	nLayer := n.nodes[layer]
 	for i := 0; i < nLayer; i++ {
 		a := n.FeedforwardActivation(i, layer, mb)
-		a_i := n.GetActivation(i, layer, mb)
-		*a_i = a
+		n.SetActivation(a, i, layer, mb)
 	}
 }
 
@@ -208,30 +233,20 @@ func (n *Network) Feedforward(mb *Minibatch) {
 	}
 }
 
-func (n *Network) InitializeNetworkWeightsAndBiasesLayer(layer int) {
-	if layer == 0 {
-		return
-	}
-	rand.Seed(time.Now().Unix())
-	// number of weights in this layer
-	weightBaseIdx := n.getWeightBaseIndex(layer)
-	nWeights := n.nWeightsInLayer(layer)
-	for widx := 0; widx < nWeights; widx++ {
-		n.weights[weightBaseIdx+widx] = rand.Float64() / 100.0
-	}
-	biasBaseIdx := n.getBiasBaseIndex(layer)
-	nBiases := n.nodes[layer]
-	for bidx := 0; bidx < nBiases; bidx++ {
-		n.biases[biasBaseIdx+bidx] = rand.Float64() / 100.0
-	}
-}
-
 func (n *Network) InitializeNetworkWeightsAndBiases() {
 	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
-		n.InitializeNetworkWeightsAndBiasesLayer(layer)
+		nWeights := n.nWeights()
+		for widx := 0; widx < nWeights; widx++ {
+			n.weights[widx] = rand.Float64() / 100.0
+		}
+
+		nBiases := n.nBiases()
+		for bidx := 0; bidx < nBiases; bidx++ {
+			n.biases[bidx] = rand.Float64() / 100.0
+		}
 	}
 }
 
@@ -245,7 +260,7 @@ func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float6
 	output := mb.nabla[n.getNodeBaseIndex(outputLayerIdx):]
 	for i := 0; i < nActivations; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
-		da := *a_i - expectedOutputActivations[i]
+		da := a_i - expectedOutputActivations[i]
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		ds := SigmoidPrime(z_i)
 		output[i] = da * ds
@@ -257,8 +272,7 @@ func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch)
 		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", len(inputActivations), n.nodes[0]))
 	}
 	for idx, a := range inputActivations {
-		a_i := n.GetActivation(idx, 0, mb)
-		*a_i = a
+		n.SetActivation(a, idx, 0, mb)
 	}
 }
 
@@ -331,7 +345,7 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 					mb := mbs[mbIdx]
 					a := n.GetActivation(k, layer-1, &mb)
 					nabla := n.GetNabla(j, layer, &mb)
-					dCx_dw := *a * nabla
+					dCx_dw := a * nabla
 					dw_jk += dCx_dw
 				}
 				dw_jk /= float64(nMiniBatches)
