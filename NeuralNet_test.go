@@ -76,7 +76,7 @@ func TestActivationIndex(t *testing.T) {
 	for _, ts := range tables {
 		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
-			ai := network.GetActivationIndex(as.i, as.layer)
+			ai := network.GetNodeIndex(as.i, as.layer)
 			if ai != as.index {
 				t.Errorf("Expected %v, but is %v", as.index, ai)
 			}
@@ -208,8 +208,8 @@ func CreateTestNetwork() (Network, Minibatch) {
 	network.biases[network.GetBiasIndex(1, 2)] = 5
 
 	mb := CreateMiniBatch(7, 12)
-	mb.a[network.GetActivationIndex(0, 0)] = 1
-	mb.a[network.GetActivationIndex(1, 0)] = 2
+	mb.a[network.GetNodeIndex(0, 0)] = 1
+	mb.a[network.GetNodeIndex(1, 0)] = 2
 
 	return network, mb
 }
@@ -430,8 +430,8 @@ func TestTrainWithMNIST(t *testing.T) {
 	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/train-images.idx3-ubyte")
 	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/train-labels.idx1-ubyte")
 
-	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
-	//	ts := make([]MNISTImport.TrainingSample, 5000)
+	//ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
+	ts := make([]MNISTImport.TrainingSample, 100)
 	for idx := range ts {
 		ts[idx].InputActivations = trainingInputActivations[idx]
 
@@ -443,10 +443,10 @@ func TestTrainWithMNIST(t *testing.T) {
 
 	// Assert
 
-	mb := CreateMiniBatch(network.nActivations(), network.nWeights())
+	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
 	network.SetInputActivations(ts[45].InputActivations, &mb)
 	network.Feedforward(&mb)
-	idx := network.getActivationBaseIndex(2)
+	idx := network.getNodeBaseIndex(2)
 	as := mb.a[idx:]
 
 	fmt.Printf("\n%v\n", ts[45].OutputActivations)

@@ -18,18 +18,18 @@ import (
 //          w_00^{2}, w_01^{2}, ..., w_0m^{2}, w_10^{2}, ..., w_1m^{2}, ..., w_n0^{2}, ..., w_nm^{2},
 type Network struct {
 	// how many activations per layer
-	layers []int
+	nodes []int
 
 	// biases, ordered by layer, then index of activation
 	biases []float64
 
-	// weights
+	// Weights. w_{ij}^l connects a_i^l with a_j^{l-1}
 	weights []float64
 }
 
 func CreateNetwork(layers []int) Network {
 	nBiases := sum(layers[1:])
-	return Network{layers: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
+	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
 }
 
 func sum(xs []int) int {
@@ -51,54 +51,50 @@ func nWeights(xs []int) int {
 	return n
 }
 
-func (n Network) getOutputLayerIndex() int {
-	return len(n.layers) - 1
-}
-
 func (n Network) nWeights() int {
-	return nWeights(n.layers)
+	return nWeights(n.nodes)
 }
 
 func (n Network) nWeightsInLayer(layer int) int {
 	if layer == 0 {
 		panic("Layer 0 has no weights")
 	}
-	idx1 := nWeights(n.layers[0:layer])
-	idx2 := nWeights(n.layers[0 : layer+1])
+	idx1 := nWeights(n.nodes[0:layer])
+	idx2 := nWeights(n.nodes[0 : layer+1])
 	return idx2 - idx1
 }
 
-func (n *Network) nActivations() int {
-	return sum(n.layers)
+func (n Network) getOutputLayerIndex() int {
+	return len(n.nodes) - 1
 }
 
-func (n *Network) getActivationBaseIndex(layer int) int {
-	bi := sum(n.layers[0:layer])
+func (n *Network) nNodes() int {
+	return sum(n.nodes)
+}
+
+func (n *Network) getNodeBaseIndex(layer int) int {
+	bi := sum(n.nodes[0:layer])
 	return bi
 }
 
-func (n *Network) GetActivationIndex(index int, layer int) int {
-	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+func (n *Network) GetNodeIndex(index int, layer int) int {
+	if layer >= len(n.nodes) {
+		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
 	}
-	if index >= n.layers[layer] {
-		panic(fmt.Sprintf("Activation index i=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
+	if index >= n.nodes[layer] {
+		panic(fmt.Sprintf("Node index i=%v must be smaller than the number of nodes=%v in layer %v", index, n.nodes[layer], layer))
 	}
-	bi := n.getActivationBaseIndex(layer)
+	bi := n.getNodeBaseIndex(layer)
 	return bi + index
 }
 
 func (n *Network) GetActivation(index int, layer int, mb *Minibatch) *float64 {
-	aIdx := n.GetActivationIndex(index, layer)
+	aIdx := n.GetNodeIndex(index, layer)
 	return &mb.a[aIdx]
 }
 
-func (n *Network) getNablaBaseIndex(layer int) int {
-	return n.getActivationBaseIndex(layer)
-}
-
 func (n *Network) GetNablaIndex(index int, layer int) int {
-	return n.GetActivationIndex(index, layer)
+	return n.GetNodeIndex(index, layer)
 }
 
 func (n *Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
@@ -107,16 +103,16 @@ func (n *Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
 }
 
 func (n *Network) getBiasBaseIndex(layer int) int {
-	bi := sum(n.layers[1:layer])
+	bi := sum(n.nodes[1:layer])
 	return bi
 }
 
 func (n *Network) GetBiasIndex(index int, layer int) int {
-	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Bias layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+	if layer >= len(n.nodes) {
+		panic(fmt.Sprintf("Bias layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
 	}
-	if index >= n.layers[layer] {
-		panic(fmt.Sprintf("Bias index i=%v must be smaller than the number of activations=%v in layer %v", index, n.layers[layer], layer))
+	if index >= n.nodes[layer] {
+		panic(fmt.Sprintf("Bias index i=%v must be smaller than the number of activations=%v in layer %v", index, n.nodes[layer], layer))
 	}
 	bi := n.getBiasBaseIndex(layer)
 	return bi + index
@@ -126,35 +122,35 @@ func (n *Network) GetBias(index int, layer int) float64 {
 	return n.biases[n.GetBiasIndex(index, layer)]
 }
 
+// Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
+// n.weights
+func (n *Network) getWeightBaseIndex(layer int) int {
+	return nWeights(n.nodes[0:layer])
+}
+
 func (n *Network) GetWeightIndex(i int, j int, layer int) int {
 	// Remember the meaning of the indices: w_ij^{l) is the weight from
 	// neuron a_j^{l-1} to neuron a_i^{l}.
 	if layer == 0 {
-		panic(fmt.Sprintf("Weight layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, len(n.layers)))
+		panic(fmt.Sprintf("Weight layer index=%v must be bigger than 0 and smaller than the number of nodes=%v", layer, len(n.nodes)))
 	}
-	if layer >= len(n.layers) {
-		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of layers=%v", layer, len(n.layers)))
+	if layer >= len(n.nodes) {
+		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
 	}
-	if i >= n.layers[layer] {
-		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.layers[layer], layer))
+	if i >= n.nodes[layer] {
+		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.nodes[layer], layer))
 	}
-	if j >= n.layers[layer-1] {
-		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.layers[layer-1], layer-1))
+	if j >= n.nodes[layer-1] {
+		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.nodes[layer-1], layer-1))
 	}
 	bi := n.getWeightBaseIndex(layer)
-	nl1 := n.layers[layer-1]
+	nl1 := n.nodes[layer-1]
 	bi = bi + i*nl1
 	return bi + j
 }
 
 func (n *Network) GetWeight(i int, j int, layer int) float64 {
 	return n.weights[n.GetWeightIndex(i, j, layer)]
-}
-
-// Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
-// n.weights
-func (n *Network) getWeightBaseIndex(layer int) int {
-	return nWeights(n.layers[0:layer])
 }
 
 func Sigmoid(z float64) float64 {
@@ -169,7 +165,7 @@ func SigmoidPrime(z float64) float64 {
 
 func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 	var z float64
-	nPrevLayer := n.layers[layer-1]
+	nPrevLayer := n.nodes[layer-1]
 	for j := 0; j < nPrevLayer; j++ {
 		a_j := n.GetActivation(j, layer-1, mb)
 		w_ij := n.GetWeight(i, j, layer)
@@ -183,8 +179,8 @@ func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 }
 
 func (n *Network) FeedforwardActivation(i int, layer int, mb *Minibatch) float64 {
-	if l := len(n.layers); layer == 0 || layer >= l {
-		panic(fmt.Sprintf("Activation layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, l))
+	if l := len(n.nodes); layer == 0 || layer >= l {
+		panic(fmt.Sprintf("Activation layer index=%v must be bigger than 0 and smaller than the number of nodes=%v", layer, l))
 	}
 	z := n.CalculateZ(i, layer, mb)
 	a := Sigmoid(z)
@@ -195,7 +191,7 @@ func (n *Network) FeedforwardLayer(layer int, mb *Minibatch) {
 	if layer == 0 {
 		return
 	}
-	nLayer := n.layers[layer]
+	nLayer := n.nodes[layer]
 	for i := 0; i < nLayer; i++ {
 		a := n.FeedforwardActivation(i, layer, mb)
 		a_i := n.GetActivation(i, layer, mb)
@@ -204,7 +200,7 @@ func (n *Network) FeedforwardLayer(layer int, mb *Minibatch) {
 }
 
 func (n *Network) Feedforward(mb *Minibatch) {
-	for layer := range n.layers {
+	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
@@ -224,14 +220,14 @@ func (n *Network) InitializeNetworkWeightsAndBiasesLayer(layer int) {
 		n.weights[weightBaseIdx+widx] = rand.Float64() / 100.0
 	}
 	biasBaseIdx := n.getBiasBaseIndex(layer)
-	nBiases := n.layers[layer]
+	nBiases := n.nodes[layer]
 	for bidx := 0; bidx < nBiases; bidx++ {
 		n.biases[biasBaseIdx+bidx] = rand.Float64() / 100.0
 	}
 }
 
 func (n *Network) InitializeNetworkWeightsAndBiases() {
-	for layer := range n.layers {
+	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
@@ -241,12 +237,12 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 
 func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
-	outputLayerIdx := len(n.layers) - 1
-	if len(expectedOutputActivations) != n.layers[outputLayerIdx] {
-		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in ouput layer", len(expectedOutputActivations), n.layers[outputLayerIdx]))
+	outputLayerIdx := len(n.nodes) - 1
+	if len(expectedOutputActivations) != n.nodes[outputLayerIdx] {
+		panic(fmt.Sprintf("Expected output activation size %v does not match number of activations %v in ouput layer", len(expectedOutputActivations), n.nodes[outputLayerIdx]))
 	}
-	nActivations := n.layers[outputLayerIdx]
-	output := mb.nabla[n.getActivationBaseIndex(outputLayerIdx):]
+	nActivations := n.nodes[outputLayerIdx]
+	output := mb.nabla[n.getNodeBaseIndex(outputLayerIdx):]
 	for i := 0; i < nActivations; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
 		da := *a_i - expectedOutputActivations[i]
@@ -257,8 +253,8 @@ func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float6
 }
 
 func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch) {
-	if len(inputActivations) != n.layers[0] {
-		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", len(inputActivations), n.layers[0]))
+	if len(inputActivations) != n.nodes[0] {
+		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", len(inputActivations), n.nodes[0]))
 	}
 	for idx, a := range inputActivations {
 		a_i := n.GetActivation(idx, 0, mb)
@@ -268,13 +264,13 @@ func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch)
 
 func (n *Network) BackpropagateError(mb *Minibatch) {
 	// Equation (45), Chapter 2 of http://neuralnetworksanddeeplearning.com
-	outputLayerIdx := len(n.layers) - 1
+	outputLayerIdx := len(n.nodes) - 1
 	for layer := outputLayerIdx - 1; layer > 0; layer-- {
-		nActivations := n.layers[layer]
-		nNextActivations := n.layers[layer+1]
-		abi1 := n.getActivationBaseIndex(layer)
+		nActivations := n.nodes[layer]
+		nNextActivations := n.nodes[layer+1]
+		abi1 := n.getNodeBaseIndex(layer)
 		nabla := mb.nabla[abi1 : abi1+nActivations]
-		abi2 := n.getActivationBaseIndex(layer + 1)
+		abi2 := n.getNodeBaseIndex(layer + 1)
 		nablaNext := mb.nabla[abi2 : abi2+nNextActivations]
 		for j := 0; j < nActivations; j++ {
 			var tmp float64
@@ -318,15 +314,15 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 	dw := make([]float64, n.nWeights())
 
 	// d C_x / d_bj^l
-	db := make([]float64, n.nActivations())
+	db := make([]float64, n.nNodes())
 
 	nMiniBatches := len(mbs)
-	for layer := range n.layers {
+	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
-		nActivations := n.layers[layer]
-		nPrevActivations := n.layers[layer-1]
+		nActivations := n.nodes[layer]
+		nPrevActivations := n.nodes[layer-1]
 		for j := 0; j < nActivations; j++ {
 			for k := 0; k < nPrevActivations; k++ {
 				// w_jk^l
@@ -358,12 +354,12 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 }
 
 func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
-	for layer := range n.layers {
+	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
-		nActivations := n.layers[layer]
-		nPrevActivations := n.layers[layer-1]
+		nActivations := n.nodes[layer]
+		nPrevActivations := n.nodes[layer-1]
 		for j := 0; j < nActivations; j++ {
 			for k := 0; k < nPrevActivations; k++ {
 				// w_jk^l
@@ -408,7 +404,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), 20)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
-	mbs := CreateMiniBatches(sizeMiniBatch, n.nActivations(), n.nWeights())
+	mbs := CreateMiniBatches(sizeMiniBatch, n.nNodes(), n.nWeights())
 
 	fmt.Printf("Training batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
