@@ -342,10 +342,10 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 		if layer == 0 {
 			continue
 		}
-		nActivations := n.nodes[layer]
-		nPrevActivations := n.nodes[layer-1]
-		for j := 0; j < nActivations; j++ {
-			for k := 0; k < nPrevActivations; k++ {
+		nNodes := n.nNodesInLayer(layer)
+		nPrevNodes := n.nNodesInLayer(layer - 1)
+		for j := 0; j < nNodes; j++ {
+			for k := 0; k < nPrevNodes; k++ {
 				// w_jk^l
 				var dw_jk float64
 				for mbIdx := range mbs {
@@ -379,23 +379,23 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 		if layer == 0 {
 			continue
 		}
-		nActivations := n.nodes[layer]
-		nPrevActivations := n.nodes[layer-1]
-		for j := 0; j < nActivations; j++ {
-			for k := 0; k < nPrevActivations; k++ {
+		nNodes := n.nNodesInLayer(layer)
+		nPrevNodes := n.nNodesInLayer(layer - 1)
+		for j := 0; j < nNodes; j++ {
+			for k := 0; k < nPrevNodes; k++ {
 				// w_jk^l
 				wIdx := n.GetWeightIndex(j, k, layer)
 				dw_jk := dw[wIdx]
 				w_jk := n.GetWeight(j, k, layer)
 				w_jk -= float64(eta) * dw_jk
-				n.weights[wIdx] = w_jk
+				n.SetWeight(w_jk, j, k, layer)
 			}
 			// b_j^l
 			bIdx := n.GetBiasIndex(j, layer)
 			db_j := db[bIdx]
 			b_j := n.GetBias(j, layer)
 			b_j -= float64(eta) * db_j
-			n.biases[bIdx] = b_j
+			n.SetBias(b_j, j, layer)
 		}
 	}
 }
