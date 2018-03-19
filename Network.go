@@ -175,7 +175,7 @@ func (n Network) GetWeightIndex(i int, j int, layer int) int {
 		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.nodes[layer-1], layer-1))
 	}
 	bi := n.getWeightBaseIndex(layer)
-	nl1 := n.nodes[layer-1]
+	nl1 := n.nNodesInLayer(layer - 1)
 	bi = bi + i*nl1
 	return bi + j
 }
@@ -207,9 +207,7 @@ func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
 		a_j := n.GetActivation(j, layer-1, mb)
 		w_ij := n.GetWeight(i, j, layer)
 		z += w_ij * a_j
-		//fmt.Printf("%v, %v, %v\n", *a_j, w_ij, z)
 	}
-	//	fmt.Printf("z: %v\n", z)
 	b := n.GetBias(i, layer)
 	z += b
 	return z
@@ -245,6 +243,7 @@ func (n *Network) Feedforward(mb *Minibatch) {
 }
 
 func (n *Network) InitializeNetworkWeightsAndBiases() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	for layer := range n.nodes {
 		if layer == 0 {
 			continue
@@ -303,7 +302,6 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 			s := SigmoidPrime(z_j)
 			error := tmp * s
 			n.SetNabla(error, j, layer, mb)
-			//			fmt.Printf("%v, %v, %v\n", z_j, s, error)
 		}
 	}
 }
@@ -423,7 +421,7 @@ func min(lhs int, rhs int) int {
 
 func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float32) {
 	// Stochastic Gradient Decent
-	sizeMiniBatch := min(len(trainingSamples), 20)
+	sizeMiniBatch := min(len(trainingSamples), 10)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := CreateMiniBatches(sizeMiniBatch, n.nNodes(), n.nWeights())
 

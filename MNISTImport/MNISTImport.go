@@ -1,12 +1,11 @@
 package MNISTImport
 
 import (
-	"io/ioutil"
 	"encoding/binary"
-	"image/color"
 	"image"
+	"image/color"
+	"io/ioutil"
 )
-
 
 type MNISTData struct {
 	// all training samples
@@ -26,14 +25,14 @@ func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]floa
 	output := make([][]float64, nImages)
 	idx := 0
 	for imageIdx := 0; imageIdx < nImages; imageIdx++ {
-		img := make([]float64, nRows * nCols)
+		img := make([]float64, nRows*nCols)
 		output[imageIdx] = img
 		m := image.NewRGBA(image.Rect(0, 0, nCols, nRows))
 		for rowIdx := 0; rowIdx < nRows; rowIdx++ {
 			for colIdx := 0; colIdx < nRows; colIdx++ {
 				value := data[idx]
 				idx++
-				img[rowIdx * nCols + colIdx] = float64(value) / 255
+				img[rowIdx*nCols+colIdx] = float64(value) / 255
 				m.Set(colIdx, rowIdx, color.RGBA{value, 0, 0, 255})
 			}
 		}
@@ -95,7 +94,7 @@ func Import(dir string) MNISTData {
 
 func (m *MNISTData) GenerateTrainingSamples() []TrainingSample {
 	tss := make([]TrainingSample, len(m.trainingInputActivations))
-	for idx, _ := range m.trainingInputActivations {
+	for idx := range m.trainingInputActivations {
 		ts := &tss[idx]
 		ts.InputActivations = m.trainingInputActivations[idx]
 		ts.OutputActivations = make([]float64, 10)

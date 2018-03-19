@@ -431,7 +431,7 @@ func TestTrainWithMNIST(t *testing.T) {
 	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/train-labels.idx1-ubyte")
 
 	//ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
-	ts := make([]MNISTImport.TrainingSample, 100)
+	ts := make([]MNISTImport.TrainingSample, 1000)
 	for idx := range ts {
 		ts[idx].InputActivations = trainingInputActivations[idx]
 
@@ -439,17 +439,17 @@ func TestTrainWithMNIST(t *testing.T) {
 		expectedResult := trainingResults[idx]
 		ts[idx].OutputActivations[expectedResult] = 1
 	}
-	network.Train(ts, 2, 0.01)
+	network.Train(ts, 30, 0.5)
 
 	// Assert
 
 	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
-	network.SetInputActivations(ts[45].InputActivations, &mb)
+	network.SetInputActivations(ts[38].InputActivations, &mb)
 	network.Feedforward(&mb)
 	idx := network.getNodeBaseIndex(2)
 	as := mb.a[idx:]
 
-	fmt.Printf("\n%v\n", ts[45].OutputActivations)
+	fmt.Printf("\n%v\n", ts[38].OutputActivations)
 	fmt.Printf("%v\n", as)
 
 }
