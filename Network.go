@@ -419,9 +419,9 @@ func min(lhs int, rhs int) int {
 	return rhs
 }
 
-func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float32) {
+func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
 	// Stochastic Gradient Decent
-	sizeMiniBatch := min(len(trainingSamples), 10)
+	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := CreateMiniBatches(sizeMiniBatch, n.nNodes(), n.nWeights())
 

@@ -5,20 +5,12 @@ import (
 	"image"
 	"image/color"
 	"io/ioutil"
+	"path"
 )
 
 type MNISTData struct {
-	// all training samples
-	trainingInputActivations [][]float64
-
-	// labels for each training sample
-	trainingExpectedResult []byte
-
-	// all test samples
-	testInputActivations [][]float64
-
-	// labels for each test sample
-	testExpectedResult []byte
+	inputActivations [][]float64
+	expectedResult []byte
 }
 
 func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]float64 {
@@ -83,22 +75,27 @@ func ImportLabelFile(fileName string) []byte {
 	return BuildFromLabelFile(nLabels, data[8:])
 }
 
-func Import(dir string) MNISTData {
+func ImportData(dir string, imageFile string, labelFile string) MNISTData {
 	var output MNISTData
-	output.trainingInputActivations = ImportImageFile(dir + "train-images.idx3-ubyte")
-	output.trainingExpectedResult = ImportLabelFile(dir + "train-labels.idx1-ubyte")
-	output.testInputActivations = ImportImageFile(dir + "t10k-images.idx3-ubyte")
-	output.testExpectedResult = ImportLabelFile(dir + "t10k-labels.idx1-ubyte")
+	output.inputActivations = ImportImageFile(path.Join(dir, imageFile))
+	output.expectedResult = ImportLabelFile(path.Join(dir, labelFile))
 	return output
 }
 
-func (m *MNISTData) GenerateTrainingSamples() []TrainingSample {
-	tss := make([]TrainingSample, len(m.trainingInputActivations))
-	for idx := range m.trainingInputActivations {
+func (m MNISTData) Length() int {
+	return len(m.inputActivations)
+}
+
+func (m *MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
+	tss := make([]TrainingSample, length)
+	for idx := range m.inputActivations {
+		if idx >= length {
+			break
+		}
 		ts := &tss[idx]
-		ts.InputActivations = m.trainingInputActivations[idx]
+		ts.InputActivations = m.inputActivations[idx]
 		ts.OutputActivations = make([]float64, 10)
-		digit := m.trainingExpectedResult[idx]
+		digit := m.expectedResult[idx]
 		ts.OutputActivations[digit] = 1
 	}
 	return tss

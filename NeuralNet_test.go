@@ -407,12 +407,13 @@ func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, []float64{1, 1})}
-	network.Train(ts, 2, 0.001)
+	network.Train(ts, 2, 0.001, 10)
 
 	// Assert
 	mb := CreateMiniBatch(12, 7)
 	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
 	network.Feedforward(&mb)
+
 	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, a) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, a)
 	}
@@ -439,17 +440,30 @@ func TestTrainWithMNIST(t *testing.T) {
 		expectedResult := trainingResults[idx]
 		ts[idx].OutputActivations[expectedResult] = 1
 	}
-	network.Train(ts, 30, 0.5)
+	network.Train(ts, 30, 0.5, 10)
 
 	// Assert
 
-	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
-	network.SetInputActivations(ts[38].InputActivations, &mb)
-	network.Feedforward(&mb)
-	idx := network.getNodeBaseIndex(2)
-	as := mb.a[idx:]
+	testInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/t10k-images.idx3-ubyte")
+	testResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/t10k-labels.idx1-ubyte")
+	ts2 := make([]MNISTImport.TrainingSample, len(testInputActivations))
+	for idx := range ts2 {
+		ts2[idx].InputActivations = testInputActivations[idx]
 
-	fmt.Printf("\n%v\n", ts[38].OutputActivations)
-	fmt.Printf("%v\n", as)
+		ts2[idx].OutputActivations = make([]float64, 10)
+		expectedResult := testResults[idx]
+		ts2[idx].OutputActivations[expectedResult] = 1
+	}
+
+	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
+	for index := 0; index < len(ts2); index++ {
+		network.SetInputActivations(ts2[index].InputActivations, &mb)
+		network.Feedforward(&mb)
+		idx := network.getNodeBaseIndex(2)
+		as := mb.a[idx:]
+
+		fmt.Printf("should %d: %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f\n", testResults[index], math.Abs(ts2[index].OutputActivations[0] - as[0]), math.Abs(ts2[index].OutputActivations[1] - as[1]), math.Abs(ts2[index].OutputActivations[2] - as[2]), math.Abs(ts2[index].OutputActivations[3] - as[3]), math.Abs(ts2[index].OutputActivations[4] - as[4]), math.Abs(ts2[index].OutputActivations[5] - as[5]), math.Abs(ts2[index].OutputActivations[6] - as[6]), math.Abs(ts2[index].OutputActivations[7] - as[7]), math.Abs(ts2[index].OutputActivations[8] - as[8]), math.Abs(ts2[index].OutputActivations[9] - as[9]))
+//		fmt.Printf("is    : %5.3f\n\n", as[0])
+	}
 
 }
