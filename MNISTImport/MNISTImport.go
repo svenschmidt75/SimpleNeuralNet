@@ -86,7 +86,7 @@ func (m MNISTData) Length() int {
 	return len(m.inputActivations)
 }
 
-func (m *MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
+func (m MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
 	tss := make([]TrainingSample, length)
 	for idx := range m.inputActivations {
 		if idx >= length {
@@ -99,4 +99,8 @@ func (m *MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
 		ts.OutputActivations[digit] = 1
 	}
 	return tss
+}
+
+func (m MNISTData) GetResult(index int) byte {
+	return m.expectedResult[index]
 }

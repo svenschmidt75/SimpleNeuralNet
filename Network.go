@@ -464,3 +464,29 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int
 		}
 	}
 }
+
+func GetError(a1 []float64, a2 []float64) float64 {
+	if len(a1) != len(a2) {
+		panic(fmt.Sprintf("Number of arrays to compare have different sizes"))
+	}
+	var err float64
+	for idx := range a1 {
+		d1 := a1[idx]
+		d2 := a2[idx]
+		err += (d1 - d2) * (d1 - d2)
+	}
+	return math.Sqrt(err)
+}
+
+func GetIndex(a []float64) int {
+	var index int
+	var value float64 = -1
+	for idx := range a {
+		if a[idx] > value {
+			value = a[idx]
+			index = idx
+		}
+
+	}
+	return index
+}
