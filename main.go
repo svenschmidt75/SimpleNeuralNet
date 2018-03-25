@@ -126,7 +126,7 @@ func main() {
 			fmt.Printf("Index %d: Error is %f. Predicted %d, is %d\n", testIdx, err, predictionIndex, testData.GetResult(testIdx))
 		}
 		fmt.Printf("%d/%d correct predication\n", correctPredications, testData.Length())
-		fmt.Printf("Error rate: %f\n", float64(correctPredications)/float64(testData.Length()))
+		fmt.Printf("Error rate: %f\n", 1.0-float64(correctPredications)/float64(testData.Length()))
 
 	}
 }
