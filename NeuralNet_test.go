@@ -462,8 +462,8 @@ func TestTrainWithMNIST(t *testing.T) {
 		idx := network.getNodeBaseIndex(2)
 		as := mb.a[idx:]
 
-		fmt.Printf("should %d: %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f\n", testResults[index], math.Abs(ts2[index].OutputActivations[0] - as[0]), math.Abs(ts2[index].OutputActivations[1] - as[1]), math.Abs(ts2[index].OutputActivations[2] - as[2]), math.Abs(ts2[index].OutputActivations[3] - as[3]), math.Abs(ts2[index].OutputActivations[4] - as[4]), math.Abs(ts2[index].OutputActivations[5] - as[5]), math.Abs(ts2[index].OutputActivations[6] - as[6]), math.Abs(ts2[index].OutputActivations[7] - as[7]), math.Abs(ts2[index].OutputActivations[8] - as[8]), math.Abs(ts2[index].OutputActivations[9] - as[9]))
-//		fmt.Printf("is    : %5.3f\n\n", as[0])
+		fmt.Printf("should %d: %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f\n", testResults[index], math.Abs(ts2[index].OutputActivations[0]-as[0]), math.Abs(ts2[index].OutputActivations[1]-as[1]), math.Abs(ts2[index].OutputActivations[2]-as[2]), math.Abs(ts2[index].OutputActivations[3]-as[3]), math.Abs(ts2[index].OutputActivations[4]-as[4]), math.Abs(ts2[index].OutputActivations[5]-as[5]), math.Abs(ts2[index].OutputActivations[6]-as[6]), math.Abs(ts2[index].OutputActivations[7]-as[7]), math.Abs(ts2[index].OutputActivations[8]-as[8]), math.Abs(ts2[index].OutputActivations[9]-as[9]))
+		// 		fmt.Printf("is    : %5.3f\n\n", as[0])
 	}
 
 }

@@ -5,6 +5,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" beforeDir="false" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Network.go" beforeDir="false" afterPath="$PROJECT_DIR$/Network.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NeuralNet_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/NeuralNet_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimpleNeuralNet" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleNeuralNet" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,32 +21,29 @@
       <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="560">
+            <state relative-caret-position="7786">
               <caret line="458" selection-start-line="457" selection-end-line="458" />
-              <folding>
-                <element signature="e#14#81#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="687">
-              <caret line="72" column="1" lean-forward="true" selection-start-line="72" selection-start-column="1" selection-end-line="72" selection-end-column="1" />
+            <state relative-caret-position="459">
+              <caret line="131" lean-forward="true" selection-start-line="131" selection-end-line="131" />
               <folding>
-                <element signature="e#14#37#0" expanded="true" />
+                <element signature="e#14#84#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Network.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="160">
-              <caret line="432" column="14" selection-start-line="432" selection-start-column="14" selection-end-line="432" selection-end-column="14" />
+            <state relative-caret-position="644">
+              <caret line="450" column="38" selection-start-line="450" selection-start-column="38" selection-end-line="450" selection-end-column="38" />
               <folding>
                 <element signature="e#14#91#0" expanded="true" />
               </folding>
@@ -55,11 +54,8 @@
       <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="764">
+            <state relative-caret-position="1649">
               <caret line="103" column="44" selection-start-line="103" selection-start-column="44" selection-end-line="103" selection-end-column="44" />
-              <folding>
-                <element signature="e#21#87#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -168,7 +164,7 @@
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="settings.editor.selected.configurable" value="go.dep" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -289,6 +285,7 @@
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15511023" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Cargo" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5062124" side_tool="true" weight="0.328614" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
@@ -311,18 +308,18 @@
     <layout-to-restore>
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2496994" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.4985972" weight="0.32960477" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4937876" weight="0.32885906" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4985972" weight="0.32960477" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5062124" side_tool="true" weight="0.328614" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.4985972" weight="0.32960477" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49539077" weight="0.398956" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Messages" order="7" visible="true" weight="0.32960477" />
@@ -368,7 +365,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="110" />
+      <option name="time" value="116" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -465,9 +462,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
           <caret line="28" column="29" selection-start-line="28" selection-start-column="29" selection-end-line="28" selection-end-column="29" />
-          <folding>
-            <element signature="e#21#87#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -639,18 +633,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="560">
+        <state relative-caret-position="7786">
           <caret line="458" selection-start-line="457" selection-end-line="458" />
-          <folding>
-            <element signature="e#14#81#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/go-1.10/src/runtime/proc.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="151" selection-start-line="151" selection-end-line="151" />
         </state>
       </provider>
     </entry>
@@ -670,30 +654,34 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="764">
+        <state relative-caret-position="1649">
           <caret line="103" column="44" selection-start-line="103" selection-start-column="44" selection-end-line="103" selection-end-column="44" />
-          <folding>
-            <element signature="e#21#87#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="687">
-          <caret line="72" column="1" lean-forward="true" selection-start-line="72" selection-start-column="1" selection-end-line="72" selection-end-column="1" />
-          <folding>
-            <element signature="e#14#37#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Network.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="432" column="14" selection-start-line="432" selection-start-column="14" selection-end-line="432" selection-end-column="14" />
+        <state relative-caret-position="644">
+          <caret line="450" column="38" selection-start-line="450" selection-start-column="38" selection-end-line="450" selection-end-column="38" />
           <folding>
             <element signature="e#14#91#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/go-1.10/src/runtime/proc.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="599">
+          <caret line="220" column="9" lean-forward="true" selection-start-line="220" selection-start-column="9" selection-end-line="220" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="131" lean-forward="true" selection-start-line="131" selection-end-line="131" />
+          <folding>
+            <element signature="e#14#84#0" expanded="true" />
           </folding>
         </state>
       </provider>

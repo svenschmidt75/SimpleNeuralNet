@@ -10,7 +10,7 @@ import (
 
 type MNISTData struct {
 	inputActivations [][]float64
-	expectedResult []byte
+	expectedResult   []byte
 }
 
 func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]float64 {
