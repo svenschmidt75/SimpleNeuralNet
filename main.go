@@ -4,7 +4,6 @@ import (
 	"SimpleNeuralNet/MNISTImport"
 	"encoding/gob"
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -85,8 +84,6 @@ func main() {
 			fmt.Println(err)
 		}
 	} else if idx == 2 {
-		network := CreateNetwork([]int{28 * 28, 100, 10})
-
 		filename := "./n.gob"
 		fmt.Printf("Enter the network filename (%s): ", filename)
 		fmt.Scanf("%s", &filename)
@@ -94,8 +91,9 @@ func main() {
 			filename = "./n.gob"
 		}
 		fmt.Printf("Deserializing network from %s...\n", filename)
-		err := readGob(filename, &network)
-		if err != nil && err != io.EOF {
+		network := new(Network)
+		err := readGob(filename, network)
+		if err != nil {
 			fmt.Println(err)
 		}
 		dataDir := "/home/svenschmidt75/Develop/Go/MNIST"
@@ -133,21 +131,21 @@ func main() {
 	}
 }
 
-func writeGob(filePath string, network *Network) error {
+func writeGob(filePath string, object interface{}) error {
 	file, err := os.Create(filePath)
 	if err == nil {
 		encoder := gob.NewEncoder(file)
-		encoder.Encode(network)
+		encoder.Encode(object)
 	}
 	file.Close()
 	return err
 }
 
-func readGob(filePath string, network *Network) error {
+func readGob(filePath string, object interface{}) error {
 	file, err := os.Open(filePath)
 	if err == nil {
 		decoder := gob.NewDecoder(file)
-		err = decoder.Decode(network)
+		err = decoder.Decode(object)
 	}
 	file.Close()
 	return err
