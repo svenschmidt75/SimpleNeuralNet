@@ -56,7 +56,7 @@ func main() {
 		var correctPredications int
 		mb := CreateMiniBatch(network.nNodes(), network.nWeights())
 		fmt.Printf("\nGenerating %d training samples for test data...\n", testData.Length())
-		ts = testData.GenerateTrainingSamples(nTrainingSamples)
+		ts = testData.GenerateTrainingSamples(testData.Length())
 		for testIdx := range ts {
 			network.SetInputActivations(ts[testIdx].InputActivations, &mb)
 			network.Feedforward(&mb)
