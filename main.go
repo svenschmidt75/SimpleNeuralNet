@@ -60,7 +60,7 @@ func main() {
 		for testIdx := range ts {
 			network.SetInputActivations(ts[testIdx].InputActivations, &mb)
 			network.Feedforward(&mb)
-			idx := network.getNodeBaseIndex(2)
+			idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
 			as := mb.a[idx:]
 			err := GetError(ts[testIdx].OutputActivations, as)
 			predictionIndex := GetIndex(as)
