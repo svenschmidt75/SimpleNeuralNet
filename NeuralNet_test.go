@@ -2,6 +2,7 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
+	"bytes"
 	"fmt"
 	"math"
 	"testing"
@@ -440,4 +441,28 @@ func TestTrainWithMNIST(t *testing.T) {
 }
 
 func TestSerialization(t *testing.T) {
+	network := CreateNetwork([]int{28 * 28, 100, 10})
+	network.InitializeNetworkWeightsAndBiases()
+
+	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
+	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10)
+
+	var buf bytes.Buffer
+	err := WriteGob(&buf, &network)
+	if err != nil {
+		t.Errorf("Error serializing network")
+	}
+
+	readNetwork := new(Network)
+	err = ReadGob(&buf, readNetwork)
+	if err != nil {
+		t.Error("Error deserializing network")
+	}
+
+	a1 := network.GetWeight(1, 1, 1)
+	a2 := readNetwork.GetWeight(1, 1, 1)
+	if floatEquals(a1, a2) == false {
+		t.Error("Networks not equal")
+	}
 }

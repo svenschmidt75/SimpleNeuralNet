@@ -82,7 +82,7 @@ func main() {
 			filename = "./n.gob"
 		}
 		fmt.Printf("\nSerializing network to %s...\n", filename)
-		err := writeGob(filename, &network)
+		err := WriteGobToFile(filename, &network)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -95,7 +95,7 @@ func main() {
 		}
 		fmt.Printf("Deserializing network from %s...\n", filename)
 		network := new(Network)
-		err := readGob(filename, network)
+		err := ReadGobFromFile(filename, network)
 		if err != nil {
 			fmt.Println(err)
 		}
