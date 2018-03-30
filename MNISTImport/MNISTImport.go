@@ -2,15 +2,22 @@ package MNISTImport
 
 import (
 	"encoding/binary"
+	"fmt"
 	"image"
 	"image/color"
 	"io/ioutil"
+	"math/rand"
 	"path"
+	"time"
 )
 
 type MNISTData struct {
 	inputActivations [][]float64
 	expectedResult   []byte
+}
+
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
 }
 
 func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]float64 {
@@ -28,7 +35,7 @@ func BuildFromImageFile(nImages int, nRows int, nCols int, data []byte) [][]floa
 				m.Set(colIdx, rowIdx, color.RGBA{value, 0, 0, 255})
 			}
 		}
-		//outputFile, err := os.Create(fmt.Sprintf("/home/svenschmidt75/Downloads/MNISTDecoded/test%d.png", imageIdx))
+		//outputFile, err := os.Create(fmt.Sprintf("/home/svenschmidt75/Develop/Go/MNIST/TestImages/test%d.png", imageIdx))
 		//if err != nil {
 		//	panic("error")
 		//}
@@ -82,25 +89,46 @@ func ImportData(dir string, imageFile string, labelFile string) MNISTData {
 	return output
 }
 
-func (m MNISTData) Length() int {
-	return len(m.inputActivations)
+func (data MNISTData) Length() int {
+	return len(data.inputActivations)
 }
 
-func (m MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
+func (data MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
 	tss := make([]TrainingSample, length)
-	for idx := range m.inputActivations {
+	for idx := range data.inputActivations {
 		if idx >= length {
 			break
 		}
 		ts := &tss[idx]
-		ts.InputActivations = m.inputActivations[idx]
-		ts.OutputActivations = make([]float64, 10)
-		digit := m.expectedResult[idx]
-		ts.OutputActivations[digit] = 1
+		ts.InputActivations = data.inputActivations[idx]
+		ts.ExpectedClass = int(data.expectedResult[idx])
 	}
 	return tss
 }
 
-func (m MNISTData) GetResult(index int) byte {
-	return m.expectedResult[index]
+func (data MNISTData) GetResult(index int) byte {
+	return data.expectedResult[index]
+}
+
+func (data *MNISTData) Split(ratio float32) (*MNISTData, *MNISTData) {
+	if ratio <= 0 || ratio > 1 {
+		panic(fmt.Sprintf("Ratio %f must be between (0,1]", ratio))
+	}
+	totalSize := data.Length()
+	trainingSize := int(float32(totalSize) * (1 - ratio))
+	validationSize := totalSize - trainingSize
+	perm := rand.Perm(totalSize)
+	trainingData := &MNISTData{make([][]float64, trainingSize), make([]byte, trainingSize)}
+	validationData := &MNISTData{make([][]float64, validationSize), make([]byte, validationSize)}
+	for idx := 0; idx < trainingSize; idx++ {
+		dataIdx := perm[idx]
+		trainingData.inputActivations[idx] = data.inputActivations[dataIdx]
+		trainingData.expectedResult[idx] = data.expectedResult[dataIdx]
+	}
+	for idx := 0; idx < validationSize; idx++ {
+		dataIdx := perm[trainingSize+idx]
+		validationData.inputActivations[idx] = data.inputActivations[dataIdx]
+		validationData.expectedResult[idx] = data.expectedResult[dataIdx]
+	}
+	return trainingData, validationData
 }

@@ -10,8 +10,8 @@ import (
 func main() {
 	fmt.Print("1. Train neural network with MNIST data\n")
 	fmt.Print("2. Run neural network on MNIST test data\n")
-	idx := 2
-	fmt.Scanf("%d", &idx)
+	idx := 1
+	fmt.Scanf("%d\n", &idx)
 
 	if idx == 1 {
 		network := CreateNetwork([]int{28 * 28, 100, 10})
@@ -20,13 +20,21 @@ func main() {
 		dataDir := "/home/svenschmidt75/Develop/Go/MNIST"
 		fmt.Printf("Location of training files (%s): ", dataDir)
 		userDataDir := ""
-		fmt.Scanf("%s", &userDataDir)
+		fmt.Scanf("%s\n", &userDataDir)
 		if userDataDir == "" {
 			userDataDir = dataDir
 		}
 		fmt.Printf("Importing training data from %s...\n", userDataDir)
-		trainingData := MNISTImport.ImportData(userDataDir, "train-images.idx3-ubyte", "train-labels.idx1-ubyte")
-		fmt.Printf("Read %d train images\n", trainingData.Length())
+		totalDataSet := MNISTImport.ImportData(userDataDir, "train-images.idx3-ubyte", "train-labels.idx1-ubyte")
+		fmt.Printf("Read %d train images\n", totalDataSet.Length())
+
+		validationDataFraction := float32(0.1)
+		fmt.Print("Fraction of training data for validation: ")
+		fmt.Scanf("%f\n", &validationDataFraction)
+
+		// split up training data in training and validation
+		trainingData, validationData := totalDataSet.Split(validationDataFraction)
+
 		fmt.Printf("Importing test data from %s...\n", userDataDir)
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())
@@ -39,18 +47,19 @@ func main() {
 		}
 		fmt.Printf("\nGenerating %d training samples...\n", nTrainingSamples)
 		ts := trainingData.GenerateTrainingSamples(nTrainingSamples)
+		vs := validationData.GenerateTrainingSamples(validationData.Length())
 
 		epochs := 2
 		eta := float32(0.5)
 		miniMatchSize := 10
 		fmt.Print("#epochs: ")
-		fmt.Scanf("%d", &epochs)
+		fmt.Scanf("%d\n", &epochs)
 		fmt.Print("learning rate eta: ")
-		fmt.Scanf("%f", &eta)
+		fmt.Scanf("%f\n", &eta)
 		fmt.Print("mini batch size: ")
-		fmt.Scanf("%d", &miniMatchSize)
+		fmt.Scanf("%d\n", &miniMatchSize)
 		fmt.Print("Training neural network...\n")
-		network.Train(ts, epochs, eta, miniMatchSize)
+		network.Train(ts, vs, epochs, eta, miniMatchSize)
 
 		// run against test data
 		var correctPredications int
@@ -62,9 +71,9 @@ func main() {
 			network.Feedforward(&mb)
 			idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
 			as := mb.a[idx:]
-			err := GetError(ts[testIdx].OutputActivations, as)
+			err := GetError(ts[testIdx].ExpectedClass, as)
 			predictionIndex := GetIndex(as)
-			if ts[testIdx].OutputActivations[predictionIndex] == 1 {
+			if ts[testIdx].ExpectedClass == predictionIndex {
 				correctPredications++
 			}
 			fmt.Printf("Index %d: Error is %f. Predicted %d, is %d\n", testIdx, err, predictionIndex, testData.GetResult(testIdx))
@@ -74,7 +83,7 @@ func main() {
 
 		filename := "./n.gob"
 		fmt.Printf("Enter a filename to serialize the network to (%s): ", filename)
-		fmt.Scanf("%s", &filename)
+		fmt.Scanf("%s\n", &filename)
 		if filename == "" {
 			filename = "./n.gob"
 		}
@@ -86,7 +95,7 @@ func main() {
 	} else if idx == 2 {
 		filename := "./n.gob"
 		fmt.Printf("Enter the network filename (%s): ", filename)
-		fmt.Scanf("%s", &filename)
+		fmt.Scanf("%s\n", &filename)
 		if filename == "" {
 			filename = "./n.gob"
 		}
@@ -99,7 +108,7 @@ func main() {
 		dataDir := "/home/svenschmidt75/Develop/Go/MNIST"
 		fmt.Printf("Location of test data (%s): ", dataDir)
 		userDataDir := ""
-		fmt.Scanf("%s", &userDataDir)
+		fmt.Scanf("%s\n", &userDataDir)
 		if userDataDir == "" {
 			userDataDir = dataDir
 		}
@@ -118,9 +127,9 @@ func main() {
 			network.Feedforward(&mb)
 			idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
 			as := mb.a[idx:]
-			err := GetError(ts[testIdx].OutputActivations, as)
+			err := GetError(ts[testIdx].ExpectedClass, as)
 			predictionIndex := GetIndex(as)
-			if ts[testIdx].OutputActivations[predictionIndex] == 1 {
+			if ts[testIdx].ExpectedClass == predictionIndex {
 				correctPredications++
 			}
 			fmt.Printf("Index %d: Error is %f. Predicted %d, is %d\n", testIdx, err, predictionIndex, testData.GetResult(testIdx))

@@ -341,19 +341,19 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	outputLayerIdx := 2
 
 	tables := []struct {
-		outputActivations         []float64
-		expectedOutputActivations []float64
-		error                     []float64
+		outputActivations []float64
+		expectedClass     int
+		error             []float64
 	}{
-		{[]float64{1, 1}, []float64{1, 1}, []float64{0, 0}},
-		{[]float64{0, 0}, []float64{1, 1}, []float64{-0.01897348347524417, -0.10026647037539357}},
-		{[]float64{0.24, 0.21}, []float64{1, 1}, []float64{-0.014419847441185569, -0.07921051159656092}},
+		{[]float64{1, 1}, 1, []float64{0, 0}},
+		{[]float64{0, 0}, 1, []float64{-0.01897348347524417, -0.10026647037539357}},
+		{[]float64{0.24, 0.21}, 1, []float64{-0.014419847441185569, -0.07921051159656092}},
 	}
 
 	for _, ts := range tables {
 		network.SetActivation(ts.outputActivations[0], 0, outputLayerIdx, &mb)
 		network.SetActivation(ts.outputActivations[1], 1, outputLayerIdx, &mb)
-		network.CalculateErrorInOutputLayer(ts.expectedOutputActivations, &mb)
+		network.CalculateErrorInOutputLayer(ts.expectedClass, &mb)
 		if nabla := network.GetNabla(0, 2, &mb); floatEquals(ts.error[0], nabla) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], nabla)
 		}
@@ -369,7 +369,7 @@ func TestBackpropagateError(t *testing.T) {
 	network.SetActivation(0.32, 0, 0, &mb)
 	network.SetActivation(0.56, 1, 0, &mb)
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
+	network.CalculateErrorInOutputLayer(0, &mb)
 	network.BackpropagateError(&mb)
 
 	if nabla := network.GetNabla(0, 1, &mb); floatEquals(0.007357185735347161, nabla) == false {
@@ -386,7 +386,7 @@ func TestBackpropagateError(t *testing.T) {
 func TestCalculateDerivatives(t *testing.T) {
 	network, mb := CreateTestNetwork()
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer([]float64{0.1, 0.5}, &mb)
+	network.CalculateErrorInOutputLayer(1, &mb)
 	network.BackpropagateError(&mb)
 
 	dw, db := network.CalculateDerivatives([]Minibatch{mb})
@@ -399,21 +399,17 @@ func TestCalculateDerivatives(t *testing.T) {
 	}
 }
 
-func TestUpdateNetwork(t *testing.T) {
-
-}
-
 func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, []float64{1, 1})}
-	network.Train(ts, 2, 0.001, 10)
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, 1), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, 1)}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 10)
 
-	// Assert
 	mb := CreateMiniBatch(12, 7)
 	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
 	network.Feedforward(&mb)
 
+	// Assert
 	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, a) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, a)
 	}
@@ -426,21 +422,14 @@ func TestTrainWithMNIST(t *testing.T) {
 	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
-	//trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
-	//trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
-	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/train-images.idx3-ubyte")
-	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/train-labels.idx1-ubyte")
-
-	//ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
-	ts := make([]MNISTImport.TrainingSample, 1000)
+	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
+	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
+	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
 	for idx := range ts {
 		ts[idx].InputActivations = trainingInputActivations[idx]
-
-		ts[idx].OutputActivations = make([]float64, 10)
-		expectedResult := trainingResults[idx]
-		ts[idx].OutputActivations[expectedResult] = 1
+		ts[idx].ExpectedClass = int(trainingResults[idx])
 	}
-	network.Train(ts, 30, 0.5, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10)
 
 	// Assert
 
@@ -449,20 +438,17 @@ func TestTrainWithMNIST(t *testing.T) {
 	ts2 := make([]MNISTImport.TrainingSample, len(testInputActivations))
 	for idx := range ts2 {
 		ts2[idx].InputActivations = testInputActivations[idx]
-
-		ts2[idx].OutputActivations = make([]float64, 10)
-		expectedResult := testResults[idx]
-		ts2[idx].OutputActivations[expectedResult] = 1
+		ts2[idx].ExpectedClass = int(testResults[idx])
 	}
 
 	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
 	for index := 0; index < len(ts2); index++ {
 		network.SetInputActivations(ts2[index].InputActivations, &mb)
 		network.Feedforward(&mb)
-		idx := network.getNodeBaseIndex(2)
+		idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
 		as := mb.a[idx:]
 
-		fmt.Printf("should %d: %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f\n", testResults[index], math.Abs(ts2[index].OutputActivations[0]-as[0]), math.Abs(ts2[index].OutputActivations[1]-as[1]), math.Abs(ts2[index].OutputActivations[2]-as[2]), math.Abs(ts2[index].OutputActivations[3]-as[3]), math.Abs(ts2[index].OutputActivations[4]-as[4]), math.Abs(ts2[index].OutputActivations[5]-as[5]), math.Abs(ts2[index].OutputActivations[6]-as[6]), math.Abs(ts2[index].OutputActivations[7]-as[7]), math.Abs(ts2[index].OutputActivations[8]-as[8]), math.Abs(ts2[index].OutputActivations[9]-as[9]))
+		fmt.Printf("should %d: %v\n", testResults[index], as)
 		// 		fmt.Printf("is    : %5.3f\n\n", as[0])
 	}
 

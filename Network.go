@@ -29,6 +29,10 @@ type Network struct {
 	weights []float64
 }
 
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+}
+
 func CreateNetwork(layers []int) Network {
 	nBiases := sum(layers[1:])
 	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
@@ -245,7 +249,6 @@ func (n *Network) Feedforward(mb *Minibatch) {
 }
 
 func (n *Network) InitializeNetworkWeightsAndBiases() {
-	rand.Seed(time.Now().UTC().UnixNano())
 	for layer := range n.nodes {
 		if layer == 0 {
 			continue
@@ -261,16 +264,16 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 	}
 }
 
-func (n *Network) CalculateErrorInOutputLayer(expectedOutputActivations []float64, mb *Minibatch) {
+func (n *Network) CalculateErrorInOutputLayer(expectedClass int, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
-	if len(expectedOutputActivations) != n.nodes[outputLayerIdx] {
-		panic(fmt.Sprintf("Expected number of expected output layer nodes %v does not match number of nodes %v in ouput layer", len(expectedOutputActivations), n.nodes[outputLayerIdx]))
-	}
 	nNodes := n.nNodesInLayer(outputLayerIdx)
 	for i := 0; i < nNodes; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
-		dCda := a_i - expectedOutputActivations[i]
+		dCda := a_i
+		if i == expectedClass {
+			dCda -= 1
+		}
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		ds := SigmoidPrime(z_i)
 		nabla := dCda * ds
@@ -401,7 +404,6 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 }
 
 func generateRandomIndices(size int) []int {
-	rand.Seed(time.Now().UTC().UnixNano())
 	// generate random permutation
 	perm := rand.Perm(size)
 	return perm
@@ -421,7 +423,7 @@ func min(lhs int, rhs int) int {
 	return rhs
 }
 
-func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
+func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
@@ -435,21 +437,19 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int
 	for epoch := 0; epoch < epochs; epoch++ {
 		indices := generateRandomIndices(len(trainingSamples))
 		for j := 0; j < nMiniBatches; j++ {
-			fmt.Printf("Minibatch %d of %d, epoch %d of %d...\n", j+1, nMiniBatches, epoch+1, epochs)
-
 			for i := 0; i < sizeMiniBatch; i++ {
 				mb := mbs[i]
 				index := indices[j*sizeMiniBatch+i]
 				x := trainingSamples[index]
 				n.SetInputActivations(x.InputActivations, &mb)
 				n.Feedforward(&mb)
-				n.CalculateErrorInOutputLayer(x.OutputActivations, &mb)
+				n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
 				n.BackpropagateError(&mb)
 			}
 			dw, db := n.CalculateDerivatives(mbs)
 			n.UpdateNetwork(eta, dw, db)
 		}
-		// the rest
+		// the remainder
 		nRest := len(trainingSamples) - sizeMiniBatch*nMiniBatches
 		if nRest > 0 {
 			for i := 0; i < nRest; i++ {
@@ -458,23 +458,41 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, epochs int
 				x := trainingSamples[index]
 				n.SetInputActivations(x.InputActivations, &mb)
 				n.Feedforward(&mb)
-				n.CalculateErrorInOutputLayer(x.OutputActivations, &mb)
+				n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
 				n.BackpropagateError(&mb)
 			}
 			dw, db := n.CalculateDerivatives(mbs)
 			n.UpdateNetwork(eta, dw, db)
 		}
+
+		// run against validation dataset
+		// could be done in parallel...
+		if len(validationSamples) > 0 {
+			var correctPredications int
+			mb := CreateMiniBatch(n.nNodes(), n.nWeights())
+			for testIdx := range validationSamples {
+				n.SetInputActivations(validationSamples[testIdx].InputActivations, &mb)
+				n.Feedforward(&mb)
+				idx := n.getNodeBaseIndex(n.getOutputLayerIndex())
+				as := mb.a[idx:]
+				predictionIndex := GetIndex(as)
+				if validationSamples[testIdx].ExpectedClass == predictionIndex {
+					correctPredications++
+				}
+			}
+			fmt.Printf("Epoch %d - accuracy %f\n", epoch, float64(correctPredications)/float64(len(validationSamples)))
+		}
 	}
 }
 
-func GetError(a1 []float64, a2 []float64) float64 {
-	if len(a1) != len(a2) {
-		panic(fmt.Sprintf("Number of arrays to compare have different sizes"))
-	}
+func GetError(predictedClass int, a []float64) float64 {
 	var err float64
-	for idx := range a1 {
-		d1 := a1[idx]
-		d2 := a2[idx]
+	for idx := range a {
+		var d1 float64 = 0
+		if idx == predictedClass {
+			d1 = 1
+		}
+		d2 := a[idx]
 		err += (d1 - d2) * (d1 - d2)
 	}
 	return math.Sqrt(err)
