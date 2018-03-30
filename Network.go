@@ -33,6 +33,40 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+// Implement interface 'GobEncoder'
+func (n *Network) GobEncode() ([]byte, error) {
+	w := new(bytes.Buffer)
+	encoder := gob.NewEncoder(w)
+	err := encoder.Encode(n.nodes)
+	if err != nil {
+		return nil, err
+	}
+	err = encoder.Encode(n.biases)
+	if err != nil {
+		return nil, err
+	}
+	err = encoder.Encode(n.weights)
+	if err != nil {
+		return nil, err
+	}
+	return w.Bytes(), nil
+}
+
+// Implement interface 'GobDecoder'
+func (n *Network) GobDecode(buf []byte) error {
+	r := bytes.NewBuffer(buf)
+	decoder := gob.NewDecoder(r)
+	err := decoder.Decode(&n.nodes)
+	if err != nil {
+		return err
+	}
+	err = decoder.Decode(&n.biases)
+	if err != nil {
+		return err
+	}
+	return decoder.Decode(&n.weights)
+}
+
 func CreateNetwork(layers []int) Network {
 	nBiases := sum(layers[1:])
 	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
@@ -437,6 +471,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	for epoch := 0; epoch < epochs; epoch++ {
 		indices := generateRandomIndices(len(trainingSamples))
 		for j := 0; j < nMiniBatches; j++ {
+			fmt.Printf("Minibatch %d of %d...\n", j, nMiniBatches)
 			for i := 0; i < sizeMiniBatch; i++ {
 				mb := mbs[i]
 				index := indices[j*sizeMiniBatch+i]
@@ -509,38 +544,4 @@ func GetIndex(a []float64) int {
 
 	}
 	return index
-}
-
-// Implement interface 'GobEncoder'
-func (n *Network) GobEncode() ([]byte, error) {
-	w := new(bytes.Buffer)
-	encoder := gob.NewEncoder(w)
-	err := encoder.Encode(n.nodes)
-	if err != nil {
-		return nil, err
-	}
-	err = encoder.Encode(n.biases)
-	if err != nil {
-		return nil, err
-	}
-	err = encoder.Encode(n.weights)
-	if err != nil {
-		return nil, err
-	}
-	return w.Bytes(), nil
-}
-
-// Implement interface 'GobDecoder'
-func (n *Network) GobDecode(buf []byte) error {
-	r := bytes.NewBuffer(buf)
-	decoder := gob.NewDecoder(r)
-	err := decoder.Decode(&n.nodes)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&n.biases)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(&n.weights)
 }

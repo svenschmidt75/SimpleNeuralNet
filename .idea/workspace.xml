@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="add trained NN model">
+    <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" beforeDir="false" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MNISTImport/TrainingSample.go" beforeDir="false" afterPath="$PROJECT_DIR$/MNISTImport/TrainingSample.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Network.go" beforeDir="false" afterPath="$PROJECT_DIR$/Network.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NeuralNet_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/NeuralNet_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SimpleNeuralNet" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleNeuralNet" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
@@ -34,26 +32,26 @@
       <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="439" selection-start-line="439" selection-end-line="439" />
+            <state relative-caret-position="1119">
+              <caret line="528" column="4" lean-forward="true" selection-start-line="528" selection-start-column="4" selection-end-line="528" selection-end-column="4" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="487">
-              <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+            <state relative-caret-position="578">
+              <caret line="39" selection-start-line="39" selection-end-line="39" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
-              <caret line="123" selection-start-line="123" selection-end-line="123" />
+            <state relative-caret-position="568">
+              <caret line="135" column="26" selection-start-line="135" selection-start-column="26" selection-end-line="135" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -109,10 +107,10 @@
         <option value="$PROJECT_DIR$/Minibatch.go" />
         <option value="$PROJECT_DIR$/MNISTImport/MNISTImport_test.go" />
         <option value="$PROJECT_DIR$/NeuralNet_test.go" />
-        <option value="$PROJECT_DIR$/Network.go" />
         <option value="$PROJECT_DIR$/MNISTImport/TrainingSample.go" />
-        <option value="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
+        <option value="$PROJECT_DIR$/Network.go" />
         <option value="$PROJECT_DIR$/main.go" />
+        <option value="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
       </list>
     </option>
   </component>
@@ -257,7 +255,7 @@
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49539077" weight="0.39880508" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49539077" visible="true" weight="0.39880508" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Cargo" order="3" />
@@ -325,7 +323,8 @@
     <MESSAGE value="add NN" />
     <MESSAGE value="fix: use test data length, not training data's" />
     <MESSAGE value="add trained NN model" />
-    <option name="LAST_COMMIT_MESSAGE" value="add trained NN model" />
+    <MESSAGE value="use validation data at the end of each epoch to assess accuracy" />
+    <option name="LAST_COMMIT_MESSAGE" value="use validation data at the end of each epoch to assess accuracy" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -346,28 +345,22 @@
           <option name="timeStamp" value="137" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/MNISTImport/MNISTImport.go</url>
-          <line>113</line>
-          <properties />
-          <option name="timeStamp" value="141" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/main.go</url>
-          <line>35</line>
+          <line>57</line>
           <properties />
-          <option name="timeStamp" value="142" />
+          <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/Network.go</url>
-          <line>469</line>
+          <url>file://$PROJECT_DIR$/MNISTImport/MNISTImport.go</url>
+          <line>132</line>
           <properties />
-          <option name="timeStamp" value="143" />
+          <option name="timeStamp" value="148" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="145" />
+      <option name="time" value="149" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -657,6 +650,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Network.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1119">
+          <caret line="528" column="4" lean-forward="true" selection-start-line="528" selection-start-column="4" selection-end-line="528" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/TrainingSample.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -664,24 +664,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="123" selection-start-line="123" selection-end-line="123" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Network.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="439" selection-start-line="439" selection-end-line="439" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="487">
-          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+        <state relative-caret-position="578">
+          <caret line="39" selection-start-line="39" selection-end-line="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="568">
+          <caret line="135" column="26" selection-start-line="135" selection-start-column="26" selection-end-line="135" selection-end-column="26" />
         </state>
       </provider>
     </entry>

@@ -110,25 +110,31 @@ func (data MNISTData) GetResult(index int) byte {
 	return data.expectedResult[index]
 }
 
-func (data *MNISTData) Split(ratio float32) (*MNISTData, *MNISTData) {
+func (data *MNISTData) Split(ratio float32, size int) (*MNISTData, *MNISTData) {
 	if ratio <= 0 || ratio > 1 {
 		panic(fmt.Sprintf("Ratio %f must be between (0,1]", ratio))
 	}
+	if size > data.Length() {
+		panic(fmt.Sprintf("Training data size %d cannot be larger then the total data size %d", size, data.Length()))
+	}
 	totalSize := data.Length()
-	trainingSize := int(float32(totalSize) * (1 - ratio))
-	validationSize := totalSize - trainingSize
 	perm := rand.Perm(totalSize)
-	trainingData := &MNISTData{make([][]float64, trainingSize), make([]byte, trainingSize)}
-	validationData := &MNISTData{make([][]float64, validationSize), make([]byte, validationSize)}
-	for idx := 0; idx < trainingSize; idx++ {
-		dataIdx := perm[idx]
-		trainingData.inputActivations[idx] = data.inputActivations[dataIdx]
-		trainingData.expectedResult[idx] = data.expectedResult[dataIdx]
+
+	var GenerateData = func(size int, offset int) *MNISTData {
+		newData := &MNISTData{make([][]float64, size), make([]byte, size)}
+		for idx := 0; idx < size; idx++ {
+			dataIdx := perm[offset+idx]
+			newData.inputActivations[idx] = data.inputActivations[dataIdx]
+			newData.expectedResult[idx] = data.expectedResult[dataIdx]
+		}
+		return newData
 	}
-	for idx := 0; idx < validationSize; idx++ {
-		dataIdx := perm[trainingSize+idx]
-		validationData.inputActivations[idx] = data.inputActivations[dataIdx]
-		validationData.expectedResult[idx] = data.expectedResult[dataIdx]
-	}
+
+	trainingSize := int(float32(size) * (1 - ratio))
+	trainingData := GenerateData(trainingSize, 0)
+
+	validationSize := size - trainingSize
+	validationData := GenerateData(validationSize, trainingSize)
+
 	return trainingData, validationData
 }

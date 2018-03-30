@@ -27,26 +27,22 @@ func main() {
 		fmt.Printf("Importing training data from %s...\n", userDataDir)
 		totalDataSet := MNISTImport.ImportData(userDataDir, "train-images.idx3-ubyte", "train-labels.idx1-ubyte")
 		fmt.Printf("Read %d train images\n", totalDataSet.Length())
-
-		validationDataFraction := float32(0.1)
-		fmt.Print("Fraction of training data for validation: ")
-		fmt.Scanf("%f\n", &validationDataFraction)
-
-		// split up training data in training and validation
-		trainingData, validationData := totalDataSet.Split(validationDataFraction)
-
 		fmt.Printf("Importing test data from %s...\n", userDataDir)
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())
-
-		fmt.Printf("How many training samples to train on (max %d): ", trainingData.Length())
+		fmt.Printf("How many training samples to consider (max %d): ", totalDataSet.Length())
 		nTrainingSamples := 100
-		fmt.Scanf("%d", &nTrainingSamples)
-		if nTrainingSamples > trainingData.Length() {
-			nTrainingSamples = trainingData.Length()
+		fmt.Scanf("%d\n", &nTrainingSamples)
+		if nTrainingSamples > totalDataSet.Length() {
+			nTrainingSamples = totalDataSet.Length()
 		}
-		fmt.Printf("\nGenerating %d training samples...\n", nTrainingSamples)
+		validationDataFraction := float32(0.1)
+		fmt.Print("Fraction of training data for validation: ")
+		fmt.Scanf("%f\n", &validationDataFraction)
+		trainingData, validationData := totalDataSet.Split(validationDataFraction, nTrainingSamples)
+		fmt.Printf("Generating %d training samples...\n", nTrainingSamples)
 		ts := trainingData.GenerateTrainingSamples(nTrainingSamples)
+		fmt.Printf("Generating %d validation samples...\n", validationData.Length())
 		vs := validationData.GenerateTrainingSamples(validationData.Length())
 
 		epochs := 2
