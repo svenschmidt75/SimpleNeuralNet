@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="">
+    <list default="true" id="c0b9b4de-9728-4bbb-ae0f-3f8d0ab53234" name="Default" comment="correctly split data into training and validation data">
+      <change afterPath="$PROJECT_DIR$/NetworkHelper.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" beforeDir="false" afterPath="$PROJECT_DIR$/MNISTImport/MNISTImport.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Network.go" beforeDir="false" afterPath="$PROJECT_DIR$/Network.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SimpleNeuralNet" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleNeuralNet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NeuralNet_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/NeuralNet_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimpleNeuralNet" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,8 +21,8 @@
       <file leaf-file-name="NeuralNet_test.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="439">
-              <caret line="433" selection-start-line="433" selection-end-line="433" />
+            <state relative-caret-position="747">
+              <caret line="441" column="22" selection-start-line="441" selection-start-column="22" selection-end-line="441" selection-end-column="22" />
               <folding>
                 <element signature="e#14#81#0" expanded="true" />
               </folding>
@@ -32,8 +33,20 @@
       <file leaf-file-name="Network.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Network.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1119">
-              <caret line="528" column="4" lean-forward="true" selection-start-line="528" selection-start-column="4" selection-end-line="528" selection-end-column="4" />
+            <state relative-caret-position="575">
+              <caret line="457" column="63" lean-forward="true" selection-start-line="457" selection-start-column="63" selection-end-line="457" selection-end-column="63" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NetworkHelper.go" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/NetworkHelper.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="645">
+              <caret line="65" column="57" lean-forward="true" selection-start-line="65" selection-start-column="57" selection-end-line="65" selection-end-column="57" />
+              <folding>
+                <element signature="e#14#45#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -41,17 +54,17 @@
       <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="578">
-              <caret line="39" selection-start-line="39" selection-end-line="39" />
+            <state relative-caret-position="747">
+              <caret line="137" selection-start-line="137" selection-end-line="137" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MNISTImport.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="568">
-              <caret line="135" column="26" selection-start-line="135" selection-start-column="26" selection-end-line="135" selection-end-column="26" />
+            <state relative-caret-position="438">
+              <caret line="102" selection-start-line="102" selection-end-line="102" />
             </state>
           </provider>
         </entry>
@@ -106,11 +119,12 @@
         <option value="$PROJECT_DIR$/TrainingSample.go" />
         <option value="$PROJECT_DIR$/Minibatch.go" />
         <option value="$PROJECT_DIR$/MNISTImport/MNISTImport_test.go" />
-        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
         <option value="$PROJECT_DIR$/MNISTImport/TrainingSample.go" />
-        <option value="$PROJECT_DIR$/Network.go" />
-        <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/MNISTImport/MNISTImport.go" />
+        <option value="$PROJECT_DIR$/Network.go" />
+        <option value="$PROJECT_DIR$/NeuralNet_test.go" />
+        <option value="$PROJECT_DIR$/main.go" />
+        <option value="$PROJECT_DIR$/NetworkHelper.go" />
       </list>
     </option>
   </component>
@@ -140,11 +154,6 @@
               <item name="SimpleNeuralNet" type="b2602c69:ProjectViewProjectNode" />
               <item name="SimpleNeuralNet" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="SimpleNeuralNet" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SimpleNeuralNet" type="462c0819:PsiDirectoryNode" />
-              <item name="MNISTImport" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -160,7 +169,7 @@
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -179,7 +188,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build SimpleNeuralNet/">
+  <component name="RunManager" selected="Go Test.TestTrainWithMNIST in SimpleNeuralNet">
     <configuration name="go build SimpleNeuralNet/" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="SimpleNeuralNet" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -197,24 +206,31 @@
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$/NeuralNet_test.go" />
     </configuration>
+    <configuration name="TestTrainWithMNIST in SimpleNeuralNet" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="SimpleNeuralNet" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="SimpleNeuralNet" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestTrainWithMNIST$" />
+    </configuration>
     <list>
       <item itemvalue="Go Build.go build SimpleNeuralNet/" />
       <item itemvalue="Go Test.NeuralNet_test.go" />
+      <item itemvalue="Go Test.TestTrainWithMNIST in SimpleNeuralNet" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestTrainWithMNIST in SimpleNeuralNet" />
         <item itemvalue="Go Build.go build SimpleNeuralNet/" />
         <item itemvalue="Go Test.NeuralNet_test.go" />
       </list>
     </recent_temporary>
   </component>
   <component name="TestHistory">
-    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.19 at 18h 02m 08s.xml">
-      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.19 at 18h 02m 58s.xml">
-      <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
-    </history-entry>
     <history-entry file="TestTrainWithMNIST_in_NeuralNet_test_go - 2018.03.19 at 18h 04m 04s.xml">
       <configuration name="TestTrainWithMNIST in NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
@@ -239,23 +255,29 @@
     <history-entry file="NeuralNet_test_go - 2018.03.30 at 09h 00m 17s.xml">
       <configuration name="NeuralNet_test.go" configurationId="GoTestRunConfiguration" />
     </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_SimpleNeuralNet - 2018.03.30 at 10h 03m 09s.xml">
+      <configuration name="TestTrainWithMNIST in SimpleNeuralNet" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainWithMNIST_in_SimpleNeuralNet - 2018.03.30 at 10h 05m 16s.xml">
+      <configuration name="TestTrainWithMNIST in SimpleNeuralNet" configurationId="GoTestRunConfiguration" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="64" y="-11" width="2497" height="1452" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15511023" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15511023" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5062124" side_tool="true" weight="0.328614" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4985972" weight="0.32935026" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4985972" weight="0.32960477" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4937876" weight="0.32860345" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4937876" visible="true" weight="0.32860345" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49539077" visible="true" weight="0.39880508" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49539077" weight="0.39880508" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Cargo" order="3" />
@@ -324,43 +346,18 @@
     <MESSAGE value="fix: use test data length, not training data's" />
     <MESSAGE value="add trained NN model" />
     <MESSAGE value="use validation data at the end of each epoch to assess accuracy" />
-    <option name="LAST_COMMIT_MESSAGE" value="use validation data at the end of each epoch to assess accuracy" />
+    <MESSAGE value="correctly split data into training and validation data" />
+    <option name="LAST_COMMIT_MESSAGE" value="correctly split data into training and validation data" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/NeuralNet_test.go</url>
-          <line>431</line>
-          <properties />
-          <option name="timeStamp" value="136" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/NeuralNet_test.go</url>
-          <line>435</line>
-          <properties />
-          <option name="timeStamp" value="137" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/main.go</url>
-          <line>57</line>
-          <properties />
-          <option name="timeStamp" value="145" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/MNISTImport/MNISTImport.go</url>
-          <line>132</line>
-          <properties />
-          <option name="timeStamp" value="148" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="149" />
+      <option name="time" value="151" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -432,13 +429,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7072">
-          <caret line="416" selection-start-line="416" selection-end-line="416" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Network.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="7242">
@@ -598,24 +588,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/lib/go-1.10/src/testing/testing.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12359">
-          <caret line="727" selection-start-line="727" selection-end-line="727" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/go-1.10/src/runtime/asm_amd64.s">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
           <caret line="572" selection-start-line="572" selection-end-line="572" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/go-1.10/src/runtime/panic.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="590" selection-start-line="590" selection-end-line="590" />
         </state>
       </provider>
     </entry>
@@ -640,23 +616,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="439">
-          <caret line="433" selection-start-line="433" selection-end-line="433" />
-          <folding>
-            <element signature="e#14#81#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Network.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1119">
-          <caret line="528" column="4" lean-forward="true" selection-start-line="528" selection-start-column="4" selection-end-line="528" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/TrainingSample.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -664,17 +623,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
+    <entry file="file:///usr/lib/go-1.10/src/runtime/panic.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="578">
-          <caret line="39" selection-start-line="39" selection-end-line="39" />
+        <state relative-caret-position="251">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/MNISTImport/MNISTImport.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="568">
-          <caret line="135" column="26" selection-start-line="135" selection-start-column="26" selection-end-line="135" selection-end-column="26" />
+        <state relative-caret-position="438">
+          <caret line="102" selection-start-line="102" selection-end-line="102" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/go-1.10/src/testing/testing.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="507">
+          <caret line="764" lean-forward="true" selection-start-line="764" selection-end-line="764" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NeuralNet_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="747">
+          <caret line="441" column="22" selection-start-line="441" selection-start-column="22" selection-end-line="441" selection-end-column="22" />
+          <folding>
+            <element signature="e#14#81#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="747">
+          <caret line="137" selection-start-line="137" selection-end-line="137" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Network.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="575">
+          <caret line="457" column="63" lean-forward="true" selection-start-line="457" selection-start-column="63" selection-end-line="457" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NetworkHelper.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="645">
+          <caret line="65" column="57" lean-forward="true" selection-start-line="65" selection-start-column="57" selection-end-line="65" selection-end-column="57" />
+          <folding>
+            <element signature="e#14#45#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

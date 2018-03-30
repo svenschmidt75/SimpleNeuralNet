@@ -422,34 +422,22 @@ func TestTrainWithMNIST(t *testing.T) {
 	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
-	trainingInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-images50.idx3-ubyte")
-	trainingResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/train-labels50.idx1-ubyte")
-	ts := make([]MNISTImport.TrainingSample, len(trainingInputActivations))
-	for idx := range ts {
-		ts[idx].InputActivations = trainingInputActivations[idx]
-		ts[idx].ExpectedClass = int(trainingResults[idx])
-	}
+	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
+	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10)
 
 	// Assert
-
-	testInputActivations := MNISTImport.ImportImageFile("/home/svenschmidt75/Develop/Go/MNIST/t10k-images.idx3-ubyte")
-	testResults := MNISTImport.ImportLabelFile("/home/svenschmidt75/Develop/Go/MNIST/t10k-labels.idx1-ubyte")
-	ts2 := make([]MNISTImport.TrainingSample, len(testInputActivations))
-	for idx := range ts2 {
-		ts2[idx].InputActivations = testInputActivations[idx]
-		ts2[idx].ExpectedClass = int(testResults[idx])
-	}
+	testData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/MNIST", "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
+	ts2 := testData.GenerateTrainingSamples(100)
 
 	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
 	for index := 0; index < len(ts2); index++ {
 		network.SetInputActivations(ts2[index].InputActivations, &mb)
 		network.Feedforward(&mb)
-		idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
-		as := mb.a[idx:]
-
-		fmt.Printf("should %d: %v\n", testResults[index], as)
-		// 		fmt.Printf("is    : %5.3f\n\n", as[0])
+		as := network.GetOutputLayerActivations(&mb)
+		fmt.Printf("should %d: %v\n", ts2[index].ExpectedClass, as)
 	}
+}
 
+func TestSerialization(t *testing.T) {
 }

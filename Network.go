@@ -10,10 +10,6 @@ import (
 	"time"
 )
 
-/* TODO:
- * - function that returns output layer index
- */
-
 // weights: The weights w_ij^{l} are ordered by layer l, and for each layer,
 // by i, then j.
 // Example: w_00^{1}, w_01^{1}, ..., w_0m^{1}, w_10^{1}, ..., w_1m^{1}, ..., w_n0^{1}, ..., w_nm^{1},
@@ -33,7 +29,9 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+//
 // Implement interface 'GobEncoder'
+//
 func (n *Network) GobEncode() ([]byte, error) {
 	w := new(bytes.Buffer)
 	encoder := gob.NewEncoder(w)
@@ -52,7 +50,9 @@ func (n *Network) GobEncode() ([]byte, error) {
 	return w.Bytes(), nil
 }
 
+//
 // Implement interface 'GobDecoder'
+//
 func (n *Network) GobDecode(buf []byte) error {
 	r := bytes.NewBuffer(buf)
 	decoder := gob.NewDecoder(r)
@@ -437,26 +437,6 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 	}
 }
 
-func generateRandomIndices(size int) []int {
-	// generate random permutation
-	perm := rand.Perm(size)
-	return perm
-}
-
-func max(lhs int, rhs int) int {
-	if lhs < rhs {
-		return rhs
-	}
-	return lhs
-}
-
-func min(lhs int, rhs int) int {
-	if lhs < rhs {
-		return lhs
-	}
-	return rhs
-}
-
 func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
@@ -468,40 +448,31 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
 	fmt.Printf("Learning rate: %f\n\n", eta)
 
+	var innerLoop = func(maxIndex int, offset int, indices []int) {
+		for i := 0; i < maxIndex; i++ {
+			mb := mbs[i]
+			index := indices[offset*sizeMiniBatch+i]
+			x := trainingSamples[index]
+			n.SetInputActivations(x.InputActivations, &mb)
+			n.Feedforward(&mb)
+			n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
+			n.BackpropagateError(&mb)
+		}
+		dw, db := n.CalculateDerivatives(mbs)
+		n.UpdateNetwork(eta, dw, db)
+	}
+
 	for epoch := 0; epoch < epochs; epoch++ {
-		indices := generateRandomIndices(len(trainingSamples))
+		indices := GenerateRandomIndices(len(trainingSamples))
 		for j := 0; j < nMiniBatches; j++ {
 			fmt.Printf("Minibatch %d of %d...\n", j, nMiniBatches)
-			for i := 0; i < sizeMiniBatch; i++ {
-				mb := mbs[i]
-				index := indices[j*sizeMiniBatch+i]
-				x := trainingSamples[index]
-				n.SetInputActivations(x.InputActivations, &mb)
-				n.Feedforward(&mb)
-				n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
-				n.BackpropagateError(&mb)
-			}
-			dw, db := n.CalculateDerivatives(mbs)
-			n.UpdateNetwork(eta, dw, db)
+			innerLoop(sizeMiniBatch, j, indices)
 		}
-		// the remainder
-		nRest := len(trainingSamples) - sizeMiniBatch*nMiniBatches
-		if nRest > 0 {
-			for i := 0; i < nRest; i++ {
-				mb := mbs[i]
-				index := indices[nMiniBatches*sizeMiniBatch+i]
-				x := trainingSamples[index]
-				n.SetInputActivations(x.InputActivations, &mb)
-				n.Feedforward(&mb)
-				n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
-				n.BackpropagateError(&mb)
-			}
-			dw, db := n.CalculateDerivatives(mbs)
-			n.UpdateNetwork(eta, dw, db)
+		if remainder := len(trainingSamples) - sizeMiniBatch*nMiniBatches; remainder > 0 {
+			innerLoop(remainder, nMiniBatches, indices)
 		}
 
 		// run against validation dataset
-		// could be done in parallel...
 		if len(validationSamples) > 0 {
 			var correctPredications int
 			mb := CreateMiniBatch(n.nNodes(), n.nWeights())
@@ -520,28 +491,8 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	}
 }
 
-func GetError(predictedClass int, a []float64) float64 {
-	var err float64
-	for idx := range a {
-		var d1 float64 = 0
-		if idx == predictedClass {
-			d1 = 1
-		}
-		d2 := a[idx]
-		err += (d1 - d2) * (d1 - d2)
-	}
-	return math.Sqrt(err)
-}
-
-func GetIndex(a []float64) int {
-	var index int
-	var value float64 = -1
-	for idx := range a {
-		if a[idx] > value {
-			value = a[idx]
-			index = idx
-		}
-
-	}
-	return index
+func (n *Network) GetOutputLayerActivations(mb *Minibatch) []float64 {
+	idx := n.getNodeBaseIndex(n.getOutputLayerIndex())
+	as := mb.a[idx:]
+	return as
 }

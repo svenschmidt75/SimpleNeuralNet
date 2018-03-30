@@ -2,9 +2,7 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
-	"encoding/gob"
 	"fmt"
-	"os"
 )
 
 func main() {
@@ -31,22 +29,22 @@ func main() {
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())
 		fmt.Printf("How many training samples to consider (max %d): ", totalDataSet.Length())
-		nTrainingSamples := 100
+		nTrainingSamples := 1000
 		fmt.Scanf("%d\n", &nTrainingSamples)
 		if nTrainingSamples > totalDataSet.Length() {
 			nTrainingSamples = totalDataSet.Length()
 		}
 		validationDataFraction := float32(0.1)
-		fmt.Print("Fraction of training data for validation: ")
+		fmt.Printf("Fraction of training data for validation (%f): ", validationDataFraction)
 		fmt.Scanf("%f\n", &validationDataFraction)
 		trainingData, validationData := totalDataSet.Split(validationDataFraction, nTrainingSamples)
-		fmt.Printf("Generating %d training samples...\n", nTrainingSamples)
-		ts := trainingData.GenerateTrainingSamples(nTrainingSamples)
+		fmt.Printf("Generating %d training samples...\n", trainingData.Length())
+		ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 		fmt.Printf("Generating %d validation samples...\n", validationData.Length())
 		vs := validationData.GenerateTrainingSamples(validationData.Length())
 
-		epochs := 2
-		eta := float32(0.5)
+		epochs := 10
+		eta := float32(4)
 		miniMatchSize := 10
 		fmt.Print("#epochs: ")
 		fmt.Scanf("%d\n", &epochs)
@@ -134,24 +132,4 @@ func main() {
 		fmt.Printf("Accuracy: %f\n", float64(correctPredications)/float64(testData.Length()))
 
 	}
-}
-
-func writeGob(filePath string, object interface{}) error {
-	file, err := os.Create(filePath)
-	if err == nil {
-		encoder := gob.NewEncoder(file)
-		encoder.Encode(object)
-	}
-	file.Close()
-	return err
-}
-
-func readGob(filePath string, object interface{}) error {
-	file, err := os.Open(filePath)
-	if err == nil {
-		decoder := gob.NewDecoder(file)
-		err = decoder.Decode(object)
-	}
-	file.Close()
-	return err
 }
