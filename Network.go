@@ -443,7 +443,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := CreateMiniBatches(sizeMiniBatch, n.nNodes(), n.nWeights())
 
-	fmt.Printf("Training batch size: %d\n", len(trainingSamples))
+	fmt.Printf("\nTraining batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
 	fmt.Printf("Learning rate: %f\n\n", eta)
@@ -465,7 +465,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	for epoch := 0; epoch < epochs; epoch++ {
 		indices := GenerateRandomIndices(len(trainingSamples))
 		for j := 0; j < nMiniBatches; j++ {
-			fmt.Printf("Minibatch %d of %d...\n", j, nMiniBatches)
+			//			fmt.Printf("Minibatch %d of %d...\n", j, nMiniBatches)
 			innerLoop(sizeMiniBatch, j, indices)
 		}
 		if remainder := len(trainingSamples) - sizeMiniBatch*nMiniBatches; remainder > 0 {
@@ -474,19 +474,18 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 
 		// run against validation dataset
 		if len(validationSamples) > 0 {
-			var correctPredications int
+			var correctPredictions int
 			mb := CreateMiniBatch(n.nNodes(), n.nWeights())
 			for testIdx := range validationSamples {
 				n.SetInputActivations(validationSamples[testIdx].InputActivations, &mb)
 				n.Feedforward(&mb)
-				idx := n.getNodeBaseIndex(n.getOutputLayerIndex())
-				as := mb.a[idx:]
+				as := n.GetOutputLayerActivations(&mb)
 				predictionIndex := GetIndex(as)
 				if validationSamples[testIdx].ExpectedClass == predictionIndex {
-					correctPredications++
+					correctPredictions++
 				}
 			}
-			fmt.Printf("Epoch %d - accuracy %f\n", epoch, float64(correctPredications)/float64(len(validationSamples)))
+			fmt.Printf("Epoch %d - accuracy %f\n", epoch, float64(correctPredictions)/float64(len(validationSamples)))
 		}
 	}
 }

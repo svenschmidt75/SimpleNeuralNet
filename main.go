@@ -52,28 +52,25 @@ func main() {
 		fmt.Scanf("%f\n", &eta)
 		fmt.Print("mini batch size: ")
 		fmt.Scanf("%d\n", &miniMatchSize)
-		fmt.Print("Training neural network...\n")
+		fmt.Print("\nTraining neural network...\n")
 		network.Train(ts, vs, epochs, eta, miniMatchSize)
 
 		// run against test data
-		var correctPredications int
+		var correctPredictions int
 		mb := CreateMiniBatch(network.nNodes(), network.nWeights())
 		fmt.Printf("\nGenerating %d training samples for test data...\n", testData.Length())
 		ts = testData.GenerateTrainingSamples(testData.Length())
 		for testIdx := range ts {
 			network.SetInputActivations(ts[testIdx].InputActivations, &mb)
 			network.Feedforward(&mb)
-			idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
-			as := mb.a[idx:]
-			err := GetError(ts[testIdx].ExpectedClass, as)
+			as := network.GetOutputLayerActivations(&mb)
 			predictionIndex := GetIndex(as)
 			if ts[testIdx].ExpectedClass == predictionIndex {
-				correctPredications++
+				correctPredictions++
 			}
-			fmt.Printf("Index %d: Error is %f. Predicted %d, is %d\n", testIdx, err, predictionIndex, testData.GetResult(testIdx))
 		}
-		fmt.Printf("%d/%d correct predication\n", correctPredications, testData.Length())
-		fmt.Printf("Error rate: %f\n", float64(correctPredications)/float64(testData.Length()))
+		fmt.Printf("%d/%d correct prediction\n", correctPredictions, testData.Length())
+		fmt.Printf("Accuracy: %f\n", float64(correctPredictions)/float64(testData.Length()))
 
 		filename := "./n.gob"
 		fmt.Printf("Enter a filename to serialize the network to (%s): ", filename)
@@ -112,24 +109,20 @@ func main() {
 		ts := testData.GenerateTrainingSamples(testData.Length())
 
 		// run against test data
-		var correctPredications int
+		var correctPredictions int
 		mb := CreateMiniBatch(network.nNodes(), network.nWeights())
 		fmt.Printf("\nGenerating %d training samples for test data...\n", testData.Length())
 		ts = testData.GenerateTrainingSamples(testData.Length())
 		for testIdx := range ts {
 			network.SetInputActivations(ts[testIdx].InputActivations, &mb)
 			network.Feedforward(&mb)
-			idx := network.getNodeBaseIndex(network.getOutputLayerIndex())
-			as := mb.a[idx:]
-			err := GetError(ts[testIdx].ExpectedClass, as)
+			as := network.GetOutputLayerActivations(&mb)
 			predictionIndex := GetIndex(as)
 			if ts[testIdx].ExpectedClass == predictionIndex {
-				correctPredications++
+				correctPredictions++
 			}
-			fmt.Printf("Index %d: Error is %f. Predicted %d, is %d\n", testIdx, err, predictionIndex, testData.GetResult(testIdx))
 		}
-		fmt.Printf("%d/%d correct predictions\n", correctPredications, testData.Length())
-		fmt.Printf("Accuracy: %f\n", float64(correctPredications)/float64(testData.Length()))
-
+		fmt.Printf("%d/%d correct predictions\n", correctPredictions, testData.Length())
+		fmt.Printf("Accuracy: %f\n", float64(correctPredictions)/float64(testData.Length()))
 	}
 }
