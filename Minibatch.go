@@ -7,7 +7,7 @@ type Minibatch struct {
 	a []float64
 
 	// errors
-	nabla []float64
+	delta []float64
 }
 
 func CreateMiniBatch(nActivations int, nWeights int) Minibatch {
@@ -19,7 +19,7 @@ func CreateMiniBatch(nActivations int, nWeights int) Minibatch {
 
 func CreateMiniBatches(size int, nActivations int, nWeights int) []Minibatch {
 	mbs := make([]Minibatch, size)
-	for idx, _ := range mbs {
+	for idx := range mbs {
 		mbs[idx] = CreateMiniBatch(nActivations, nWeights)
 	}
 	return mbs

@@ -355,10 +355,10 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 		network.SetActivation(ts.outputActivations[0], 0, outputLayerIdx, &mb)
 		network.SetActivation(ts.outputActivations[1], 1, outputLayerIdx, &mb)
 		network.CalculateErrorInOutputLayer(ts.expectedClass, &mb)
-		if nabla := network.GetNabla(0, 2, &mb); floatEquals(ts.error[0], nabla) == false {
+		if nabla := network.GetDelta(0, 2, &mb); floatEquals(ts.error[0], nabla) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], nabla)
 		}
-		if nabla := network.GetNabla(1, 2, &mb); floatEquals(ts.error[1], nabla) == false {
+		if nabla := network.GetDelta(1, 2, &mb); floatEquals(ts.error[1], nabla) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[1], nabla)
 		}
 	}
@@ -373,13 +373,13 @@ func TestBackpropagateError(t *testing.T) {
 	network.CalculateErrorInOutputLayer(0, &mb)
 	network.BackpropagateError(&mb)
 
-	if nabla := network.GetNabla(0, 1, &mb); floatEquals(0.007357185735347161, nabla) == false {
+	if nabla := network.GetDelta(0, 1, &mb); floatEquals(0.007357185735347161, nabla) == false {
 		t.Errorf("Expected %v, but was %v", 0.007357185735347161, nabla)
 	}
-	if nabla := network.GetNabla(1, 1, &mb); floatEquals(0.016680036100361194, nabla) == false {
+	if nabla := network.GetDelta(1, 1, &mb); floatEquals(0.016680036100361194, nabla) == false {
 		t.Errorf("Expected %v, but was %v", 0.016680036100361194, nabla)
 	}
-	if nabla := network.GetNabla(2, 1, &mb); floatEquals(0.025347427582781648, nabla) == false {
+	if nabla := network.GetDelta(2, 1, &mb); floatEquals(0.025347427582781648, nabla) == false {
 		t.Errorf("Expected %v, but was %v", 0.025347427582781648, nabla)
 	}
 }
@@ -463,6 +463,33 @@ func TestSerialization(t *testing.T) {
 	a1 := network.GetWeight(1, 1, 1)
 	a2 := readNetwork.GetWeight(1, 1, 1)
 	if floatEquals(a1, a2) == false {
+		t.Error("Networks not equal")
+	}
+}
+
+func TestCostDerivativeNumerical(t *testing.T) {
+	// Arrange
+	network := new(Network)
+	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	if err != nil {
+		t.Error("Error deserializing network")
+	}
+	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
+	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
+
+	// Act
+	c1 := network.EvaluateCostFunction(ts)
+
+	w_jk := network.GetWeight(1, 1, 1)
+	delta := 0.0001
+	w_jk += delta
+	network.SetWeight(w_jk, 1, 1, 1)
+
+	c2 := network.EvaluateCostFunction(ts)
+
+	dCost := (c2 - c1) / delta
+
+	if floatEquals(dCost, 0) == false {
 		t.Error("Networks not equal")
 	}
 }

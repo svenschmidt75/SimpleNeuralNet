@@ -145,22 +145,22 @@ func (n *Network) SetActivation(a float64, index int, layer int, mb *Minibatch) 
 	mb.a[aIdx] = a
 }
 
-func (n Network) getNablaBaseIndex(layer int) int {
+func (n Network) getDeltaBaseIndex(layer int) int {
 	return n.getNodeBaseIndex(layer)
 }
 
-func (n Network) getNablaIndex(index int, layer int) int {
+func (n Network) getDeltaIndex(index int, layer int) int {
 	return n.GetNodeIndex(index, layer)
 }
 
-func (n Network) GetNabla(index int, layer int, mb *Minibatch) float64 {
-	nablaIdx := n.getNablaIndex(index, layer)
-	return mb.nabla[nablaIdx]
+func (n Network) GetDelta(index int, layer int, mb *Minibatch) float64 {
+	deltaIdx := n.getDeltaIndex(index, layer)
+	return mb.delta[deltaIdx]
 }
 
-func (n *Network) SetNabla(nabla float64, index int, layer int, mb *Minibatch) {
-	nablaIdx := n.getNablaIndex(index, layer)
-	mb.nabla[nablaIdx] = nabla
+func (n *Network) SetDelta(delta float64, index int, layer int, mb *Minibatch) {
+	deltaIdx := n.getDeltaIndex(index, layer)
+	mb.delta[deltaIdx] = delta
 }
 
 func (n Network) nBiases() int {
@@ -311,7 +311,7 @@ func (n *Network) CalculateErrorInOutputLayer(expectedClass int, mb *Minibatch) 
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		ds := SigmoidPrime(z_i)
 		nabla := dCda * ds
-		n.SetNabla(nabla, i, outputLayerIdx, mb)
+		n.SetDelta(nabla, i, outputLayerIdx, mb)
 	}
 }
 
@@ -334,13 +334,13 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 			var tmp float64
 			for k := 0; k < nNextNodes; k++ {
 				weight_kj := n.GetWeight(k, j, layer+1)
-				nabla_k := n.GetNabla(k, layer+1, mb)
+				nabla_k := n.GetDelta(k, layer+1, mb)
 				tmp += weight_kj * nabla_k
 			}
 			z_j := n.CalculateZ(j, layer, mb)
 			s := SigmoidPrime(z_j)
 			error := tmp * s
-			n.SetNabla(error, j, layer, mb)
+			n.SetDelta(error, j, layer, mb)
 		}
 	}
 }
@@ -388,8 +388,8 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 				for mbIdx := range mbs {
 					mb := mbs[mbIdx]
 					a := n.GetActivation(k, layer-1, &mb)
-					nabla := n.GetNabla(j, layer, &mb)
-					dCx_dw := a * nabla
+					delta := n.GetDelta(j, layer, &mb)
+					dCx_dw := a * delta
 					dw_jk += dCx_dw
 				}
 				dw_jk /= float64(nMiniBatches)
@@ -400,8 +400,8 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 			var db_j float64
 			for mbIdx := range mbs {
 				mb := mbs[mbIdx]
-				nabla := n.GetNabla(j, layer, &mb)
-				db_j += nabla
+				delta := n.GetDelta(j, layer, &mb)
+				db_j += delta
 			}
 			db_j /= float64(nMiniBatches)
 			bIdx := n.GetBiasIndex(j, layer)
@@ -435,6 +435,24 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 			n.SetBias(b_j, j, layer)
 		}
 	}
+}
+
+func (n *Network) EvaluateCostFunction(trainingSamples []MNISTImport.TrainingSample) float64 {
+	var cost float64
+	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
+	for _, x := range trainingSamples {
+		n.SetInputActivations(x.InputActivations, &mb)
+		n.Feedforward(&mb)
+		a := n.GetOutputLayerActivations(&mb)
+		diff := GetError(x.ExpectedClass, a)
+		cost += diff * diff
+
+		//n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
+		//n.BackpropagateError(&mb)
+		//dw, db := n.CalculateDerivatives([]Minibatch{mb})
+	}
+	cost /= float64(2 * len(trainingSamples))
+	return cost
 }
 
 func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
