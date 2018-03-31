@@ -310,8 +310,8 @@ func (n *Network) CalculateErrorInOutputLayer(expectedClass int, mb *Minibatch) 
 		}
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		ds := SigmoidPrime(z_i)
-		nabla := dCda * ds
-		n.SetDelta(nabla, i, outputLayerIdx, mb)
+		delta := dCda * ds
+		n.SetDelta(delta, i, outputLayerIdx, mb)
 	}
 }
 
@@ -334,8 +334,8 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 			var tmp float64
 			for k := 0; k < nNextNodes; k++ {
 				weight_kj := n.GetWeight(k, j, layer+1)
-				nabla_k := n.GetDelta(k, layer+1, mb)
-				tmp += weight_kj * nabla_k
+				delta_k := n.GetDelta(k, layer+1, mb)
+				tmp += weight_kj * delta_k
 			}
 			z_j := n.CalculateZ(j, layer, mb)
 			s := SigmoidPrime(z_j)
@@ -437,6 +437,64 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 	}
 }
 
+func (n *Network) CaculateDelta(j int, layer int, mb *Minibatch, ts *MNISTImport.TrainingSample) float64 {
+	if layer == n.getOutputLayerIndex() {
+		a_i := n.GetActivation(j, layer, mb)
+		dCda := a_i
+		if j == ts.ExpectedClass {
+			dCda -= 1
+		}
+		z_i := n.CalculateZ(j, layer, mb)
+		ds := SigmoidPrime(z_i)
+		delta := dCda * ds
+		return delta
+	}
+	nNextNodes := n.nNodesInLayer(layer + 1)
+	var tmp float64
+	for k := 0; k < nNextNodes; k++ {
+		weight_kj := n.GetWeight(k, j, layer+1)
+		delta_k := n.CaculateDelta(k, layer+1, mb, ts)
+		tmp += weight_kj * delta_k
+	}
+	z_j := n.CalculateZ(j, layer, mb)
+	s := SigmoidPrime(z_j)
+	delta := tmp * s
+	return delta
+}
+
+func (n *Network) GradWeight(j int, k int, layer int, trainingSamples []MNISTImport.TrainingSample) float64 {
+	if layer == 0 {
+		panic(fmt.Sprintf("Layer must be > 0"))
+	}
+	var dCdw float64
+	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
+	for _, x := range trainingSamples {
+		n.SetInputActivations(x.InputActivations, &mb)
+		n.Feedforward(&mb)
+		a_k := n.GetActivation(k, layer-1, &mb)
+		delta_j := n.CaculateDelta(j, layer, &mb, &x)
+		dCdw += a_k * delta_j
+	}
+	dCdw /= float64(len(trainingSamples))
+	return dCdw
+}
+
+func (n *Network) GradBias(j int, layer int, trainingSamples []MNISTImport.TrainingSample) float64 {
+	if layer == 0 {
+		panic(fmt.Sprintf("Layer must be > 0"))
+	}
+	var delta float64
+	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
+	for _, x := range trainingSamples {
+		n.SetInputActivations(x.InputActivations, &mb)
+		n.Feedforward(&mb)
+		delta_j := n.CaculateDelta(j, layer, &mb, &x)
+		delta += delta_j
+	}
+	delta /= float64(len(trainingSamples))
+	return delta
+}
+
 func (n *Network) EvaluateCostFunction(trainingSamples []MNISTImport.TrainingSample) float64 {
 	var cost float64
 	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
@@ -446,10 +504,6 @@ func (n *Network) EvaluateCostFunction(trainingSamples []MNISTImport.TrainingSam
 		a := n.GetOutputLayerActivations(&mb)
 		diff := GetError(x.ExpectedClass, a)
 		cost += diff * diff
-
-		//n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
-		//n.BackpropagateError(&mb)
-		//dw, db := n.CalculateDerivatives([]Minibatch{mb})
 	}
 	cost /= float64(2 * len(trainingSamples))
 	return cost

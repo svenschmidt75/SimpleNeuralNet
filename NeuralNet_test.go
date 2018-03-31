@@ -480,16 +480,18 @@ func TestCostDerivativeNumerical(t *testing.T) {
 	// Act
 	c1 := network.EvaluateCostFunction(ts)
 
-	w_jk := network.GetWeight(1, 1, 1)
+	w_jk := network.GetWeight(77, 358, 1)
 	delta := 0.0001
 	w_jk += delta
-	network.SetWeight(w_jk, 1, 1, 1)
+	network.SetWeight(w_jk, 77, 358, 1)
 
 	c2 := network.EvaluateCostFunction(ts)
 
-	dCost := (c2 - c1) / delta
+	dCdw_numeric := (c2 - c1) / delta
 
-	if floatEquals(dCost, 0) == false {
+	dCdw := network.GradWeight(77, 358, 1, ts)
+
+	if floatEquals(dCdw_numeric, dCdw) == false {
 		t.Error("Networks not equal")
 	}
 }
