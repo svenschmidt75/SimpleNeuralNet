@@ -471,21 +471,9 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 		if remainder := len(trainingSamples) - sizeMiniBatch*nMiniBatches; remainder > 0 {
 			innerLoop(remainder, nMiniBatches, indices)
 		}
-
-		// run against validation dataset
 		if len(validationSamples) > 0 {
-			var correctPredictions int
-			mb := CreateMiniBatch(n.nNodes(), n.nWeights())
-			for testIdx := range validationSamples {
-				n.SetInputActivations(validationSamples[testIdx].InputActivations, &mb)
-				n.Feedforward(&mb)
-				as := n.GetOutputLayerActivations(&mb)
-				predictionIndex := GetIndex(as)
-				if validationSamples[testIdx].ExpectedClass == predictionIndex {
-					correctPredictions++
-				}
-			}
-			fmt.Printf("Epoch %d - accuracy %f\n", epoch, float64(correctPredictions)/float64(len(validationSamples)))
+			accuracy := n.RunSamples(validationSamples)
+			fmt.Printf("Epoch %d - accuracy %f\n", epoch, accuracy)
 		}
 	}
 }
@@ -494,4 +482,20 @@ func (n *Network) GetOutputLayerActivations(mb *Minibatch) []float64 {
 	idx := n.getNodeBaseIndex(n.getOutputLayerIndex())
 	as := mb.a[idx:]
 	return as
+}
+
+func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample) float32 {
+	var correctPredictions int
+	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
+	for testIdx := range trainingSamples {
+		n.SetInputActivations(trainingSamples[testIdx].InputActivations, &mb)
+		n.Feedforward(&mb)
+		as := n.GetOutputLayerActivations(&mb)
+		predictionIndex := GetIndex(as)
+		if trainingSamples[testIdx].ExpectedClass == predictionIndex {
+			correctPredictions++
+		}
+	}
+	accuracy := float32(correctPredictions) / float32(len(trainingSamples))
+	return accuracy
 }
