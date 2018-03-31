@@ -23,6 +23,9 @@ type Network struct {
 
 	// Weights. w_{ij}^l connects a_i^l with a_j^{l-1}
 	weights []float64
+
+	// cost function
+	//	costFunction CostFunction
 }
 
 func init() {
