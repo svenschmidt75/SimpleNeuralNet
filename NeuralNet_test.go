@@ -474,21 +474,40 @@ func TestCostDerivativeNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
+	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
 	// Act
-	c1 := network.EvaluateCostFunction(ts)
-	w_jk := network.GetWeight(7, 57, 2)
-	delta := 0.0000001
-	w_jk += delta
-	network.SetWeight(w_jk, 7, 57, 2)
-	c2 := network.EvaluateCostFunction(ts)
-	dCdw_numeric := (c2 - c1) / delta
+	tables := []struct {
+		i     int
+		j     int
+		layer int
+	}{
+		{1, 17, 2},
+		{3, 22, 2},
+		{5, 56, 2},
+		{7, 78, 2},
+		{9, 98, 2},
+		{98, 498, 1},
+		{38, 780, 1},
+		{18, 281, 1},
+		{4, 81, 1},
+	}
+	for _, item := range tables {
+		// evaluate numerically
+		c1 := network.EvaluateCostFunction(ts)
+		w_jk := network.GetWeight(item.i, item.j, item.layer)
+		delta := 0.00001
+		w_jk += delta
+		network.SetWeight(w_jk, item.i, item.j, item.layer)
+		c2 := network.EvaluateCostFunction(ts)
+		dCdw_numeric := (c2 - c1) / delta
 
-	dCdw := network.GradWeight(7, 77, 2, ts)
+		// evaluate analytically
+		dCdw := network.GradWeight(item.i, item.j, item.layer, ts)
 
-	if floatEquals(dCdw_numeric, dCdw) == false {
-		t.Error("Networks not equal")
+		if floatEquals(dCdw_numeric, dCdw) == false {
+			t.Error("Networks not equal")
+		}
 	}
 }
