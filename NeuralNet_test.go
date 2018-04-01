@@ -495,13 +495,13 @@ func TestCostDerivativeNumerical(t *testing.T) {
 	}
 	for _, item := range tables {
 		// evaluate numerically
-		c1 := network.EvaluateCostFunction(ts)
+		delta := 0.000001
 		w_jk := network.GetWeight(item.i, item.j, item.layer)
-		delta := 0.00001
-		w_jk += delta
-		network.SetWeight(w_jk, item.i, item.j, item.layer)
+		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
+		c1 := network.EvaluateCostFunction(ts)
+		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
 		c2 := network.EvaluateCostFunction(ts)
-		dCdw_numeric := (c2 - c1) / delta
+		dCdw_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
 		dCdw := network.GradWeight(item.i, item.j, item.layer, ts)
