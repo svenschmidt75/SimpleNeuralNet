@@ -1,0 +1,143 @@
+54000_30_3_10 - 28^2 x 100 x 10
+===============================
+
+04/02/2018
+
+
+1. Train neural network with MNIST data
+2. Run neural network on MNIST test data
+1
+Importing training data from C:\Users\s.schmidt\dev\private\MNIST...
+Read 60000 train images
+Importing test data from C:\Users\s.schmidt\dev\private\MNIST...
+Read 10000 test images
+Generating 54000 training samples...
+Generating 6000 validation samples...
+
+Training batch size: 54000
+Minibatch size: 10
+Number of minibatches: 5400
+Learning rate: 3.000000
+
+Epoch 0 - accuracy 0.936000
+Epoch 1 - accuracy 0.957000
+Epoch 2 - accuracy 0.964000
+Epoch 3 - accuracy 0.965833
+Epoch 4 - accuracy 0.969167
+Epoch 5 - accuracy 0.971333
+Epoch 6 - accuracy 0.972833
+Epoch 7 - accuracy 0.973667
+Epoch 8 - accuracy 0.972833
+Epoch 9 - accuracy 0.973833
+Epoch 10 - accuracy 0.975000
+Epoch 11 - accuracy 0.975667
+Epoch 12 - accuracy 0.974667
+Epoch 13 - accuracy 0.975833
+Epoch 14 - accuracy 0.978000
+Epoch 15 - accuracy 0.978000
+Epoch 16 - accuracy 0.977667
+Epoch 17 - accuracy 0.977833
+Epoch 18 - accuracy 0.978333
+Epoch 19 - accuracy 0.978833
+Epoch 20 - accuracy 0.974667
+Epoch 21 - accuracy 0.976000
+Epoch 22 - accuracy 0.977833
+Epoch 23 - accuracy 0.977667
+Epoch 24 - accuracy 0.979167
+Epoch 25 - accuracy 0.978167
+Epoch 26 - accuracy 0.977500
+Epoch 27 - accuracy 0.978333
+Epoch 28 - accuracy 0.978333
+Epoch 29 - accuracy 0.978167
+
+Generating 10000 training samples for test data...
+Accuracy: 0.974800
+
+Serializing network to ./n.gob...
+PS C:\Users\s.schmidt\dev\private\Go\src\SimpleNeuralNet>
+
+
+------------------------------------------------------------------------------------
+
+54000_30_3_25 - 28^2 x 100 x 50 x 10
+====================================
+
+04/02/18
+
+
+1. Train neural network with MNIST data
+2. Run neural network on MNIST test data
+1
+Importing training data from C:\Users\s.schmidt\dev\private\MNIST...
+Read 60000 train images
+Importing test data from C:\Users\s.schmidt\dev\private\MNIST...
+Read 10000 test images
+Generating 54000 training samples...
+Generating 6000 validation samples...
+
+Training batch size: 54000
+Minibatch size: 25
+Number of minibatches: 2160
+Learning rate: 3.000000
+
+Epoch 0 - accuracy 0.412000
+Epoch 1 - accuracy 0.910833
+Epoch 2 - accuracy 0.935500
+Epoch 3 - accuracy 0.949333
+Epoch 4 - accuracy 0.957167
+Epoch 5 - accuracy 0.961500
+Epoch 6 - accuracy 0.963167
+Epoch 7 - accuracy 0.965000
+Epoch 8 - accuracy 0.969000
+Epoch 9 - accuracy 0.970167
+Epoch 10 - accuracy 0.969500
+Epoch 11 - accuracy 0.969000
+Epoch 12 - accuracy 0.969000
+Epoch 13 - accuracy 0.972667
+Epoch 14 - accuracy 0.972000
+Epoch 15 - accuracy 0.970167
+Epoch 16 - accuracy 0.972333
+Epoch 17 - accuracy 0.973000
+Epoch 18 - accuracy 0.972667
+Epoch 19 - accuracy 0.972000
+Epoch 20 - accuracy 0.973000
+Epoch 21 - accuracy 0.972833
+Epoch 22 - accuracy 0.970667
+Epoch 23 - accuracy 0.973333
+Epoch 24 - accuracy 0.971667
+Epoch 25 - accuracy 0.971833
+Epoch 26 - accuracy 0.973833
+Epoch 27 - accuracy 0.973000
+Epoch 28 - accuracy 0.974167
+Epoch 29 - accuracy 0.973500
+
+Generating 10000 training samples for test data...
+Accuracy: 0.975100
+
+Serializing network to ./n.gob...
+PS C:\Users\s.schmidt\dev\private\Go\src\SimpleNeuralNet>
+
+
+------------------------------------------------------------------------------------
+
+54000_30_3_10 - 28^2 x 100 x 200 x 10
+====================================
+
+04/02/18
+
+
+1. Train neural network with MNIST data
+2. Run neural network on MNIST test data
+1
+Importing training data from C:\Users\s.schmidt\dev\private\MNIST...
+Read 60000 train images
+Importing test data from C:\Users\s.schmidt\dev\private\MNIST...
+Read 10000 test images
+Generating 54000 training samples...
+Generating 6000 validation samples...
+
+Training batch size: 54000
+Minibatch size: 10
+Number of minibatches: 5400
+Learning rate: 2.500000
+
