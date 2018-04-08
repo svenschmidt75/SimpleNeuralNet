@@ -346,17 +346,17 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 		expectedClass     int
 		error             []float64
 	}{
-		{[]float64{1, 1}, 1, []float64{0, 0}},
-		{[]float64{0, 0}, 1, []float64{-0.01897348347524417, -0.10026647037539357}},
-		{[]float64{0.24, 0.21}, 1, []float64{-0.014419847441185569, -0.07921051159656092}},
+		{[]float64{1, 1}, 1, []float64{0.01897348347524417, 0}},
+		{[]float64{0, 0}, 1, []float64{0, -0.10026647037539357}},
+		{[]float64{0.24, 0.21}, 1, []float64{0.0045536360340586, -0.07921051159656092}},
 	}
 
 	for _, ts := range tables {
 		network.SetActivation(ts.outputActivations[0], 0, outputLayerIdx, &mb)
 		network.SetActivation(ts.outputActivations[1], 1, outputLayerIdx, &mb)
 		network.CalculateErrorInOutputLayer(ts.expectedClass, &mb)
-		if nabla := network.GetDelta(0, 2, &mb); floatEquals(ts.error[0], nabla) == false {
-			t.Errorf("Expected %v, but was %v", ts.error[0], nabla)
+		if delta := network.GetDelta(0, 2, &mb); floatEquals(ts.error[0], delta) == false {
+			t.Errorf("Expected %v, but was %v", ts.error[0], delta)
 		}
 		if nabla := network.GetDelta(1, 2, &mb); floatEquals(ts.error[1], nabla) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[1], nabla)
@@ -373,14 +373,19 @@ func TestBackpropagateError(t *testing.T) {
 	network.CalculateErrorInOutputLayer(0, &mb)
 	network.BackpropagateError(&mb)
 
-	if nabla := network.GetDelta(0, 1, &mb); floatEquals(0.007357185735347161, nabla) == false {
-		t.Errorf("Expected %v, but was %v", 0.007357185735347161, nabla)
+	expected := -0.0010048637687567257
+	if delta := network.GetDelta(0, 1, &mb); floatEquals(expected, delta) == false {
+		t.Errorf("Expected %v, but was %v", expected, delta)
 	}
-	if nabla := network.GetDelta(1, 1, &mb); floatEquals(0.016680036100361194, nabla) == false {
-		t.Errorf("Expected %v, but was %v", 0.016680036100361194, nabla)
+
+	expected = 0.018229366486609905
+	if delta := network.GetDelta(1, 1, &mb); floatEquals(expected, delta) == false {
+		t.Errorf("Expected %v, but was %v", expected, delta)
 	}
-	if nabla := network.GetDelta(2, 1, &mb); floatEquals(0.025347427582781648, nabla) == false {
-		t.Errorf("Expected %v, but was %v", 0.025347427582781648, nabla)
+
+	expected = 0.018229366486609905
+	if delta := network.GetDelta(2, 1, &mb); floatEquals(0.0010172359440642931, delta) == false {
+		t.Errorf("Expected %v, but was %v", 0.0010172359440642931, delta)
 	}
 }
 
@@ -411,11 +416,14 @@ func TestTrain(t *testing.T) {
 	network.Feedforward(&mb)
 
 	// Assert
-	if a := network.GetActivation(0, 2, &mb); floatEquals(0.34, a) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.34, a)
+	expected := 0.999999999998501
+	if a := network.GetActivation(0, 2, &mb); floatEquals(expected, a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
 	}
-	if a := network.GetActivation(1, 2, &mb); floatEquals(0.43, a) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", 0.43, a)
+
+	expected = 0.999999999998501
+	if a := network.GetActivation(1, 2, &mb); floatEquals(1, a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", 1, a)
 	}
 }
 
