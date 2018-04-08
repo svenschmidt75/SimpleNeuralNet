@@ -78,3 +78,20 @@ func (QuadtraticCostFunction) GradWeight(j int, k int, layer int, network *Netwo
 	dCdw /= float64(len(trainingSamples))
 	return dCdw
 }
+
+func (QuadtraticCostFunction) CalculateErrorInOutputLayer(n *Network, expectedClass int, mb *Minibatch) {
+	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
+	outputLayerIdx := n.getOutputLayerIndex()
+	nNodes := n.nNodesInLayer(outputLayerIdx)
+	for i := 0; i < nNodes; i++ {
+		a_i := n.GetActivation(i, outputLayerIdx, mb)
+		dCda := a_i
+		if i == expectedClass {
+			dCda -= 1
+		}
+		z_i := n.CalculateZ(i, outputLayerIdx, mb)
+		ds := SigmoidPrime(z_i)
+		delta := dCda * ds
+		n.SetDelta(delta, i, outputLayerIdx, mb)
+	}
+}

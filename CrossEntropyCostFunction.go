@@ -3,6 +3,7 @@ package main
 import (
 	"SimpleNeuralNet/MNISTImport"
 	"fmt"
+	"math"
 )
 
 type CrossEntropyCostFunction struct{}
@@ -14,10 +15,19 @@ func (CrossEntropyCostFunction) Evaluate(network *Network, trainingSamples []MNI
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		a := network.GetOutputLayerActivations(&mb)
-		diff := GetError(x.ExpectedClass, a)
-		cost += diff * diff
+		var sumj float64
+		for y := 0; y < len(a); y++ {
+			var term float64
+			if y == x.ExpectedClass {
+				term = math.Log2(a[y])
+			} else {
+				term = math.Log2(1 - a[y])
+			}
+			sumj += term
+		}
+		cost += sumj
 	}
-	cost /= float64(2 * len(trainingSamples))
+	cost /= float64(len(trainingSamples))
 	return cost
 }
 
@@ -77,4 +87,21 @@ func (CrossEntropyCostFunction) GradWeight(j int, k int, layer int, network *Net
 	}
 	dCdw /= float64(len(trainingSamples))
 	return dCdw
+}
+
+func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, expectedClass int, mb *Minibatch) {
+	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
+	outputLayerIdx := n.getOutputLayerIndex()
+	nNodes := n.nNodesInLayer(outputLayerIdx)
+	for i := 0; i < nNodes; i++ {
+		a_i := n.GetActivation(i, outputLayerIdx, mb)
+		dCda := a_i
+		if i == expectedClass {
+			dCda -= 1
+		}
+		z_i := n.CalculateZ(i, outputLayerIdx, mb)
+		ds := SigmoidPrime(z_i)
+		delta := dCda * ds
+		n.SetDelta(delta, i, outputLayerIdx, mb)
+	}
 }
