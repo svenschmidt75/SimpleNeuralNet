@@ -12,6 +12,7 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
+	network.CostFunction = CrossEntropyCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -57,6 +58,7 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
+	network.CostFunction = CrossEntropyCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 

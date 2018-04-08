@@ -50,10 +50,6 @@ func (n *Network) GobEncode() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = encoder.Encode(n.CostFunction)
-	if err != nil {
-		return nil, err
-	}
 	return w.Bytes(), nil
 }
 
@@ -71,16 +67,7 @@ func (n *Network) GobDecode(buf []byte) error {
 	if err != nil {
 		return err
 	}
-	err = decoder.Decode(&n.weights)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&n.CostFunction)
-	if err != nil {
-		n.CostFunction = QuadtraticCostFunction{}
-		return nil
-	}
-	return err
+	return decoder.Decode(&n.weights)
 }
 
 func CreateNetwork(layers []int, costFunction CostFunction) Network {
