@@ -12,7 +12,7 @@ func main() {
 	fmt.Scanf("%d\n", &idx)
 
 	if idx == 1 {
-		network := CreateNetwork([]int{28 * 28, 100, 10})
+		network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
 		network.InitializeNetworkWeightsAndBiases()
 
 		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"

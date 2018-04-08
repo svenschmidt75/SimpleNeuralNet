@@ -25,7 +25,7 @@ type Network struct {
 	weights []float64
 
 	// cost function
-	//	costFunction CostFunction
+	CostFunction CostFunction
 }
 
 func init() {
@@ -50,6 +50,10 @@ func (n *Network) GobEncode() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = encoder.Encode(n.CostFunction)
+	if err != nil {
+		return nil, err
+	}
 	return w.Bytes(), nil
 }
 
@@ -67,12 +71,21 @@ func (n *Network) GobDecode(buf []byte) error {
 	if err != nil {
 		return err
 	}
-	return decoder.Decode(&n.weights)
+	err = decoder.Decode(&n.weights)
+	if err != nil {
+		return err
+	}
+	err = decoder.Decode(&n.CostFunction)
+	if err != nil {
+		n.CostFunction = QuadtraticCostFunction{}
+		return nil
+	}
+	return err
 }
 
-func CreateNetwork(layers []int) Network {
+func CreateNetwork(layers []int, costFunction CostFunction) Network {
 	nBiases := sum(layers[1:])
-	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
+	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers)), CostFunction: costFunction}
 }
 
 func sum(xs []int) int {
@@ -463,53 +476,6 @@ func (n *Network) CaculateDelta(j int, layer int, mb *Minibatch, ts *MNISTImport
 	s := SigmoidPrime(z_j)
 	delta := tmp * s
 	return delta
-}
-
-func (n *Network) GradWeight(j int, k int, layer int, trainingSamples []MNISTImport.TrainingSample) float64 {
-	if layer == 0 {
-		panic(fmt.Sprintf("Layer must be > 0"))
-	}
-	var dCdw float64
-	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
-	for _, x := range trainingSamples {
-		n.SetInputActivations(x.InputActivations, &mb)
-		n.Feedforward(&mb)
-		a_k := n.GetActivation(k, layer-1, &mb)
-		delta_j := n.CaculateDelta(j, layer, &mb, &x)
-		dCdw += a_k * delta_j
-	}
-	dCdw /= float64(len(trainingSamples))
-	return dCdw
-}
-
-func (n *Network) GradBias(j int, layer int, trainingSamples []MNISTImport.TrainingSample) float64 {
-	if layer == 0 {
-		panic(fmt.Sprintf("Layer must be > 0"))
-	}
-	var delta float64
-	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
-	for _, x := range trainingSamples {
-		n.SetInputActivations(x.InputActivations, &mb)
-		n.Feedforward(&mb)
-		delta_j := n.CaculateDelta(j, layer, &mb, &x)
-		delta += delta_j
-	}
-	delta /= float64(len(trainingSamples))
-	return delta
-}
-
-func (n *Network) EvaluateCostFunction(trainingSamples []MNISTImport.TrainingSample) float64 {
-	var cost float64
-	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
-	for _, x := range trainingSamples {
-		n.SetInputActivations(x.InputActivations, &mb)
-		n.Feedforward(&mb)
-		a := n.GetOutputLayerActivations(&mb)
-		diff := GetError(x.ExpectedClass, a)
-		cost += diff * diff
-	}
-	cost /= float64(2 * len(trainingSamples))
-	return cost
 }
 
 func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {

@@ -27,7 +27,7 @@ func TestNumberOfWeights(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs)
+		network := CreateNetwork(item.xs, QuadtraticCostFunction{})
 		nWeights := len(network.weights)
 		if nWeights != item.nWeights {
 			t.Errorf("Expected 2, but is %v", nWeights)
@@ -47,7 +47,7 @@ func TestNumberOfBiases(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs)
+		network := CreateNetwork(item.xs, QuadtraticCostFunction{})
 		nBiases := len(network.biases)
 		if nBiases != item.nBiases {
 			t.Errorf("Expected 2, but is %v", nBiases)
@@ -75,7 +75,7 @@ func TestActivationIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
+		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
 		for _, as := range ts.ais {
 			ai := network.GetNodeIndex(as.i, as.layer)
 			if ai != as.index {
@@ -105,7 +105,7 @@ func TestBiasIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
+		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
 		for _, as := range ts.ais {
 			ai := network.GetBiasIndex(as.i, as.layer)
 			if ai != as.index {
@@ -146,7 +146,7 @@ func TestWeightIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
+		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
 		for _, as := range ts.ais {
 			ai := network.GetWeightIndex(as.i, as.j, as.layer)
 			if ai != as.index {
@@ -177,7 +177,7 @@ func TestNumberOfWeightsPerLayer(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
+		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
 		for _, as := range ts.ais {
 			ai := network.nWeightsInLayer(as.layer)
 			if ai != as.expected {
@@ -188,7 +188,7 @@ func TestNumberOfWeightsPerLayer(t *testing.T) {
 }
 
 func CreateTestNetwork() (Network, Minibatch) {
-	network := CreateNetwork([]int{2, 3, 2})
+	network := CreateNetwork([]int{2, 3, 2}, QuadtraticCostFunction{})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
 	network.weights[network.GetWeightIndex(0, 1, 1)] = 2
 	network.weights[network.GetWeightIndex(1, 0, 1)] = 3
@@ -216,7 +216,7 @@ func CreateTestNetwork() (Network, Minibatch) {
 }
 
 func CreateTestNetwork2() Network {
-	network := CreateNetwork([]int{2, 3, 2})
+	network := CreateNetwork([]int{2, 3, 2}, QuadtraticCostFunction{})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.03645
 	network.weights[network.GetWeightIndex(0, 1, 1)] = 0.3645
 	network.weights[network.GetWeightIndex(1, 0, 1)] = 0.14352
@@ -428,7 +428,7 @@ func TestTrain(t *testing.T) {
 }
 
 func TestTrainWithMNIST(t *testing.T) {
-	network := CreateNetwork([]int{28 * 28, 100, 10})
+	network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
 	network.InitializeNetworkWeightsAndBiases()
 
 	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
@@ -449,7 +449,7 @@ func TestTrainWithMNIST(t *testing.T) {
 }
 
 func TestSerialization(t *testing.T) {
-	network := CreateNetwork([]int{28 * 28, 100, 10})
+	network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
 	network.InitializeNetworkWeightsAndBiases()
 
 	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
@@ -471,6 +471,10 @@ func TestSerialization(t *testing.T) {
 	a1 := network.GetWeight(1, 1, 1)
 	a2 := readNetwork.GetWeight(1, 1, 1)
 	if floatEquals(a1, a2) == false {
+		t.Error("Networks not equal")
+	}
+
+	if network.CostFunction != readNetwork.CostFunction {
 		t.Error("Networks not equal")
 	}
 }
@@ -506,13 +510,13 @@ func TestCostDerivativeNumerical(t *testing.T) {
 		delta := 0.000001
 		w_jk := network.GetWeight(item.i, item.j, item.layer)
 		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
-		c1 := network.EvaluateCostFunction(ts)
+		c1 := network.CostFunction.Evaluate(network, ts)
 		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
-		c2 := network.EvaluateCostFunction(ts)
+		c2 := network.CostFunction.Evaluate(network, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdw := network.GradWeight(item.i, item.j, item.layer, ts)
+		dCdw := network.CostFunction.GradWeight(item.i, item.j, item.layer, network, ts)
 
 		if floatEquals(dCdw_numeric, dCdw) == false {
 			t.Error("Networks not equal")
