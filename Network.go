@@ -453,31 +453,6 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 	}
 }
 
-func (n *Network) CaculateDelta(j int, layer int, mb *Minibatch, ts *MNISTImport.TrainingSample) float64 {
-	if layer == n.getOutputLayerIndex() {
-		a_i := n.GetActivation(j, layer, mb)
-		dCda := a_i
-		if j == ts.ExpectedClass {
-			dCda -= 1
-		}
-		z_i := n.CalculateZ(j, layer, mb)
-		ds := SigmoidPrime(z_i)
-		delta := dCda * ds
-		return delta
-	}
-	nNextNodes := n.nNodesInLayer(layer + 1)
-	var tmp float64
-	for k := 0; k < nNextNodes; k++ {
-		weight_kj := n.GetWeight(k, j, layer+1)
-		delta_k := n.CaculateDelta(k, layer+1, mb, ts)
-		tmp += weight_kj * delta_k
-	}
-	z_j := n.CalculateZ(j, layer, mb)
-	s := SigmoidPrime(z_j)
-	delta := tmp * s
-	return delta
-}
-
 func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
