@@ -427,6 +427,26 @@ func TestTrain(t *testing.T) {
 	}
 }
 
+func TestSingleNeuronTrain(t *testing.T) {
+	network := CreateNetwork([]int{1, 1}, QuadtraticCostFunction{})
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.6
+	network.biases[network.GetBiasIndex(0, 1)] = 0.9
+	mb := CreateMiniBatch(2, 1)
+	mb.a[network.GetNodeIndex(0, 0)] = 1
+
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, 0)}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10)
+
+	network.SetInputActivations([]float64{1}, &mb)
+	network.Feedforward(&mb)
+
+	// Assert
+	expected := 0.09
+	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
+	}
+}
+
 func TestTrainWithMNIST(t *testing.T) {
 	network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
 	network.InitializeNetworkWeightsAndBiases()

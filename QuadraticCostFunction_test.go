@@ -2,18 +2,16 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
-	"math"
 	"testing"
 )
 
-func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
+func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := ReadGobFromFile("./50000_30_3_10_QCFN.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	network.CostFunction = CrossEntropyCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -52,14 +50,13 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 	}
 }
 
-func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
+func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := ReadGobFromFile("./50000_30_3_10_QCFN.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	network.CostFunction = CrossEntropyCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -98,8 +95,8 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	}
 }
 
-func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, CrossEntropyCostFunction{})
+func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
+	network := CreateNetwork([]int{1, 1}, QuadtraticCostFunction{})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.6
 	network.biases[network.GetBiasIndex(0, 1)] = 0.9
 	mb := CreateMiniBatch(2, 1)
@@ -113,7 +110,8 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 
 	C := func(z float64) float64 {
 		a := Sigmoid(z)
-		return -math.Log(a)
+		t := 1 - a
+		return 0.5 * t * t
 	}
 	delta := 0.000001
 	z_j := network.CalculateZ(0, 1, &mb)

@@ -449,6 +449,18 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			n.BackpropagateError(&mb)
 		}
 		dw, db := n.CalculateDerivatives(mbs)
+
+		var gradCNorm float64
+		for _, dwi := range dw {
+			gradCNorm += dwi * dwi
+			fmt.Printf("dwi = %f\n", dwi*dwi)
+		}
+		for _, dbi := range db {
+			gradCNorm += dbi * dbi
+			fmt.Printf("dbi = %f\n", dbi*dbi)
+		}
+		fmt.Printf("|gradC| = %f\n", math.Sqrt(gradCNorm))
+
 		n.UpdateNetwork(eta, dw, db)
 	}
 

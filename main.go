@@ -12,7 +12,7 @@ func main() {
 	fmt.Scanf("%d\n", &idx)
 
 	if idx == 1 {
-		network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
+		network := CreateNetwork([]int{28 * 28, 30, 10}, CrossEntropyCostFunction{})
 		network.InitializeNetworkWeightsAndBiases()
 
 		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"
@@ -22,7 +22,7 @@ func main() {
 		fmt.Printf("Importing test data from %s...\n", userDataDir)
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())
-		nTrainingSamples := 10000
+		nTrainingSamples := 54000
 		validationDataFraction := float32(0.1)
 		trainingData, validationData := totalDataSet.Split(validationDataFraction, nTrainingSamples)
 		fmt.Printf("Generating %d training samples...\n", trainingData.Length())
