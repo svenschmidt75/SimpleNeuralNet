@@ -455,7 +455,7 @@ func TestSingleNeuronCrossEntropyCostTrain(t *testing.T) {
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.005, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.05, 10)
 
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)

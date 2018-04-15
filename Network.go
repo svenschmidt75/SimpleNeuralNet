@@ -473,10 +473,10 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 		if remainder := len(trainingSamples) - sizeMiniBatch*nMiniBatches; remainder > 0 {
 			innerLoop(remainder, nMiniBatches, indices)
 		}
-		output := fmt.Sprintf("Epoch %d -", epoch)
+		output := fmt.Sprintf("Epoch %d", epoch)
 		if len(validationSamples) > 0 {
 			accuracy := n.RunSamples(validationSamples)
-			output += fmt.Sprintf(" accuracy %f", accuracy)
+			output += fmt.Sprintf(" - accuracy %f", accuracy)
 		}
 		cost := n.CostFunction.Evaluate(n, trainingSamples)
 		output += fmt.Sprintf(" - cost %f\n", cost)

@@ -22,7 +22,7 @@ func main() {
 		fmt.Printf("Importing test data from %s...\n", userDataDir)
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())
-		nTrainingSamples := 54000
+		nTrainingSamples := 60000
 		validationDataFraction := float32(0.1)
 		trainingData, validationData := totalDataSet.Split(validationDataFraction, nTrainingSamples)
 		fmt.Printf("Generating %d training samples...\n", trainingData.Length())
@@ -31,7 +31,7 @@ func main() {
 		vs := validationData.GenerateTrainingSamples(validationData.Length())
 
 		epochs := 30
-		eta := float32(3)
+		eta := float32(0.5)
 		miniMatchSize := 10
 		network.Train(ts, vs, epochs, eta, miniMatchSize)
 

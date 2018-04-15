@@ -99,8 +99,8 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 
 func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	network := CreateNetwork([]int{1, 1}, QuadtraticCostFunction{})
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.6
-	network.biases[network.GetBiasIndex(0, 1)] = 0.9
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
+	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 

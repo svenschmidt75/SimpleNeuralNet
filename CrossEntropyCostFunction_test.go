@@ -102,8 +102,8 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 
 func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	network := CreateNetwork([]int{1, 1}, CrossEntropyCostFunction{})
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.6
-	network.biases[network.GetBiasIndex(0, 1)] = 0.9
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
+	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
@@ -113,14 +113,14 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	network.Feedforward(&mb)
 	network.CalculateErrorInOutputLayer(ts[0].OutputActivations, &mb)
 
-	C := func(z float64) float64 {
+	C := func(z float64, y float64) float64 {
 		a := Sigmoid(z)
-		return -math.Log(1 - a)
+		return -(y*math.Log(a) + (1-y)*math.Log(1-a))
 	}
 	delta := 0.000001
 	z_j := network.CalculateZ(0, 1, &mb)
-	c1 := C(z_j - delta)
-	c2 := C(z_j + delta)
+	c1 := C(z_j-delta, 0)
+	c2 := C(z_j+delta, 0)
 	dCdb_numeric := (c2 - c1) / 2 / delta
 
 	// evaluate analytically
