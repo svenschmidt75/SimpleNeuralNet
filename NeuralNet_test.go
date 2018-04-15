@@ -427,21 +427,41 @@ func TestTrain(t *testing.T) {
 	}
 }
 
-func TestSingleNeuronTrain(t *testing.T) {
+func TestSingleNeuronQuadraticCostTrain(t *testing.T) {
 	network := CreateNetwork([]int{1, 1}, QuadtraticCostFunction{})
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.6
-	network.biases[network.GetBiasIndex(0, 1)] = 0.9
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
+	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10)
 
-	network.SetInputActivations([]float64{1}, &mb)
+	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
 
 	// Assert
-	expected := 0.09395569
+	expected := 0.20284840518811262
+	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
+	}
+}
+
+func TestSingleNeuronCrossEntropyCostTrain(t *testing.T) {
+	network := CreateNetwork([]int{1, 1}, CrossEntropyCostFunction{})
+	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
+	network.biases[network.GetBiasIndex(0, 1)] = 2
+	mb := CreateMiniBatch(2, 1)
+	mb.a[network.GetNodeIndex(0, 0)] = 1
+
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.005, 10)
+
+	network.SetInputActivations(ts[0].InputActivations, &mb)
+	network.Feedforward(&mb)
+
+	// Assert
+	expected := 0.20284840518811262
 	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
 	}
