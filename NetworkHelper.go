@@ -28,20 +28,17 @@ func GenerateRandomIndices(size int) []int {
 	return perm
 }
 
-func GetError(predictedClass int, a []float64) float64 {
+func GetError(outputActivations []float64, a []float64) float64 {
 	var err float64
 	for idx := range a {
-		var d1 float64 = 0
-		if idx == predictedClass {
-			d1 = 1
-		}
+		d1 := outputActivations[idx]
 		d2 := a[idx]
 		err += (d1 - d2) * (d1 - d2)
 	}
 	return math.Sqrt(err)
 }
 
-func GetIndex(a []float64) int {
+func GetClass(a []float64) int {
 	var index int
 	var value float64 = -1
 	for idx := range a {

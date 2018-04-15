@@ -301,8 +301,8 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 	}
 }
 
-func (n *Network) CalculateErrorInOutputLayer(expectedClass int, mb *Minibatch) {
-	n.CostFunction.CalculateErrorInOutputLayer(n, expectedClass, mb)
+func (n *Network) CalculateErrorInOutputLayer(outputActivations []float64, mb *Minibatch) {
+	n.CostFunction.CalculateErrorInOutputLayer(n, outputActivations, mb)
 }
 
 func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch) {
@@ -445,7 +445,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			x := trainingSamples[index]
 			n.SetInputActivations(x.InputActivations, &mb)
 			n.Feedforward(&mb)
-			n.CalculateErrorInOutputLayer(x.ExpectedClass, &mb)
+			n.CalculateErrorInOutputLayer(x.OutputActivations, &mb)
 			n.BackpropagateError(&mb)
 		}
 		dw, db := n.CalculateDerivatives(mbs)
@@ -453,13 +453,13 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 		var gradCNorm float64
 		for _, dwi := range dw {
 			gradCNorm += dwi * dwi
-			fmt.Printf("dwi = %f\n", dwi*dwi)
+			//			fmt.Printf("dwi = %f\n", dwi*dwi)
 		}
 		for _, dbi := range db {
 			gradCNorm += dbi * dbi
-			fmt.Printf("dbi = %f\n", dbi*dbi)
+			//			fmt.Printf("dbi = %f\n", dbi*dbi)
 		}
-		fmt.Printf("|gradC| = %f\n", math.Sqrt(gradCNorm))
+		//		fmt.Printf("|gradC| = %f\n", math.Sqrt(gradCNorm))
 
 		n.UpdateNetwork(eta, dw, db)
 	}
@@ -497,8 +497,9 @@ func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample) float
 		n.SetInputActivations(trainingSamples[testIdx].InputActivations, &mb)
 		n.Feedforward(&mb)
 		as := n.GetOutputLayerActivations(&mb)
-		predictionIndex := GetIndex(as)
-		if trainingSamples[testIdx].ExpectedClass == predictionIndex {
+		predictionClass := GetClass(as)
+		expectedClass := GetClass(trainingSamples[testIdx].OutputActivations)
+		if expectedClass == predictionClass {
 			correctPredictions++
 		}
 	}

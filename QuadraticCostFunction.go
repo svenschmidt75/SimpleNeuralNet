@@ -14,7 +14,7 @@ func (QuadtraticCostFunction) Evaluate(network *Network, trainingSamples []MNIST
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		a := network.GetOutputLayerActivations(&mb)
-		diff := GetError(x.ExpectedClass, a)
+		diff := GetError(x.OutputActivations, a)
 		cost += diff * diff
 	}
 	cost /= float64(2 * len(trainingSamples))
@@ -25,9 +25,7 @@ func caculateDeltaCost(j int, layer int, n *Network, mb *Minibatch, ts *MNISTImp
 	if layer == n.getOutputLayerIndex() {
 		a_i := n.GetActivation(j, layer, mb)
 		dCda := a_i
-		if j == ts.ExpectedClass {
-			dCda -= 1
-		}
+		dCda -= ts.OutputActivations[j]
 		z_i := n.CalculateZ(j, layer, mb)
 		ds := SigmoidPrime(z_i)
 		delta := dCda * ds
@@ -79,16 +77,14 @@ func (QuadtraticCostFunction) GradWeight(j int, k int, layer int, network *Netwo
 	return dCdw
 }
 
-func (QuadtraticCostFunction) CalculateErrorInOutputLayer(n *Network, expectedClass int, mb *Minibatch) {
+func (QuadtraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations []float64, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
 	nNodes := n.nNodesInLayer(outputLayerIdx)
 	for i := 0; i < nNodes; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
 		dCda := a_i
-		if i == expectedClass {
-			dCda -= 1
-		}
+		dCda -= outputActivations[i]
 		z_i := n.CalculateZ(i, outputLayerIdx, mb)
 		ds := SigmoidPrime(z_i)
 		delta := dCda * ds

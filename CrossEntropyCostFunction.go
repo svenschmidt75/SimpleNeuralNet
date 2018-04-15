@@ -15,14 +15,11 @@ func (CrossEntropyCostFunction) Evaluate(network *Network, trainingSamples []MNI
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		a := network.GetOutputLayerActivations(&mb)
+		y := x.OutputActivations
 		var sumj float64
-		for y := 0; y < len(a); y++ {
+		for j := 0; j < len(a); j++ {
 			var term float64
-			if y == x.ExpectedClass {
-				term = math.Log(a[y])
-			} else {
-				term = math.Log(1 - a[y])
-			}
+			term = y[j]*math.Log(a[j]) + (1-y[j])*math.Log(1-a[j])
 			sumj += term
 		}
 		cost += sumj
@@ -35,9 +32,7 @@ func caculateDeltaCrossEntropy(j int, layer int, n *Network, mb *Minibatch, ts *
 	if layer == n.getOutputLayerIndex() {
 		a_i := n.GetActivation(j, layer, mb)
 		dCda := a_i
-		if j == ts.ExpectedClass {
-			dCda -= 1
-		}
+		dCda -= ts.OutputActivations[j]
 		return dCda
 	}
 	nNextNodes := n.nNodesInLayer(layer + 1)
@@ -86,16 +81,14 @@ func (CrossEntropyCostFunction) GradWeight(j int, k int, layer int, network *Net
 	return dCdw
 }
 
-func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, expectedClass int, mb *Minibatch) {
+func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations []float64, mb *Minibatch) {
 	// Equation (68), Chapter 3 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
 	nNodes := n.nNodesInLayer(outputLayerIdx)
 	for i := 0; i < nNodes; i++ {
 		a_i := n.GetActivation(i, outputLayerIdx, mb)
 		dCda := a_i
-		if i == expectedClass {
-			dCda -= 1
-		}
+		dCda -= outputActivations[i]
 		n.SetDelta(dCda, i, outputLayerIdx, mb)
 	}
 }

@@ -339,26 +339,26 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	network.SetActivation(1, 0, 1, &mb)
 	network.SetActivation(2, 1, 1, &mb)
 	network.SetActivation(3, 2, 1, &mb)
-	outputLayerIdx := 2
+	outputLayerIdx := network.getOutputLayerIndex()
 
 	tables := []struct {
-		outputActivations []float64
-		expectedClass     int
-		error             []float64
+		initialOutputActivations  []float64
+		expectedOutputActivations []float64
+		error                     []float64
 	}{
-		{[]float64{1, 1}, 1, []float64{0.01897348347524417, 0}},
-		{[]float64{0, 0}, 1, []float64{0, -0.10026647037539357}},
-		{[]float64{0.24, 0.21}, 1, []float64{0.0045536360340586, -0.07921051159656092}},
+		{[]float64{1, 1}, []float64{0.76, 0.65}, []float64{0.0045536360340586, 0.03509326463138775}},
+		{[]float64{0.32, 0.34}, []float64{0.01, 0.78}, []float64{0.005881779877325692, -0.04411724696517317}},
+		{[]float64{0.24, 0.21}, []float64{0.66, 0.98}, []float64{-0.007968863059602552, -0.07720518218905305}},
 	}
 
 	for _, ts := range tables {
-		network.SetActivation(ts.outputActivations[0], 0, outputLayerIdx, &mb)
-		network.SetActivation(ts.outputActivations[1], 1, outputLayerIdx, &mb)
-		network.CalculateErrorInOutputLayer(ts.expectedClass, &mb)
-		if delta := network.GetDelta(0, 2, &mb); floatEquals(ts.error[0], delta) == false {
+		network.SetActivation(ts.initialOutputActivations[0], 0, outputLayerIdx, &mb)
+		network.SetActivation(ts.initialOutputActivations[1], 1, outputLayerIdx, &mb)
+		network.CalculateErrorInOutputLayer(ts.expectedOutputActivations, &mb)
+		if delta := network.GetDelta(0, outputLayerIdx, &mb); floatEquals(ts.error[0], delta) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], delta)
 		}
-		if nabla := network.GetDelta(1, 2, &mb); floatEquals(ts.error[1], nabla) == false {
+		if nabla := network.GetDelta(1, outputLayerIdx, &mb); floatEquals(ts.error[1], nabla) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[1], nabla)
 		}
 	}
@@ -370,7 +370,7 @@ func TestBackpropagateError(t *testing.T) {
 	network.SetActivation(0.32, 0, 0, &mb)
 	network.SetActivation(0.56, 1, 0, &mb)
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer(0, &mb)
+	network.CalculateErrorInOutputLayer([]float64{1, 0}, &mb)
 	network.BackpropagateError(&mb)
 
 	expected := -0.0010048637687567257
@@ -392,7 +392,7 @@ func TestBackpropagateError(t *testing.T) {
 func TestCalculateDerivatives(t *testing.T) {
 	network, mb := CreateTestNetwork()
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer(1, &mb)
+	network.CalculateErrorInOutputLayer([]float64{0, 1}, &mb)
 	network.BackpropagateError(&mb)
 
 	dw, db := network.CalculateDerivatives([]Minibatch{mb})
@@ -408,7 +408,7 @@ func TestCalculateDerivatives(t *testing.T) {
 func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, 1), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, 1)}
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, []float64{0, 1})}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 10)
 
 	mb := CreateMiniBatch(12, 7)
@@ -434,14 +434,14 @@ func TestSingleNeuronTrain(t *testing.T) {
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, 0)}
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10)
 
 	network.SetInputActivations([]float64{1}, &mb)
 	network.Feedforward(&mb)
 
 	// Assert
-	expected := 0.09
+	expected := 0.09395569
 	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
 	}
@@ -464,7 +464,8 @@ func TestTrainWithMNIST(t *testing.T) {
 		network.SetInputActivations(ts2[index].InputActivations, &mb)
 		network.Feedforward(&mb)
 		as := network.GetOutputLayerActivations(&mb)
-		fmt.Printf("should %d: %v\n", ts2[index].ExpectedClass, as)
+		expectedClass := GetClass(ts2[index].OutputActivations)
+		fmt.Printf("should %d: %v\n", expectedClass, as)
 	}
 }
 
@@ -491,10 +492,6 @@ func TestSerialization(t *testing.T) {
 	a1 := network.GetWeight(1, 1, 1)
 	a2 := readNetwork.GetWeight(1, 1, 1)
 	if floatEquals(a1, a2) == false {
-		t.Error("Networks not equal")
-	}
-
-	if network.CostFunction != readNetwork.CostFunction {
 		t.Error("Networks not equal")
 	}
 }

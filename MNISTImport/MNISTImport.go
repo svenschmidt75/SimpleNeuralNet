@@ -101,7 +101,9 @@ func (data MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
 		}
 		ts := &tss[idx]
 		ts.InputActivations = data.inputActivations[idx]
-		ts.ExpectedClass = int(data.expectedResult[idx])
+		ts.OutputActivations = make([]float64, 10)
+		expectedResult := data.expectedResult[idx]
+		ts.OutputActivations[expectedResult] = 1
 	}
 	return tss
 }

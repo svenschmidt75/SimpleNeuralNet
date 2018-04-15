@@ -8,10 +8,11 @@ import (
 func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10_QCFN.gob", network)
+	err := ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
+	network.CostFunction = QuadtraticCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -53,10 +54,11 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10_QCFN.gob", network)
+	err := ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
+	network.CostFunction = QuadtraticCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -102,16 +104,15 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, 0)}
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10)
-	network.SetInputActivations([]float64{1}, &mb)
+	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer(0, &mb)
+	network.CalculateErrorInOutputLayer(ts[0].OutputActivations, &mb)
 
 	C := func(z float64) float64 {
 		a := Sigmoid(z)
-		t := 1 - a
-		return 0.5 * t * t
+		return 0.5 * a * a
 	}
 	delta := 0.000001
 	z_j := network.CalculateZ(0, 1, &mb)
