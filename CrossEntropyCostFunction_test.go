@@ -13,8 +13,7 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	network.CostFunction = CrossEntropyCostFunction{}
-	network.CostFunction = CrossEntropyCostFunction{}
+	costFunction := CrossEntropyCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -39,13 +38,13 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 		delta := 0.000001
 		w_jk := network.GetWeight(item.i, item.j, item.layer)
 		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
-		c1 := network.CostFunction.Evaluate(network, ts)
+		c1 := costFunction.Evaluate(network, ts)
 		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
-		c2 := network.CostFunction.Evaluate(network, ts)
+		c2 := costFunction.Evaluate(network, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdw := network.CostFunction.GradWeight(item.i, item.j, item.layer, network, ts)
+		dCdw := costFunction.GradWeight(item.i, item.j, item.layer, network, ts)
 
 		if floatEquals(dCdw_numeric, dCdw) == false {
 			t.Error("Networks not equal")
@@ -60,8 +59,7 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	network.CostFunction = CrossEntropyCostFunction{}
-	network.CostFunction = CrossEntropyCostFunction{}
+	costFunction := CrossEntropyCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -86,13 +84,13 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 		delta := 0.000001
 		b_j := network.GetBias(item.i, item.layer)
 		network.SetBias(b_j-delta, item.i, item.layer)
-		c1 := network.CostFunction.Evaluate(network, ts)
+		c1 := costFunction.Evaluate(network, ts)
 		network.SetBias(b_j+delta, item.i, item.layer)
-		c2 := network.CostFunction.Evaluate(network, ts)
+		c2 := costFunction.Evaluate(network, ts)
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdb := network.CostFunction.GradBias(item.i, item.layer, network, ts)
+		dCdb := costFunction.GradBias(item.i, item.layer, network, ts)
 
 		if floatEquals(dCdb_numeric, dCdb) == false {
 			t.Error("Networks not equal")
@@ -101,17 +99,18 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 }
 
 func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, CrossEntropyCostFunction{})
+	network := CreateNetwork([]int{1, 1})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
+	costFunction := CrossEntropyCostFunction{}
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10, costFunction)
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer(ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
 
 	C := func(z float64, y float64) float64 {
 		a := Sigmoid(z)

@@ -23,9 +23,6 @@ type Network struct {
 
 	// Weights. w_{ij}^l connects a_i^l with a_j^{l-1}
 	weights []float64
-
-	// cost function
-	CostFunction CostFunction
 }
 
 func init() {
@@ -70,9 +67,9 @@ func (n *Network) GobDecode(buf []byte) error {
 	return decoder.Decode(&n.weights)
 }
 
-func CreateNetwork(layers []int, costFunction CostFunction) Network {
+func CreateNetwork(layers []int) Network {
 	nBiases := sum(layers[1:])
-	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers)), CostFunction: costFunction}
+	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
 }
 
 func sum(xs []int) int {
@@ -301,10 +298,6 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 	}
 }
 
-func (n *Network) CalculateErrorInOutputLayer(outputActivations []float64, mb *Minibatch) {
-	n.CostFunction.CalculateErrorInOutputLayer(n, outputActivations, mb)
-}
-
 func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch) {
 	if len(inputActivations) != n.nodes[0] {
 		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", len(inputActivations), n.nodes[0]))
@@ -427,7 +420,7 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 	}
 }
 
-func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int) {
+func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int, costFunction CostFunction) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
@@ -436,7 +429,8 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	fmt.Printf("\nTraining batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
-	fmt.Printf("Learning rate: %f\n\n", eta)
+	fmt.Printf("Learning rate: %f\n", eta)
+	fmt.Printf("Cost function: %s\n\n", costFunction)
 
 	var innerLoop = func(maxIndex int, offset int, indices []int) {
 		for i := 0; i < maxIndex; i++ {
@@ -445,7 +439,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			x := trainingSamples[index]
 			n.SetInputActivations(x.InputActivations, &mb)
 			n.Feedforward(&mb)
-			n.CalculateErrorInOutputLayer(x.OutputActivations, &mb)
+			costFunction.CalculateErrorInOutputLayer(n, x.OutputActivations, &mb)
 			n.BackpropagateError(&mb)
 		}
 		dw, db := n.CalculateDerivatives(mbs)
@@ -478,7 +472,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			accuracy := n.RunSamples(validationSamples)
 			output += fmt.Sprintf(" - accuracy %f", accuracy)
 		}
-		cost := n.CostFunction.Evaluate(n, trainingSamples)
+		cost := costFunction.Evaluate(n, trainingSamples)
 		output += fmt.Sprintf(" - cost %f\n", cost)
 		fmt.Print(output)
 	}

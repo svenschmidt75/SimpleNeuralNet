@@ -1,3 +1,6 @@
+#training_samples - #eopchs - #training rate - # minibatch size
+
+
 54000_30_3_10 - 28^2 x 100 x 10
 ===============================
 
@@ -120,11 +123,10 @@ PS C:\Users\s.schmidt\dev\private\Go\src\SimpleNeuralNet>
 
 ------------------------------------------------------------------------------------
 
-54000_30_3_10 - 28^2 x 100 x 200 x 10
-====================================
+54000_100_0.5_10 - 28^2 x 100 x 10
+==================================
 
-04/02/18
-
+04/16/18
 
 1. Train neural network with MNIST data
 2. Run neural network on MNIST test data
@@ -139,64 +141,43 @@ Generating 6000 validation samples...
 Training batch size: 54000
 Minibatch size: 10
 Number of minibatches: 5400
-Learning rate: 2.500000
+Learning rate: 0.500000
+Cost function: Cross-Entropy
 
+Epoch 0 - accuracy 0.936000 - cost 0.373742
+Epoch 1 - accuracy 0.938667 - cost 0.345526
+Epoch 2 - accuracy 0.940833 - cost 0.302489
+Epoch 3 - accuracy 0.949667 - cost 0.250069
+Epoch 4 - accuracy 0.950667 - cost 0.240237
+Epoch 5 - accuracy 0.952167 - cost 0.212297
+Epoch 6 - accuracy 0.952500 - cost 0.213155
+Epoch 7 - accuracy 0.956000 - cost 0.198972
+Epoch 8 - accuracy 0.954333 - cost 0.198167
+Epoch 9 - accuracy 0.950500 - cost 0.188554
+Epoch 10 - accuracy 0.956000 - cost 0.177041
+Epoch 11 - accuracy 0.954500 - cost 0.188794
+Epoch 12 - accuracy 0.954667 - cost 0.177746
+Epoch 13 - accuracy 0.958333 - cost 0.162846
+Epoch 14 - accuracy 0.954833 - cost 0.156920
+Epoch 15 - accuracy 0.954167 - cost 0.161886
+Epoch 16 - accuracy 0.954500 - cost 0.157183
+Epoch 17 - accuracy 0.956000 - cost 0.157121
+Epoch 18 - accuracy 0.955667 - cost 0.148579
+Epoch 19 - accuracy 0.953667 - cost 0.147585
+Epoch 20 - accuracy 0.953667 - cost 0.144895
+Epoch 21 - accuracy 0.951333 - cost 0.155299
+Epoch 22 - accuracy 0.954000 - cost 0.140969
+Epoch 23 - accuracy 0.955833 - cost 0.139575
+Epoch 24 - accuracy 0.955500 - cost 0.129991
+Epoch 25 - accuracy 0.954833 - cost 0.141620
+Epoch 26 - accuracy 0.951667 - cost 0.138529
+Epoch 27 - accuracy 0.953667 - cost 0.130382
+Epoch 28 - accuracy 0.953667 - cost 0.123466
+Epoch 29 - accuracy 0.953333 - cost 0.120176
 
+Generating 10000 training samples for test data...
+Accuracy: 0.961600
 
+Serializing network to ./n.gob...
+PS C:\Users\s.schmidt\dev\private\Go\src\SimpleNeuralNet>
 
-
-
-
-------------------------------------------------------------------------------------
-
-10000_30_3_10_QCFN
-==================
-
-04/08/18
-
-
-1. Train neural network with MNIST data
-2. Run neural network on MNIST test data
-1
-Importing training data from /home/svenschmidt75/Develop/Go/MNIST...
-Read 60000 train images
-Importing test data from /home/svenschmidt75/Develop/Go/MNIST...
-Read 10000 test images
-Generating 9000 training samples...
-Generating 1000 validation samples...
-
-Training batch size: 9000
-Minibatch size: 10
-Number of minibatches: 900
-Learning rate: 3.000000
-
-Epoch 0 - accuracy 0.083000 - cost 0.499849
-Epoch 1 - accuracy 0.263000 - cost 0.390165
-Epoch 2 - accuracy 0.396000 - cost 0.350817
-Epoch 3 - accuracy 0.467000 - cost 0.293744
-Epoch 4 - accuracy 0.567000 - cost 0.229600
-Epoch 5 - accuracy 0.569000 - cost 0.225609
-Epoch 6 - accuracy 0.565000 - cost 0.226699
-Epoch 7 - accuracy 0.627000 - cost 0.196727
-Epoch 8 - accuracy 0.646000 - cost 0.176238
-Epoch 9 - accuracy 0.648000 - cost 0.176813
-Epoch 10 - accuracy 0.647000 - cost 0.170973
-Epoch 11 - accuracy 0.652000 - cost 0.166485
-Epoch 12 - accuracy 0.657000 - cost 0.164406
-Epoch 13 - accuracy 0.649000 - cost 0.164496
-Epoch 14 - accuracy 0.659000 - cost 0.161575
-Epoch 15 - accuracy 0.660000 - cost 0.160832
-Epoch 16 - accuracy 0.662000 - cost 0.160773
-Epoch 17 - accuracy 0.661000 - cost 0.160388
-Epoch 18 - accuracy 0.665000 - cost 0.158781
-Epoch 19 - accuracy 0.743000 - cost 0.123565
-Epoch 20 - accuracy 0.750000 - cost 0.110740
-Epoch 21 - accuracy 0.746000 - cost 0.109826
-Epoch 22 - accuracy 0.747000 - cost 0.108109
-Epoch 23 - accuracy 0.750000 - cost 0.107426
-Epoch 24 - accuracy 0.741000 - cost 0.107307
-Epoch 25 - accuracy 0.751000 - cost 0.106618
-Epoch 26 - accuracy 0.841000 - cost 0.067543
-Epoch 27 - accuracy 0.847000 - cost 0.062530
-Epoch 28 - accuracy 0.841000 - cost 0.061092
-Epoch 29 - accuracy 0.845000 - cost 0.059357

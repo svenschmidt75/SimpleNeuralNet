@@ -8,6 +8,14 @@ import (
 
 type CrossEntropyCostFunction struct{}
 
+// -- Stringer --
+
+func (CrossEntropyCostFunction) String() string {
+	return "Cross-Entropy"
+}
+
+// -- CostFunction --
+
 func (CrossEntropyCostFunction) Evaluate(network *Network, trainingSamples []MNISTImport.TrainingSample) float64 {
 	var cost float64
 	mb := CreateMiniBatch(network.nNodes(), network.nWeights())

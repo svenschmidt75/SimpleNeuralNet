@@ -7,6 +7,14 @@ import (
 
 type QuadtraticCostFunction struct{}
 
+// -- Stringer --
+
+func (QuadtraticCostFunction) String() string {
+	return "Quadratic"
+}
+
+// -- CostFunction --
+
 func (QuadtraticCostFunction) Evaluate(network *Network, trainingSamples []MNISTImport.TrainingSample) float64 {
 	var cost float64
 	mb := CreateMiniBatch(network.nNodes(), network.nWeights())

@@ -27,7 +27,7 @@ func TestNumberOfWeights(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs, QuadtraticCostFunction{})
+		network := CreateNetwork(item.xs)
 		nWeights := len(network.weights)
 		if nWeights != item.nWeights {
 			t.Errorf("Expected 2, but is %v", nWeights)
@@ -47,7 +47,7 @@ func TestNumberOfBiases(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs, QuadtraticCostFunction{})
+		network := CreateNetwork(item.xs)
 		nBiases := len(network.biases)
 		if nBiases != item.nBiases {
 			t.Errorf("Expected 2, but is %v", nBiases)
@@ -75,7 +75,7 @@ func TestActivationIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetNodeIndex(as.i, as.layer)
 			if ai != as.index {
@@ -105,7 +105,7 @@ func TestBiasIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetBiasIndex(as.i, as.layer)
 			if ai != as.index {
@@ -146,7 +146,7 @@ func TestWeightIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetWeightIndex(as.i, as.j, as.layer)
 			if ai != as.index {
@@ -177,7 +177,7 @@ func TestNumberOfWeightsPerLayer(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, QuadtraticCostFunction{})
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.nWeightsInLayer(as.layer)
 			if ai != as.expected {
@@ -188,7 +188,7 @@ func TestNumberOfWeightsPerLayer(t *testing.T) {
 }
 
 func CreateTestNetwork() (Network, Minibatch) {
-	network := CreateNetwork([]int{2, 3, 2}, QuadtraticCostFunction{})
+	network := CreateNetwork([]int{2, 3, 2})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
 	network.weights[network.GetWeightIndex(0, 1, 1)] = 2
 	network.weights[network.GetWeightIndex(1, 0, 1)] = 3
@@ -216,7 +216,7 @@ func CreateTestNetwork() (Network, Minibatch) {
 }
 
 func CreateTestNetwork2() Network {
-	network := CreateNetwork([]int{2, 3, 2}, QuadtraticCostFunction{})
+	network := CreateNetwork([]int{2, 3, 2})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 0.03645
 	network.weights[network.GetWeightIndex(0, 1, 1)] = 0.3645
 	network.weights[network.GetWeightIndex(1, 0, 1)] = 0.14352
@@ -340,6 +340,7 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	network.SetActivation(2, 1, 1, &mb)
 	network.SetActivation(3, 2, 1, &mb)
 	outputLayerIdx := network.getOutputLayerIndex()
+	costFunction := QuadtraticCostFunction{}
 
 	tables := []struct {
 		initialOutputActivations  []float64
@@ -354,7 +355,7 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	for _, ts := range tables {
 		network.SetActivation(ts.initialOutputActivations[0], 0, outputLayerIdx, &mb)
 		network.SetActivation(ts.initialOutputActivations[1], 1, outputLayerIdx, &mb)
-		network.CalculateErrorInOutputLayer(ts.expectedOutputActivations, &mb)
+		costFunction.CalculateErrorInOutputLayer(&network, ts.expectedOutputActivations, &mb)
 		if delta := network.GetDelta(0, outputLayerIdx, &mb); floatEquals(ts.error[0], delta) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], delta)
 		}
@@ -369,8 +370,9 @@ func TestBackpropagateError(t *testing.T) {
 	mb := CreateMiniBatch(7, 12)
 	network.SetActivation(0.32, 0, 0, &mb)
 	network.SetActivation(0.56, 1, 0, &mb)
+	costFunction := QuadtraticCostFunction{}
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer([]float64{1, 0}, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, []float64{1, 0}, &mb)
 	network.BackpropagateError(&mb)
 
 	expected := -0.0010048637687567257
@@ -391,8 +393,9 @@ func TestBackpropagateError(t *testing.T) {
 
 func TestCalculateDerivatives(t *testing.T) {
 	network, mb := CreateTestNetwork()
+	costFunction := QuadtraticCostFunction{}
 	network.Feedforward(&mb)
-	network.CalculateErrorInOutputLayer([]float64{0, 1}, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, []float64{0, 1}, &mb)
 	network.BackpropagateError(&mb)
 
 	dw, db := network.CalculateDerivatives([]Minibatch{mb})
@@ -409,7 +412,7 @@ func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, []float64{0, 1})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 10, QuadtraticCostFunction{})
 
 	mb := CreateMiniBatch(12, 7)
 	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
@@ -428,14 +431,14 @@ func TestTrain(t *testing.T) {
 }
 
 func TestSingleNeuronQuadraticCostTrain(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, QuadtraticCostFunction{})
+	network := CreateNetwork([]int{1, 1})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10, QuadtraticCostFunction{})
 
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
@@ -448,32 +451,32 @@ func TestSingleNeuronQuadraticCostTrain(t *testing.T) {
 }
 
 func TestSingleNeuronCrossEntropyCostTrain(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, CrossEntropyCostFunction{})
+	network := CreateNetwork([]int{1, 1})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.05, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.5, 10, CrossEntropyCostFunction{})
 
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
 
 	// Assert
-	expected := 0.20284840518811262
+	expected := 0.0033988511270660214
 	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
 	}
 }
 
 func TestTrainWithMNIST(t *testing.T) {
-	network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
+	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
 	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
-	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10, QuadtraticCostFunction{})
 
 	// Assert
 	testData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/MNIST", "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
@@ -490,12 +493,12 @@ func TestTrainWithMNIST(t *testing.T) {
 }
 
 func TestSerialization(t *testing.T) {
-	network := CreateNetwork([]int{28 * 28, 100, 10}, QuadtraticCostFunction{})
+	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
 	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
-	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10, QuadtraticCostFunction{})
 
 	var buf bytes.Buffer
 	err := WriteGob(&buf, &network)

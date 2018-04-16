@@ -12,7 +12,7 @@ func main() {
 	fmt.Scanf("%d\n", &idx)
 
 	if idx == 1 {
-		network := CreateNetwork([]int{28 * 28, 30, 10}, CrossEntropyCostFunction{})
+		network := CreateNetwork([]int{28 * 28, 30, 10})
 		network.InitializeNetworkWeightsAndBiases()
 
 		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"
@@ -33,7 +33,7 @@ func main() {
 		epochs := 30
 		eta := float32(0.5)
 		miniMatchSize := 10
-		network.Train(ts, vs, epochs, eta, miniMatchSize)
+		network.Train(ts, vs, epochs, eta, miniMatchSize, CrossEntropyCostFunction{})
 
 		fmt.Printf("\nGenerating %d training samples for test data...\n", testData.Length())
 		ts = testData.GenerateTrainingSamples(testData.Length())
