@@ -12,10 +12,10 @@ func main() {
 	fmt.Scanf("%d\n", &idx)
 
 	if idx == 1 {
-		network := CreateNetwork([]int{28 * 28, 30, 10})
+		network := CreateNetwork([]int{28 * 28, 100, 10})
 		network.InitializeNetworkWeightsAndBiases()
 
-		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"
+		userDataDir := "C:\\Users\\s.schmidt\\dev\\private\\MNIST"
 		fmt.Printf("Importing training data from %s...\n", userDataDir)
 		totalDataSet := MNISTImport.ImportData(userDataDir, "train-images.idx3-ubyte", "train-labels.idx1-ubyte")
 		fmt.Printf("Read %d train images\n", totalDataSet.Length())
@@ -31,9 +31,9 @@ func main() {
 		vs := validationData.GenerateTrainingSamples(validationData.Length())
 
 		epochs := 30
-		eta := float32(0.5)
+		eta := float32(3)
 		miniMatchSize := 10
-		network.Train(ts, vs, epochs, eta, miniMatchSize, CrossEntropyCostFunction{})
+		network.Train(ts, vs, epochs, eta, miniMatchSize, QuadtraticCostFunction{})
 
 		fmt.Printf("\nGenerating %d training samples for test data...\n", testData.Length())
 		ts = testData.GenerateTrainingSamples(testData.Length())
@@ -56,7 +56,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"
+		userDataDir := "C:\\Users\\s.schmidt\\dev\\private\\MNIST"
 		fmt.Printf("Importing test data from %s...\n", userDataDir)
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())

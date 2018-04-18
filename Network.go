@@ -427,6 +427,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	mbs := CreateMiniBatches(sizeMiniBatch, n.nNodes(), n.nWeights())
 
 	fmt.Printf("\nTraining batch size: %d\n", len(trainingSamples))
+	fmt.Printf("Validation batch size: %d\n", len(validationSamples))
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
 	fmt.Printf("Learning rate: %f\n", eta)
@@ -467,7 +468,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 		if remainder := len(trainingSamples) - sizeMiniBatch*nMiniBatches; remainder > 0 {
 			innerLoop(remainder, nMiniBatches, indices)
 		}
-		output := fmt.Sprintf("Epoch %d", epoch)
+		output := fmt.Sprintf("Epoch %d", epoch+1)
 		accuracy := n.RunSamples(trainingSamples)
 		output += fmt.Sprintf(" - training accuracy %f", accuracy)
 		if len(validationSamples) > 0 {
