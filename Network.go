@@ -469,10 +469,10 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			innerLoop(remainder, nMiniBatches, indices)
 		}
 		output := fmt.Sprintf("Epoch %d", epoch+1)
-		accuracy := n.RunSamples(trainingSamples)
+		accuracy := n.RunSamples(trainingSamples, false)
 		output += fmt.Sprintf(" - training accuracy %f", accuracy)
 		if len(validationSamples) > 0 {
-			accuracy := n.RunSamples(validationSamples)
+			accuracy := n.RunSamples(validationSamples, false)
 			output += fmt.Sprintf(" - validation accuracy %f", accuracy)
 		}
 		cost := costFunction.Evaluate(n, trainingSamples)
@@ -487,7 +487,7 @@ func (n *Network) GetOutputLayerActivations(mb *Minibatch) []float64 {
 	return as
 }
 
-func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample) float32 {
+func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample, showFailures bool) float32 {
 	var correctPredictions int
 	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
 	for testIdx := range trainingSamples {
@@ -498,6 +498,8 @@ func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample) float
 		expectedClass := GetClass(trainingSamples[testIdx].OutputActivations)
 		if expectedClass == predictionClass {
 			correctPredictions++
+		} else if showFailures {
+			fmt.Printf("Image %d: is %d, classified as %d\n", testIdx, expectedClass, predictionClass)
 		}
 	}
 	accuracy := float32(correctPredictions) / float32(len(trainingSamples))
