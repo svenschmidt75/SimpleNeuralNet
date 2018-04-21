@@ -46,7 +46,7 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 		// evaluate analytically
 		dCdw := costFunction.GradWeight(item.i, item.j, item.layer, network, ts)
 
-		if floatEquals(dCdw_numeric, dCdw) == false {
+		if floatEquals(dCdw_numeric, dCdw, EPSILON) == false {
 			t.Error("Networks not equal")
 		}
 	}
@@ -92,14 +92,14 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 		// evaluate analytically
 		dCdb := costFunction.GradBias(item.i, item.layer, network, ts)
 
-		if floatEquals(dCdb_numeric, dCdb) == false {
+		if floatEquals(dCdb_numeric, dCdb, EPSILON) == false {
 			t.Error("Networks not equal")
 		}
 	}
 }
 
 func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
-	network := CreateNetwork([]int{1, 1})
+	network := CreateNetwork([]int{1, 1}, 1)
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
@@ -125,7 +125,7 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	// evaluate analytically
 	delta_L := network.GetDelta(0, 1, &mb)
 
-	if floatEquals(dCdb_numeric, delta_L) == false {
+	if floatEquals(dCdb_numeric, delta_L, EPSILON) == false {
 		t.Error("Networks not equal")
 	}
 }

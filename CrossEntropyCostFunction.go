@@ -33,7 +33,17 @@ func (CrossEntropyCostFunction) Evaluate(network *Network, trainingSamples []MNI
 		cost += sumj
 	}
 	cost /= -float64(len(trainingSamples))
-	return cost
+
+	// add the regularization term
+	var l2 float64
+	nWeights := network.nWeights()
+	for widx := 0; widx < nWeights; widx++ {
+		w := network.weights[widx]
+		l2 += w * w
+	}
+	fac := float64(2 * len(trainingSamples))
+	l2 *= network.Lambda / fac
+	return cost + l2
 }
 
 func caculateDeltaCrossEntropy(j int, layer int, n *Network, mb *Minibatch, ts *MNISTImport.TrainingSample) float64 {
@@ -86,7 +96,12 @@ func (CrossEntropyCostFunction) GradWeight(j int, k int, layer int, network *Net
 		dCdw += a_k * delta_j
 	}
 	dCdw /= float64(len(trainingSamples))
-	return dCdw
+
+	// add the regularization term
+	w := network.GetWeight(j, k, layer)
+	l2 := network.Lambda / float64(len(trainingSamples)) * w
+
+	return dCdw + l2
 }
 
 func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations []float64, mb *Minibatch) {

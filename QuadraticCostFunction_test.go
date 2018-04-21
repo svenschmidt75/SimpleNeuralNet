@@ -12,6 +12,7 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
+	network.Lambda = 1
 	costFunction := QuadtraticCostFunction{}
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
@@ -45,7 +46,7 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 		// evaluate analytically
 		dCdw := costFunction.GradWeight(item.i, item.j, item.layer, network, ts)
 
-		if floatEquals(dCdw_numeric, dCdw) == false {
+		if floatEquals(dCdw_numeric, dCdw, EPSILON*10) == false {
 			t.Error("Networks not equal")
 		}
 	}
@@ -91,14 +92,14 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 		// evaluate analytically
 		dCdb := costFunction.GradBias(item.i, item.layer, network, ts)
 
-		if floatEquals(dCdb_numeric, dCdb) == false {
+		if floatEquals(dCdb_numeric, dCdb, EPSILON) == false {
 			t.Error("Networks not equal")
 		}
 	}
 }
 
 func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
-	network := CreateNetwork([]int{1, 1})
+	network := CreateNetwork([]int{1, 1}, 0)
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
 	mb := CreateMiniBatch(2, 1)
@@ -124,7 +125,7 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	// evaluate analytically
 	delta_L := network.GetDelta(0, 1, &mb)
 
-	if floatEquals(dCdb_numeric, delta_L) == false {
+	if floatEquals(dCdb_numeric, delta_L, EPSILON) == false {
 		t.Error("Networks not equal")
 	}
 }

@@ -23,6 +23,9 @@ type Network struct {
 
 	// Weights. w_{ij}^l connects a_i^l with a_j^{l-1}
 	weights []float64
+
+	// L2 regularization
+	Lambda float64
 }
 
 func init() {
@@ -47,6 +50,10 @@ func (n *Network) GobEncode() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = encoder.Encode(n.Lambda)
+	if err != nil {
+		return nil, err
+	}
 	return w.Bytes(), nil
 }
 
@@ -64,12 +71,17 @@ func (n *Network) GobDecode(buf []byte) error {
 	if err != nil {
 		return err
 	}
-	return decoder.Decode(&n.weights)
+	err = decoder.Decode(&n.weights)
+	if err != nil {
+		return err
+	}
+	return decoder.Decode(&n.Lambda)
+	return err
 }
 
-func CreateNetwork(layers []int) Network {
+func CreateNetwork(layers []int, lambda float64) Network {
 	nBiases := sum(layers[1:])
-	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers))}
+	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers)), Lambda: lambda}
 }
 
 func sum(xs []int) int {
@@ -394,7 +406,7 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
 	return dw, db
 }
 
-func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
+func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64, nTrainingSamples int) {
 	for layer := range n.nodes {
 		if layer == 0 {
 			continue
@@ -407,8 +419,8 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64) {
 				wIdx := n.GetWeightIndex(j, k, layer)
 				dw_jk := dw[wIdx]
 				w_jk := n.GetWeight(j, k, layer)
-				w_jk -= float64(eta) * dw_jk
-				n.SetWeight(w_jk, j, k, layer)
+				update := (1-float64(eta)*n.Lambda/float64(nTrainingSamples))*w_jk - float64(eta)*dw_jk
+				n.SetWeight(update, j, k, layer)
 			}
 			// b_j^l
 			bIdx := n.GetBiasIndex(j, layer)
@@ -456,7 +468,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 		}
 		//		fmt.Printf("|gradC| = %f\n", math.Sqrt(gradCNorm))
 
-		n.UpdateNetwork(eta, dw, db)
+		n.UpdateNetwork(eta, dw, db, len(trainingSamples))
 	}
 
 	for epoch := 0; epoch < epochs; epoch++ {
