@@ -46,7 +46,7 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 		// evaluate analytically
 		dCdw := costFunction.GradWeight(item.i, item.j, item.layer, network, ts)
 
-		if floatEquals(dCdw_numeric, dCdw, EPSILON) == false {
+		if floatEquals(dCdw_numeric, dCdw, EPSILON*10) == false {
 			t.Error("Networks not equal")
 		}
 	}
