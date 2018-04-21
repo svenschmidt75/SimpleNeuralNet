@@ -443,7 +443,8 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
 	fmt.Printf("Learning rate: %f\n", eta)
-	fmt.Printf("Cost function: %s\n\n", costFunction)
+	fmt.Printf("Cost function: %s\n", costFunction)
+	fmt.Printf("L2 regularization: %f\n\n", n.Lambda)
 
 	var innerLoop = func(maxIndex int, offset int, indices []int) {
 		for i := 0; i < maxIndex; i++ {
