@@ -265,7 +265,7 @@ func TestCalculateZ(t *testing.T) {
 	}
 }
 
-var EPSILON = 0.00000001
+const EPSILON = 0.00000001
 
 func floatEquals(a, b float64, eps float64) bool {
 	return math.Abs(a-b) < eps
