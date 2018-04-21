@@ -1,5 +1,7 @@
 package LinAlg
 
+import "fmt"
+
 type Vector struct {
 	data []float64
 }
@@ -22,4 +24,23 @@ func (v *Vector) Set(index int, value float64) {
 
 func (v *Vector) Get(index int) float64 {
 	return v.data[index]
+}
+
+func (v *Vector) Scalar(scalar float64) {
+	for idx := range v.data {
+		v.data[idx] *= scalar
+	}
+}
+
+func (v *Vector) Hadamard(other *Vector) Vector {
+	if v.Size() != other.Size() {
+		panic(fmt.Sprintf("LinAlg.Vector.Hadamard: Vectors must have same size, but is %d and %d", v.Size(), other.Size()))
+	}
+	result := MakeEmptyVector(v.Size())
+	for idx := range v.data {
+		e1 := v.data[idx]
+		e2 := other.data[idx]
+		result.Set(idx, e1*e2)
+	}
+	return result
 }
