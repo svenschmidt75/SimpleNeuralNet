@@ -1,6 +1,10 @@
 package LinAlg
 
-import "testing"
+import (
+	"SimpleNeuralNet/Utility"
+	"bytes"
+	"testing"
+)
 
 func Test_Dotproduct(t *testing.T) {
 	// Arrange
@@ -52,5 +56,34 @@ func Test_F(t *testing.T) {
 	}
 	if expected := float64(3); floatEquals(v.Get(1), expected, EPSILON) == false {
 		t.Errorf("Hadamard error, %f != %f", expected, v.Get(1))
+	}
+}
+
+func TestVectorSerialization(t *testing.T) {
+	// Arrange
+	v1 := MakeVector([]float64{1, 2})
+
+	// Act
+	var buf bytes.Buffer
+	err := Utility.WriteGob(&buf, &v1)
+	if err != nil {
+		t.Errorf("Error serializing vector")
+	}
+
+	v2 := new(Vector)
+	err = Utility.ReadGob(&buf, v2)
+	if err != nil {
+		t.Error("Error deserializing vector")
+	}
+
+	// Assert
+	if expected := v1.Size(); v2.Size() != expected {
+		t.Errorf("Vector size must be %d, but is %d", expected, v2.Size())
+	}
+	if expected := v1.Get(0); floatEquals(v2.Get(0), expected, EPSILON) == false {
+		t.Errorf("Serialization error, %f != %f", expected, v2.Get(0))
+	}
+	if expected := v1.Get(1); floatEquals(v2.Get(1), expected, EPSILON) == false {
+		t.Errorf("Serialization error, %f != %f", expected, v2.Get(1))
 	}
 }

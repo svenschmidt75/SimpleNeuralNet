@@ -2,6 +2,7 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
+	"SimpleNeuralNet/Utility"
 	"fmt"
 )
 
@@ -44,7 +45,7 @@ func main() {
 
 		filename := "./n.gob"
 		fmt.Printf("\nSerializing network to %s...\n", filename)
-		err := WriteGobToFile(filename, &network)
+		err := Utility.WriteGobToFile(filename, &network)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -52,7 +53,7 @@ func main() {
 		filename := "./n.gob"
 		fmt.Printf("Deserializing network from %s...\n", filename)
 		network := new(Network)
-		err := ReadGobFromFile(filename, network)
+		err := Utility.ReadGobFromFile(filename, network)
 		if err != nil {
 			fmt.Println(err)
 		}

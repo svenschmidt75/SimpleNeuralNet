@@ -2,6 +2,7 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
+	"SimpleNeuralNet/Utility"
 	"bytes"
 	"fmt"
 	"math"
@@ -501,13 +502,13 @@ func TestSerialization(t *testing.T) {
 	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10, QuadtraticCostFunction{})
 
 	var buf bytes.Buffer
-	err := WriteGob(&buf, &network)
+	err := Utility.WriteGob(&buf, &network)
 	if err != nil {
 		t.Errorf("Error serializing network")
 	}
 
 	readNetwork := new(Network)
-	err = ReadGob(&buf, readNetwork)
+	err = Utility.ReadGob(&buf, readNetwork)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
