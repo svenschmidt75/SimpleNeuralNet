@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SimpleNeuralNet/LinAlg"
 	"SimpleNeuralNet/MNISTImport"
 	"bytes"
 	"encoding/gob"
@@ -18,11 +19,11 @@ type Network struct {
 	// how many activations per layer
 	nodes []int
 
-	// biases, ordered by layer, then index of activation
-	biases []float64
+	// bias vectors, ordered by layer
+	biases []LinAlg.Vector
 
-	// Weights. w_{ij}^l connects a_i^l with a_j^{l-1}
-	weights []float64
+	// Weight matrices. w_{ij}^l connects a_i^l with a_j^{l-1}
+	weights []LinAlg.Matrix
 
 	// L2 regularization
 	Lambda float64

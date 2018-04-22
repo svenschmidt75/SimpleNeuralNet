@@ -1,9 +1,35 @@
 package LinAlg
 
-import "fmt"
+import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
+)
 
 type Vector struct {
 	data []float64
+}
+
+//
+// Implement interface 'GobEncoder'
+//
+func (v *Vector) GobEncode() ([]byte, error) {
+	w := new(bytes.Buffer)
+	encoder := gob.NewEncoder(w)
+	err := encoder.Encode(v.data)
+	if err != nil {
+		return nil, err
+	}
+	return w.Bytes(), nil
+}
+
+//
+// Implement interface 'GobDecoder'
+//
+func (v *Vector) GobDecode(buf []byte) error {
+	r := bytes.NewBuffer(buf)
+	decoder := gob.NewDecoder(r)
+	return decoder.Decode(&v.data)
 }
 
 func MakeVector(data []float64) Vector {

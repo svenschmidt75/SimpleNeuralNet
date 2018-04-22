@@ -43,7 +43,7 @@ func Test_MatrixTranspose(t *testing.T) {
 	// Arrange
 	m := MakeMatrix(3, 2, []float64{3, 4, -2, -9, 4, 7})
 
-	// Act~
+	// Act
 	mt := m.Transpose()
 
 	// Assert
