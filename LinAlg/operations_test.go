@@ -13,21 +13,6 @@ func floatEquals(a, b float64, eps float64) bool {
 	return math.Abs(a-b) < eps
 }
 
-func Test_Dotproduct(t *testing.T) {
-	// Arrange
-	v1 := MakeVector([]float64{1, 2})
-	v2 := MakeVector([]float64{3, 4})
-
-	// Act
-	dp := DotProduct(&v1, &v2)
-
-	// Assert
-	var expected float64 = 11
-	if floatEquals(dp, expected, EPSILON) == false {
-		t.Error("Dot product error")
-	}
-}
-
 func Test_AddVectors(t *testing.T) {
 	// Arrange
 	v1 := MakeVector([]float64{1, 2})

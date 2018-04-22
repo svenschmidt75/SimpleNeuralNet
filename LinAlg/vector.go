@@ -26,9 +26,30 @@ func (v *Vector) Get(index int) float64 {
 	return v.data[index]
 }
 
-func (v *Vector) Scalar(scalar float64) {
+func (v1 *Vector) DotProduct(v2 *Vector) float64 {
+	if v1.Size() != v2.Size() {
+		panic(fmt.Sprintf("LinAlg.Vector.DotProduct: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
+	}
+	var d float64 = 0
+	for i := 0; i < v1.Size(); i++ {
+		e1 := v1.Get(i)
+		e2 := v2.Get(i)
+		d += e1 * e2
+	}
+	return d
+}
+
+func (v *Vector) ScalarMultiplication(scalar float64) {
 	for idx := range v.data {
 		v.data[idx] *= scalar
+	}
+}
+
+func (v *Vector) F(f func(float64) float64) {
+	for idx := range v.data {
+		value := v.data[idx]
+		value = f(value)
+		v.data[idx] = value
 	}
 }
 
