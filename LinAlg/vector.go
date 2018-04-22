@@ -71,12 +71,14 @@ func (v *Vector) ScalarMultiplication(scalar float64) {
 	}
 }
 
-func (v *Vector) F(f func(float64) float64) {
+func (v *Vector) F(f func(float64) float64) Vector {
+	result := MakeEmptyVector(v.Size())
 	for idx := range v.data {
 		value := v.data[idx]
 		value = f(value)
-		v.data[idx] = value
+		result.data[idx] = value
 	}
+	return result
 }
 
 func (v *Vector) Hadamard(other *Vector) Vector {

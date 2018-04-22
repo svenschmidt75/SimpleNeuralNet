@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SimpleNeuralNet/LinAlg"
 	"math"
 	"math/rand"
 )
@@ -35,12 +36,12 @@ func GetError(outputActivations []float64, a []float64) float64 {
 	return math.Sqrt(err)
 }
 
-func GetClass(a []float64) int {
+func GetClass(a LinAlg.Vector) int {
 	var index int
 	var value float64 = -1
-	for idx := range a {
-		if a[idx] > value {
-			value = a[idx]
+	for idx := 0; idx < a.Size(); idx++ {
+		if a.Get(idx) > value {
+			value = a.Get(idx)
 			index = idx
 		}
 

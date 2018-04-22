@@ -1,26 +1,36 @@
 package main
 
+import "SimpleNeuralNet/LinAlg"
+
 type Minibatch struct {
-	z []float64
+	z []LinAlg.Vector
 
 	// activations
-	a []float64
+	a []LinAlg.Vector
 
 	// errors
-	delta []float64
+	delta []LinAlg.Vector
 }
 
-func CreateMiniBatch(nActivations int, nWeights int) Minibatch {
-	a := make([]float64, nActivations)
-	z := make([]float64, nActivations)
-	nabla := make([]float64, nActivations)
-	return Minibatch{z, a, nabla}
+func CreateMiniBatch(layers []int) Minibatch {
+	z := createVectors(layers)
+	a := createVectors(layers)
+	delta := createVectors(layers)
+	return Minibatch{z, a, delta}
 }
 
-func CreateMiniBatches(size int, nActivations int, nWeights int) []Minibatch {
+func CreateMiniBatches(size int, layers []int) []Minibatch {
 	mbs := make([]Minibatch, size)
 	for idx := range mbs {
-		mbs[idx] = CreateMiniBatch(nActivations, nWeights)
+		mbs[idx] = CreateMiniBatch(layers)
 	}
 	return mbs
+}
+
+func createVectors(layers []int) []LinAlg.Vector {
+	result := make([]LinAlg.Vector, len(layers))
+	for idx, nNodes := range layers[1:] {
+		result[idx] = LinAlg.MakeEmptyVector(nNodes)
+	}
+	return result
 }

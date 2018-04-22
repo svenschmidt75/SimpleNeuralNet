@@ -81,8 +81,25 @@ func (n *Network) GobDecode(buf []byte) error {
 }
 
 func CreateNetwork(layers []int, lambda float64) Network {
-	nBiases := sum(layers[1:])
-	return Network{nodes: layers, biases: make([]float64, nBiases), weights: make([]float64, nWeights(layers)), Lambda: lambda}
+	return Network{nodes: layers, biases: createBiasVector(layers), weights: createWeightMatrices(layers), Lambda: lambda}
+}
+
+func createWeightMatrices(layers []int) []LinAlg.Matrix {
+	result := make([]LinAlg.Matrix, len(layers))
+	for idx := 1; idx < len(layers); idx++ {
+		rows := layers[idx]
+		cols := layers[idx-1]
+		result[idx] = LinAlg.MakeEmptyMatrix(rows, cols)
+	}
+	return result
+}
+
+func createBiasVector(layers []int) []LinAlg.Vector {
+	result := make([]LinAlg.Vector, len(layers))
+	for idx, nNodes := range layers[1:] {
+		result[idx] = LinAlg.MakeEmptyVector(nNodes)
+	}
+	return result
 }
 
 func sum(xs []int) int {
@@ -102,6 +119,10 @@ func nWeights(xs []int) int {
 		x1 = x2
 	}
 	return n
+}
+
+func (n *Network) GetLayers() []int {
+	return n.nodes
 }
 
 func (n Network) nWeights() int {
@@ -153,9 +174,8 @@ func (n Network) GetActivation(index int, layer int, mb *Minibatch) float64 {
 	return mb.a[aIdx]
 }
 
-func (n *Network) SetActivation(a float64, index int, layer int, mb *Minibatch) {
-	aIdx := n.GetNodeIndex(index, layer)
-	mb.a[aIdx] = a
+func (n *Network) SetActivation(a LinAlg.Vector, layer int, mb *Minibatch) {
+	mb.a = a
 }
 
 func (n Network) getDeltaBaseIndex(layer int) int {
@@ -206,6 +226,10 @@ func (n *Network) SetBias(b float64, index int, layer int) {
 	n.biases[biasIndex] = b
 }
 
+func (n *Network) GetWeights(layer int) LinAlg.Matrix {
+	return n.weights[layer]
+}
+
 // Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
 // n.weights
 func (n Network) getWeightBaseIndex(layer int) int {
@@ -253,37 +277,19 @@ func SigmoidPrime(z float64) float64 {
 	return s * (1.0 - s)
 }
 
-func (n *Network) CalculateZ(i int, layer int, mb *Minibatch) float64 {
-	var z float64
-	nPrevLayer := n.nNodesInLayer(layer - 1)
-	for j := 0; j < nPrevLayer; j++ {
-		a_j := n.GetActivation(j, layer-1, mb)
-		w_ij := n.GetWeight(i, j, layer)
-		z += w_ij * a_j
-	}
-	b := n.GetBias(i, layer)
-	z += b
-	return z
-}
-
-func (n *Network) FeedforwardActivation(i int, layer int, mb *Minibatch) float64 {
-	if l := len(n.nodes); layer == 0 || layer >= l {
-		panic(fmt.Sprintf("Node layer index=%v must be bigger than 0 and smaller than the number of layers=%v", layer, l))
-	}
-	z := n.CalculateZ(i, layer, mb)
-	a := Sigmoid(z)
-	return a
+func (n *Network) CalculateZ(layer int, mb *Minibatch) {
+	w := n.weights[layer]
+	a := mb.a[layer-1]
+	b := n.biases[layer]
+	wa := w.Ax(&a)
+	z := LinAlg.AddVectors(&wa, &b)
+	mb.z[layer] = z
 }
 
 func (n *Network) FeedforwardLayer(layer int, mb *Minibatch) {
-	if layer == 0 {
-		return
-	}
-	nLayer := n.nNodesInLayer(layer)
-	for i := 0; i < nLayer; i++ {
-		a := n.FeedforwardActivation(i, layer, mb)
-		n.SetActivation(a, i, layer, mb)
-	}
+	n.CalculateZ(layer, mb)
+	z := mb.z[layer]
+	mb.a[layer] = z.F(Sigmoid)
 }
 
 func (n *Network) Feedforward(mb *Minibatch) {
@@ -300,24 +306,24 @@ func (n *Network) InitializeNetworkWeightsAndBiases() {
 		if layer == 0 {
 			continue
 		}
-		nWeights := n.nWeights()
-		for widx := 0; widx < nWeights; widx++ {
-			n.weights[widx] = rand.Float64() / 100.0
+		w := n.weights[layer]
+		for row := 0; row < w.Rows; row++ {
+			for col := 0; col < w.Cols; col++ {
+				w.Set(row, col, rand.Float64()/100.0)
+			}
 		}
-		nBiases := n.nBiases()
-		for bidx := 0; bidx < nBiases; bidx++ {
-			n.biases[bidx] = rand.Float64() / 100.0
+		b := n.biases[layer]
+		for row := 0; row < b.Size(); row++ {
+			b.Set(row, rand.Float64()/100.0)
 		}
 	}
 }
 
-func (n *Network) SetInputActivations(inputActivations []float64, mb *Minibatch) {
-	if len(inputActivations) != n.nodes[0] {
-		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", len(inputActivations), n.nodes[0]))
+func (n *Network) SetInputActivations(inputActivations LinAlg.Vector, mb *Minibatch) {
+	if inputActivations.Size() != n.nodes[0] {
+		panic(fmt.Sprintf("Input activation size %v does not match number of activations %v in input layer", inputActivations.Size(), n.nodes[0]))
 	}
-	for idx, a := range inputActivations {
-		n.SetActivation(a, idx, 0, mb)
-	}
+	mb.a[0] = inputActivations
 }
 
 func (n *Network) BackpropagateError(mb *Minibatch) {
@@ -341,7 +347,7 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 	}
 }
 
-func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]float64, []float64) {
+func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Vector, []LinAlg.Vector) {
 	/* We use Stochastic Gradient Descent to update the weights and biases.
 	 * The idea is that we sample m trainings samples from the entire set
 	 * and feed forward, then backpropagate. We then update the weights and
@@ -437,7 +443,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
-	mbs := CreateMiniBatches(sizeMiniBatch, n.nNodes(), n.nWeights())
+	mbs := CreateMiniBatches(sizeMiniBatch, n.layer)
 
 	fmt.Printf("\nTraining batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Validation batch size: %d\n", len(validationSamples))
@@ -495,15 +501,14 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	}
 }
 
-func (n *Network) GetOutputLayerActivations(mb *Minibatch) []float64 {
-	idx := n.getNodeBaseIndex(n.getOutputLayerIndex())
-	as := mb.a[idx:]
-	return as
+func (n *Network) GetOutputLayerActivations(mb *Minibatch) LinAlg.Vector {
+	idx := n.getOutputLayerIndex()
+	return mb.a[idx]
 }
 
 func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample, showFailures bool) float32 {
 	var correctPredictions int
-	mb := CreateMiniBatch(n.nNodes(), n.nWeights())
+	mb := CreateMiniBatch(n.nodes)
 	for testIdx := range trainingSamples {
 		n.SetInputActivations(trainingSamples[testIdx].InputActivations, &mb)
 		n.Feedforward(&mb)

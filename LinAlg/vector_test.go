@@ -46,7 +46,7 @@ func Test_F(t *testing.T) {
 	v := MakeVector([]float64{1, 2})
 
 	// Act
-	v.F(func(v float64) float64 {
+	v = v.F(func(v float64) float64 {
 		return v + 1
 	})
 

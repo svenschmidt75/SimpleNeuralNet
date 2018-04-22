@@ -2,6 +2,7 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
+	"SimpleNeuralNet/Utility"
 	"math"
 	"testing"
 )
@@ -9,7 +10,7 @@ import (
 func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}

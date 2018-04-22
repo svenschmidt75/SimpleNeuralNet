@@ -4,6 +4,7 @@ import (
 	"SimpleNeuralNet/MNISTImport"
 	"fmt"
 	"math"
+	"SimpleNeuralNet/LinAlg"
 )
 
 type CrossEntropyCostFunction struct{}
@@ -18,16 +19,18 @@ func (CrossEntropyCostFunction) String() string {
 
 func (CrossEntropyCostFunction) Evaluate(network *Network, trainingSamples []MNISTImport.TrainingSample) float64 {
 	var cost float64
-	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
+	mb := CreateMiniBatch(network.nodes)
 	for _, x := range trainingSamples {
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		a := network.GetOutputLayerActivations(&mb)
 		y := x.OutputActivations
 		var sumj float64
-		for j := 0; j < len(a); j++ {
+		for j := 0; j < a.Size(); j++ {
+			yj := y.Get(j)
+			aj := a.Get(j)
 			var term float64
-			term = y[j]*math.Log(a[j]) + (1-y[j])*math.Log(1-a[j])
+			term = yj*math.Log(aj) + (1-yj)*math.Log(1-aj)
 			sumj += term
 		}
 		cost += sumj
@@ -35,35 +38,46 @@ func (CrossEntropyCostFunction) Evaluate(network *Network, trainingSamples []MNI
 	cost /= -float64(len(trainingSamples))
 
 	// add the regularization term
-	var l2 float64
-	nWeights := network.nWeights()
-	for widx := 0; widx < nWeights; widx++ {
-		w := network.weights[widx]
-		l2 += w * w
-	}
-	fac := float64(2 * len(trainingSamples))
-	l2 *= network.Lambda / fac
+	l2 := weightsSquared(network)
+	l2 *= network.Lambda / float64(2*len(trainingSamples))
 	return cost + l2
 }
 
-func caculateDeltaCrossEntropy(j int, layer int, n *Network, mb *Minibatch, ts *MNISTImport.TrainingSample) float64 {
+func weightsSquared(n *Network) float64 {
+	var l2 float64
+	for layer := range n.GetLayers() {
+		w := n.GetWeights(layer)
+		for row := 0; row < w.Rows; row++ {
+			for col := 0; col < w.Cols; col++ {
+				v := w.Get(row, col)
+				l2 += v
+			}
+		}
+	}
+	return l2
+}
+
+func caculateDeltaCrossEntropy(layer int, n *Network, mb *Minibatch, ts *MNISTImport.TrainingSample) LinAlg.Vector {
 	if layer == n.getOutputLayerIndex() {
-		a_i := n.GetActivation(j, layer, mb)
-		dCda := a_i
-		dCda -= ts.OutputActivations[j]
+		dCda := LinAlg.SubtractVectors(&mb.a[layer], &ts.OutputActivations)
 		return dCda
 	}
-	nNextNodes := n.nNodesInLayer(layer + 1)
-	var tmp float64
-	for k := 0; k < nNextNodes; k++ {
-		weight_kj := n.GetWeight(k, j, layer+1)
-		delta_k := caculateDeltaCrossEntropy(k, layer+1, n, mb, ts)
-		tmp += weight_kj * delta_k
-	}
-	z_j := n.CalculateZ(j, layer, mb)
-	s := SigmoidPrime(z_j)
-	delta := tmp * s
-	return delta
+	w_transpose := n.GetWeights(layer + 1).Transpose()
+	delta := caculateDeltaCrossEntropy(layer+1, n, mb, ts)
+
+	z
+	is
+	already
+	calculated
+	because
+	of
+	ffed
+	forward?
+	
+	n.CalculateZ(layer, mb)
+	s := mb.z[layer].F(SigmoidPrime)
+	d := w_transpose.Ax(&delta).Hadamard(&s)
+	return d
 }
 
 func (CrossEntropyCostFunction) GradBias(j int, layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) float64 {
@@ -71,7 +85,7 @@ func (CrossEntropyCostFunction) GradBias(j int, layer int, network *Network, tra
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
 	var delta float64
-	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
+	mb := CreateMiniBatch(network.GetLayers())
 	for _, x := range trainingSamples {
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
@@ -104,14 +118,8 @@ func (CrossEntropyCostFunction) GradWeight(j int, k int, layer int, network *Net
 	return dCdw + l2
 }
 
-func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations []float64, mb *Minibatch) {
+func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations LinAlg.Vector, mb *Minibatch) {
 	// Equation (68), Chapter 3 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
-	nNodes := n.nNodesInLayer(outputLayerIdx)
-	for i := 0; i < nNodes; i++ {
-		a_i := n.GetActivation(i, outputLayerIdx, mb)
-		dCda := a_i
-		dCda -= outputActivations[i]
-		n.SetDelta(dCda, i, outputLayerIdx, mb)
-	}
+	mb.delta[outputLayerIdx] = LinAlg.SubtractVectors(&mb.a[outputLayerIdx], &outputActivations)
 }
