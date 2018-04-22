@@ -35,12 +35,19 @@ func (m *Matrix) Get(row int, col int) float64 {
 }
 
 func (m *Matrix) Transpose() Matrix {
-	return Matrix{}
+	t := MakeEmptyMatrix(m.Cols, m.Rows)
+	for row := 0; row < m.Rows; row++ {
+		for col := 0; col < m.Cols; col++ {
+			value := m.Get(row, col)
+			t.Set(col, row, value)
+		}
+	}
+	return t
 }
 
-func (m *Matrix) MultVector(v *Vector) Vector {
+func (m *Matrix) Ax(v *Vector) Vector {
 	if m.Cols != v.Size() {
-		panic(fmt.Sprintf("LinAlg.Matrix.MultVector: Matrix number of columns %d must equal vector size %d", m.Cols, v.Size()))
+		panic(fmt.Sprintf("LinAlg.Matrix.Axby: Matrix number of columns %d must equal vector size %d", m.Cols, v.Size()))
 	}
 	result := MakeEmptyVector(m.Rows)
 	for row := 0; row < m.Rows; row++ {
@@ -53,7 +60,7 @@ func (m *Matrix) MultVector(v *Vector) Vector {
 	return result
 }
 
-func (m *Matrix) Scalar(scalar float64) {
+func (m *Matrix) ScalarMultiplication(scalar float64) {
 	for idx := range m.data {
 		m.data[idx] *= scalar
 	}
