@@ -24,9 +24,6 @@ type Network struct {
 
 	// Weight matrices. w_{ij}^l connects a_i^l with a_j^{l-1}
 	weights []LinAlg.Matrix
-
-	// L2 regularization
-	Lambda float64
 }
 
 func init() {
@@ -51,10 +48,6 @@ func (n *Network) GobEncode() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = encoder.Encode(n.Lambda)
-	if err != nil {
-		return nil, err
-	}
 	return w.Bytes(), nil
 }
 
@@ -72,16 +65,11 @@ func (n *Network) GobDecode(buf []byte) error {
 	if err != nil {
 		return err
 	}
-	err = decoder.Decode(&n.weights)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(&n.Lambda)
-	return err
+	return decoder.Decode(&n.weights)
 }
 
-func CreateNetwork(layers []int, lambda float64) Network {
-	return Network{nodes: layers, biases: createBiasVector(layers), weights: createWeightMatrices(layers), Lambda: lambda}
+func CreateNetwork(layers []int) Network {
+	return Network{nodes: layers, biases: createBiasVector(layers), weights: createWeightMatrices(layers)}
 }
 
 func createWeightMatrices(layers []int) []LinAlg.Matrix {
@@ -169,13 +157,12 @@ func (n Network) GetNodeIndex(index int, layer int) int {
 	return bi + index
 }
 
-func (n Network) GetActivation(index int, layer int, mb *Minibatch) float64 {
-	aIdx := n.GetNodeIndex(index, layer)
-	return mb.a[aIdx]
+func (n *Network) GetActivation(layer int, mb *Minibatch) LinAlg.Vector {
+	return mb.a[layer]
 }
 
 func (n *Network) SetActivation(a LinAlg.Vector, layer int, mb *Minibatch) {
-	mb.a = a
+	mb.a[0] = a
 }
 
 func (n Network) getDeltaBaseIndex(layer int) int {
@@ -439,11 +426,11 @@ func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64, nTraini
 	}
 }
 
-func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, miniBatchSize int, costFunction CostFunction) {
+func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validationSamples []MNISTImport.TrainingSample, epochs int, eta float32, lambda float64, miniBatchSize int, costFunction CostFunction) {
 	// Stochastic Gradient Decent
 	sizeMiniBatch := min(len(trainingSamples), miniBatchSize)
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
-	mbs := CreateMiniBatches(sizeMiniBatch, n.layer)
+	mbs := CreateMiniBatches(sizeMiniBatch, n.GetLayers())
 
 	fmt.Printf("\nTraining batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Validation batch size: %d\n", len(validationSamples))
@@ -451,7 +438,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)
 	fmt.Printf("Learning rate: %f\n", eta)
 	fmt.Printf("Cost function: %s\n", costFunction)
-	fmt.Printf("L2 regularization: %f\n\n", n.Lambda)
+	fmt.Printf("L2 regularization: %f\n\n", lambda)
 
 	var innerLoop = func(maxIndex int, offset int, indices []int) {
 		for i := 0; i < maxIndex; i++ {
@@ -460,7 +447,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			x := trainingSamples[index]
 			n.SetInputActivations(x.InputActivations, &mb)
 			n.Feedforward(&mb)
-			costFunction.CalculateErrorInOutputLayer(n, x.OutputActivations, &mb)
+			costFunction.CalculateErrorInOutputLayer(n, &x.OutputActivations, &mb)
 			n.BackpropagateError(&mb)
 		}
 		dw, db := n.CalculateDerivatives(mbs)

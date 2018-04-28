@@ -89,7 +89,7 @@ func (m *Matrix) Transpose() Matrix {
 
 func (m *Matrix) Ax(v *Vector) Vector {
 	if m.Cols != v.Size() {
-		panic(fmt.Sprintf("LinAlg.Matrix.Axby: Matrix number of columns %d must equal vector size %d", m.Cols, v.Size()))
+		panic(fmt.Sprintf("LinAlg.Matrix.Ax: Matrix number of columns %d must equal vector size %d", m.Cols, v.Size()))
 	}
 	result := MakeEmptyVector(m.Rows)
 	for row := 0; row < m.Rows; row++ {
@@ -102,8 +102,42 @@ func (m *Matrix) Ax(v *Vector) Vector {
 	return result
 }
 
+func (m *Matrix) Am(other *Matrix) Matrix {
+	if m.Cols != other.Rows {
+		panic(fmt.Sprint("LinAlg.Matrix.Am: Matrices not compatible"))
+	}
+	result := MakeEmptyMatrix(m.Rows, other.Cols)
+	for row := 0; row < m.Rows; row++ {
+		for col := 0; col < m.Cols; col++ {
+			var value float64
+			for k := 0; k < m.Cols; k++ {
+				value += m.Get(row, k) * other.Get(k, col)
+			}
+			result.Set(row, col, value)
+		}
+	}
+	return result
+}
+
 func (m *Matrix) ScalarMultiplication(scalar float64) {
 	for idx := range m.data {
 		m.data[idx] *= scalar
+	}
+}
+
+func (m *Matrix) Add(other *Matrix) {
+	if m.Rows != other.Rows {
+		panic(fmt.Sprintf("LinAlg.Matrix.Add: Matrix number of rows %d and %d must equal", m.Rows, other.Rows))
+	}
+	if m.Cols != other.Cols {
+		panic(fmt.Sprintf("LinAlg.Matrix.Add: Matrix number of columns %d and %d must equal", m.Cols, other.Cols))
+	}
+	for row := 0; row < m.Rows; row++ {
+		for col := 0; col < m.Cols; col++ {
+			e1 := m.Get(row, col)
+			e2 := other.Get(row, col)
+			value := e1 + e2
+			m.Set(row, col, value)
+		}
 	}
 }

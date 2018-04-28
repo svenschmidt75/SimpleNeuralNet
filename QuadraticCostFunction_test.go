@@ -2,13 +2,14 @@ package main
 
 import (
 	"SimpleNeuralNet/MNISTImport"
+	"SimpleNeuralNet/Utility"
 	"testing"
 )
 
 func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
@@ -54,7 +55,7 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
@@ -89,9 +90,9 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdb := costFunction.GradBias(item.i, item.layer, network, ts)
+		dCdb := costFunction.GradBias(item.layer, network, ts)
 
-		if floatEquals(dCdb_numeric, dCdb, EPSILON) == false {
+		if floatEquals(dCdb_numeric, dCdb.Get(item.i), EPSILON) == false {
 			t.Error("Networks not equal")
 		}
 	}

@@ -15,6 +15,7 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 		t.Error("Error deserializing network")
 	}
 	costFunction := CrossEntropyCostFunction{}
+	var lambda float64
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -39,15 +40,15 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 		delta := 0.000001
 		w_jk := network.GetWeight(item.i, item.j, item.layer)
 		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
-		c1 := costFunction.Evaluate(network, ts)
+		c1 := costFunction.Evaluate(network, lambda, ts)
 		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
-		c2 := costFunction.Evaluate(network, ts)
+		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdw := costFunction.GradWeight(item.i, item.j, item.layer, network, ts)
+		dCdw := costFunction.GradWeight(item.layer, lambda, network, ts)
 
-		if floatEquals(dCdw_numeric, dCdw, EPSILON*10) == false {
+		if floatEquals(dCdw_numeric, dCdw.Get(item.i, item.j), EPSILON*10) == false {
 			t.Error("Networks not equal")
 		}
 	}

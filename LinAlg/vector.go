@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"math"
 )
 
 type Vector struct {
@@ -65,6 +66,18 @@ func (v1 *Vector) DotProduct(v2 *Vector) float64 {
 	return d
 }
 
+func (v *Vector) Add(other *Vector) {
+	if v.Size() != other.Size() {
+		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v.Size(), other.Size()))
+	}
+	for i := 0; i < v.Size(); i++ {
+		e1 := v.Get(i)
+		e2 := other.Get(i)
+		d := e1 * e2
+		v.Set(i, d)
+	}
+}
+
 func (v *Vector) ScalarMultiplication(scalar float64) {
 	for idx := range v.data {
 		v.data[idx] *= scalar
@@ -92,4 +105,13 @@ func (v *Vector) Hadamard(other *Vector) Vector {
 		result.Set(idx, e1*e2)
 	}
 	return result
+}
+
+func (v *Vector) EuklideanNorm() float64 {
+	var err float64
+	for idx := range v.data {
+		e := v.Get(idx)
+		err += e * e
+	}
+	return math.Sqrt(err)
 }

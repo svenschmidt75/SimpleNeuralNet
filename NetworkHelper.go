@@ -26,7 +26,10 @@ func GenerateRandomIndices(size int) []int {
 	return perm
 }
 
-func GetError(outputActivations []float64, a []float64) float64 {
+func GetError(outputActivations *LinAlg.Vector, a *LinAlg.Vector) float64 {
+	e := LinAlg.SubtractVectors(outputActivations, a)
+	return e.Norm()
+
 	var err float64
 	for idx := range a {
 		d1 := outputActivations[idx]

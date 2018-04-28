@@ -1,10 +1,13 @@
 package main
 
-import "SimpleNeuralNet/MNISTImport"
+import (
+	"SimpleNeuralNet/LinAlg"
+	"SimpleNeuralNet/MNISTImport"
+)
 
 type CostFunction interface {
 	Evaluate(network *Network, trainingSamples []MNISTImport.TrainingSample) float64
-	GradBias(j int, layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) float64
-	GradWeight(j int, k int, layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) float64
-	CalculateErrorInOutputLayer(n *Network, outputActivations []float64, mb *Minibatch)
+	GradBias(layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) float64
+	GradWeight(layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) float64
+	CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch)
 }
