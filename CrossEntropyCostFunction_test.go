@@ -57,11 +57,12 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
 	costFunction := CrossEntropyCostFunction{}
+	var lambda float64
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -86,30 +87,31 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 		delta := 0.000001
 		b_j := network.GetBias(item.i, item.layer)
 		network.SetBias(b_j-delta, item.i, item.layer)
-		c1 := costFunction.Evaluate(network, ts)
+		c1 := costFunction.Evaluate(network, lambda, ts)
 		network.SetBias(b_j+delta, item.i, item.layer)
-		c2 := costFunction.Evaluate(network, ts)
+		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdb := costFunction.GradBias(item.i, item.layer, network, ts)
+		dCdb := costFunction.GradBias(item.layer, network, ts)
 
-		if floatEquals(dCdb_numeric, dCdb, EPSILON) == false {
+		if floatEquals(dCdb_numeric, dCdb.Get(item.i), EPSILON) == false {
 			t.Error("Networks not equal")
 		}
 	}
 }
 
 func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, 1)
+	network := CreateNetwork([]int{1, 1})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
-	mb := CreateMiniBatch(2, 1)
+	mb := CreateMiniBatch(2)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 	costFunction := CrossEntropyCostFunction{}
+	lambda := float64(1)
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10, costFunction)
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
 	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)

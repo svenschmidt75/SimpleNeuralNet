@@ -173,9 +173,8 @@ func (n Network) getDeltaIndex(index int, layer int) int {
 	return n.GetNodeIndex(index, layer)
 }
 
-func (n Network) GetDelta(index int, layer int, mb *Minibatch) float64 {
-	deltaIdx := n.getDeltaIndex(index, layer)
-	return mb.delta[deltaIdx]
+func (n *Network) GetDelta(layer int, mb *Minibatch) *LinAlg.Vector {
+	return &mb.delta[layer]
 }
 
 func (n *Network) SetDelta(delta float64, index int, layer int, mb *Minibatch) {
@@ -317,20 +316,13 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 	// Equation (45), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
 	for layer := outputLayerIdx - 1; layer > 0; layer-- {
-		nNodes := n.nNodesInLayer(layer)
-		nNextNodes := n.nNodesInLayer(layer + 1)
-		for j := 0; j < nNodes; j++ {
-			var tmp float64
-			for k := 0; k < nNextNodes; k++ {
-				weight_kj := n.GetWeight(k, j, layer+1)
-				delta_k := n.GetDelta(k, layer+1, mb)
-				tmp += weight_kj * delta_k
-			}
-			z_j := n.CalculateZ(j, layer, mb)
-			s := SigmoidPrime(z_j)
-			error := tmp * s
-			n.SetDelta(error, j, layer, mb)
-		}
+		weights := n.GetWeights(layer + 1)
+		w_transpose := weights.Transpose()
+		delta := mb.delta[layer+1]
+		ax := w_transpose.Ax(&delta)
+		s := mb.z[layer].F(SigmoidPrime)
+		d := ax.Hadamard(&s)
+		mb.delta[layer] = d
 	}
 }
 

@@ -6,17 +6,17 @@ import (
 	"fmt"
 )
 
-type QuadtraticCostFunction struct{}
+type QuadraticCostFunction struct{}
 
 // -- Stringer --
 
-func (QuadtraticCostFunction) String() string {
+func (QuadraticCostFunction) String() string {
 	return "Quadratic"
 }
 
 // -- CostFunction --
 
-func (QuadtraticCostFunction) Evaluate(network *Network, lambda float64, trainingSamples []MNISTImport.TrainingSample) float64 {
+func (QuadraticCostFunction) Evaluate(network *Network, lambda float64, trainingSamples []MNISTImport.TrainingSample) float64 {
 	var cost float64
 	mb := CreateMiniBatch(network.GetLayers())
 	for _, x := range trainingSamples {
@@ -49,7 +49,7 @@ func caculateDeltaCost(layer int, n *Network, mb *Minibatch, ts *MNISTImport.Tra
 	return d
 }
 
-func (QuadtraticCostFunction) GradBias(layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) LinAlg.Vector {
+func (QuadraticCostFunction) GradBias(layer int, network *Network, trainingSamples []MNISTImport.TrainingSample) LinAlg.Vector {
 	if layer == 0 {
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
@@ -65,7 +65,7 @@ func (QuadtraticCostFunction) GradBias(layer int, network *Network, trainingSamp
 	return delta
 }
 
-func (QuadtraticCostFunction) GradWeight(layer int, lambda float64, network *Network, trainingSamples []MNISTImport.TrainingSample) LinAlg.Matrix {
+func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Network, trainingSamples []MNISTImport.TrainingSample) LinAlg.Matrix {
 	if layer == 0 {
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
@@ -89,7 +89,7 @@ func (QuadtraticCostFunction) GradWeight(layer int, lambda float64, network *Net
 	return dCdw
 }
 
-func (QuadtraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {
+func (QuadraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
 	delta := LinAlg.SubtractVectors(&mb.a[outputLayerIdx], outputActivations)

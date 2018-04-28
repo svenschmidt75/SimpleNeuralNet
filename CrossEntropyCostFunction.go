@@ -62,10 +62,12 @@ func caculateDeltaCrossEntropy(layer int, n *Network, mb *Minibatch, ts *MNISTIm
 		dCda := LinAlg.SubtractVectors(&mb.a[layer], &ts.OutputActivations)
 		return dCda
 	}
-	w_transpose := n.GetWeights(layer + 1).Transpose()
+	weights := n.GetWeights(layer + 1)
+	w_transpose := weights.Transpose()
 	delta := caculateDeltaCrossEntropy(layer+1, n, mb, ts)
+	ax := w_transpose.Ax(&delta)
 	s := mb.z[layer].F(SigmoidPrime)
-	d := w_transpose.Ax(&delta).Hadamard(&s)
+	d := ax.Hadamard(&s)
 	return d
 }
 

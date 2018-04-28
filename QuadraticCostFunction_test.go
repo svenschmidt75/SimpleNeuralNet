@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SimpleNeuralNet/LinAlg"
 	"SimpleNeuralNet/MNISTImport"
 	"SimpleNeuralNet/Utility"
 	"testing"
@@ -13,7 +14,8 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	costFunction := QuadtraticCostFunction{}
+	costFunction := QuadraticCostFunction{}
+	var lambda float64
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -38,15 +40,15 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 		delta := 0.000001
 		w_jk := network.GetWeight(item.i, item.j, item.layer)
 		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
-		c1 := costFunction.Evaluate(network, ts)
+		c1 := costFunction.Evaluate(network, lambda, ts)
 		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
-		c2 := costFunction.Evaluate(network, ts)
+		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
-		dCdw := costFunction.GradWeight(item.i, item.j, item.layer, network, ts)
+		dCdw := costFunction.GradWeight(item.layer, lambda, network, ts)
 
-		if floatEquals(dCdw_numeric, dCdw, EPSILON*10) == false {
+		if floatEquals(dCdw_numeric, dCdw.Get(item.i, item.j), EPSILON*10) == false {
 			t.Error("Networks not equal")
 		}
 	}
@@ -59,7 +61,8 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 	if err != nil {
 		t.Error("Error deserializing network")
 	}
-	costFunction := QuadtraticCostFunction{}
+	costFunction := QuadraticCostFunction{}
+	var lambda float64
 	trainingData := MNISTImport.ImportData("./test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
 
@@ -84,9 +87,9 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 		delta := 0.000001
 		b_j := network.GetBias(item.i, item.layer)
 		network.SetBias(b_j-delta, item.i, item.layer)
-		c1 := costFunction.Evaluate(network, ts)
+		c1 := costFunction.Evaluate(network, lambda, ts)
 		network.SetBias(b_j+delta, item.i, item.layer)
-		c2 := costFunction.Evaluate(network, ts)
+		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
 		// evaluate analytically
@@ -99,33 +102,36 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 }
 
 func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, 0)
+	network := CreateNetwork([]int{1, 1})
 	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
 	network.biases[network.GetBiasIndex(0, 1)] = 2
-	mb := CreateMiniBatch(2, 1)
+	mb := CreateMiniBatch(2)
 	mb.a[network.GetNodeIndex(0, 0)] = 1
-	costFunction := QuadtraticCostFunction{}
+	costFunction := QuadraticCostFunction{}
+	lambda := float64(1)
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10, costFunction)
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, &ts[0].OutputActivations, &mb)
 
-	C := func(z float64) float64 {
-		a := Sigmoid(z)
-		return 0.5 * a * a
+	C := func(z *LinAlg.Vector) float64 {
+		a := z.F(Sigmoid)
+		return 0.5 * a.DotProduct(&a)
 	}
 	delta := 0.000001
-	z_j := network.CalculateZ(0, 1, &mb)
-	c1 := C(z_j - delta)
-	c2 := C(z_j + delta)
+	z_j := mb.z[0]
+	z_j.Set(0, z_j.Get(0)-delta)
+	c1 := C(&z_j)
+	z_j.Set(0, z_j.Get(0)+delta)
+	c2 := C(&z_j)
 	dCdb_numeric := (c2 - c1) / 2 / delta
 
 	// evaluate analytically
-	delta_L := network.GetDelta(0, 1, &mb)
+	delta_L := network.GetDelta(1, &mb)
 
-	if floatEquals(dCdb_numeric, delta_L, EPSILON) == false {
+	if floatEquals(dCdb_numeric, delta_L.Get(0), EPSILON) == false {
 		t.Error("Networks not equal")
 	}
 }

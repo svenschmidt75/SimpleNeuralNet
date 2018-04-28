@@ -1,6 +1,7 @@
 package MNISTImport
 
 import (
+	"SimpleNeuralNet/LinAlg"
 	"encoding/binary"
 	"fmt"
 	"image"
@@ -100,10 +101,10 @@ func (data MNISTData) GenerateTrainingSamples(length int) []TrainingSample {
 			break
 		}
 		ts := &tss[idx]
-		ts.InputActivations = data.inputActivations[idx]
-		ts.OutputActivations = make([]float64, 10)
+		ts.InputActivations = LinAlg.MakeVector(data.inputActivations[idx])
+		ts.OutputActivations = LinAlg.MakeEmptyVector(10)
 		expectedResult := data.expectedResult[idx]
-		ts.OutputActivations[expectedResult] = 1
+		ts.OutputActivations.Set(int(expectedResult), 1)
 	}
 	return tss
 }
