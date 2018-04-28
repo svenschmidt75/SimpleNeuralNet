@@ -177,9 +177,8 @@ func (n *Network) GetDelta(layer int, mb *Minibatch) *LinAlg.Vector {
 	return &mb.delta[layer]
 }
 
-func (n *Network) SetDelta(delta float64, index int, layer int, mb *Minibatch) {
-	deltaIdx := n.getDeltaIndex(index, layer)
-	mb.delta[deltaIdx] = delta
+func (n *Network) SetDelta(layer int, delta *LinAlg.Vector, mb *Minibatch) {
+	mb.delta[layer] = *delta
 }
 
 func (n Network) nBiases() int {
@@ -210,8 +209,8 @@ func (n *Network) SetBias(layer int, b *LinAlg.Vector) {
 	n.biases[layer] = *b
 }
 
-func (n *Network) GetWeights(layer int) LinAlg.Matrix {
-	return n.weights[layer]
+func (n *Network) GetWeights(layer int) *LinAlg.Matrix {
+	return &n.weights[layer]
 }
 
 func (n *Network) SetWeights(layer int, w *LinAlg.Matrix) {
@@ -243,16 +242,6 @@ func (n Network) GetWeightIndex(i int, j int, layer int) int {
 	nl1 := n.nNodesInLayer(layer - 1)
 	bi = bi + i*nl1
 	return bi + j
-}
-
-func (n Network) GetWeight(i int, j int, layer int) float64 {
-	weightIndex := n.GetWeightIndex(i, j, layer)
-	return n.weights[weightIndex]
-}
-
-func (n *Network) SetWeight(w float64, i int, j int, layer int) {
-	weightIndex := n.GetWeightIndex(i, j, layer)
-	n.weights[weightIndex] = w
 }
 
 func Sigmoid(z float64) float64 {
@@ -392,7 +381,7 @@ func (n *Network) UpdateNetwork(eta float32, lambda float64, dw []LinAlg.Matrix,
 		tmp2 := dw[layer]
 		tmp2.ScalarMultiplication(float64(eta))
 		w.Sub(&tmp2)
-		n.SetWeights(layer, &w)
+		n.SetWeights(layer, w)
 
 		b := n.GetBias(layer)
 		tmp3 := db[layer]
@@ -427,25 +416,12 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			n.BackpropagateError(&mb)
 		}
 		dw, db := n.CalculateDerivatives(mbs)
-
-		var gradCNorm float64
-		for _, dwi := range dw {
-			gradCNorm += dwi * dwi
-			//			fmt.Printf("dwi = %f\n", dwi*dwi)
-		}
-		for _, dbi := range db {
-			gradCNorm += dbi * dbi
-			//			fmt.Printf("dbi = %f\n", dbi*dbi)
-		}
-		//		fmt.Printf("|gradC| = %f\n", math.Sqrt(gradCNorm))
-
-		n.UpdateNetwork(eta, dw, db, len(trainingSamples))
+		n.UpdateNetwork(eta, lambda, dw, db, len(trainingSamples))
 	}
 
 	for epoch := 0; epoch < epochs; epoch++ {
 		indices := GenerateRandomIndices(len(trainingSamples))
 		for j := 0; j < nMiniBatches; j++ {
-			//			fmt.Printf("Minibatch %d of %d...\n", j, nMiniBatches)
 			innerLoop(sizeMiniBatch, j, indices)
 		}
 		if remainder := len(trainingSamples) - sizeMiniBatch*nMiniBatches; remainder > 0 {
@@ -458,7 +434,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			accuracy := n.RunSamples(validationSamples, false)
 			output += fmt.Sprintf(" - validation accuracy %f", accuracy)
 		}
-		cost := costFunction.Evaluate(n, trainingSamples)
+		cost := costFunction.Evaluate(n, lambda, trainingSamples)
 		output += fmt.Sprintf(" - cost %f\n", cost)
 		fmt.Print(output)
 	}

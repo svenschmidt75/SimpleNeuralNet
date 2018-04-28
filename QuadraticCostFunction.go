@@ -45,7 +45,8 @@ func caculateDeltaCost(layer int, n *Network, mb *Minibatch, ts *MNISTImport.Tra
 	w_transpose := n.GetWeights(layer + 1).Transpose()
 	delta := caculateDeltaCost(layer+1, n, mb, ts)
 	s := mb.z[layer].F(SigmoidPrime)
-	d := w_transpose.Ax(&delta).Hadamard(&s)
+	ax := w_transpose.Ax(&delta)
+	d := ax.Hadamard(&s)
 	return d
 }
 
@@ -76,7 +77,7 @@ func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Netw
 		network.Feedforward(&mb)
 		a_k := network.GetActivation(layer-1, &mb)
 		delta_j := caculateDeltaCost(layer, network, &mb, &x)
-		tmp := LinAlg.OuterProduct(&a_k, &delta_j)
+		tmp := LinAlg.OuterProduct(a_k, &delta_j)
 		dCdw.Add(&tmp)
 	}
 	dCdw.ScalarMultiplication(1 / float64(len(trainingSamples)))
@@ -84,7 +85,7 @@ func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Netw
 	// add the regularization term
 	w := network.GetWeights(layer)
 	w.ScalarMultiplication(lambda / float64(len(trainingSamples)))
-	dCdw.Add(&w)
+	dCdw.Add(w)
 
 	return dCdw
 }

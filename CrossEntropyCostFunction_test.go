@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SimpleNeuralNet/LinAlg"
 	"SimpleNeuralNet/MNISTImport"
 	"SimpleNeuralNet/Utility"
 	"math"
@@ -38,10 +39,10 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 	for _, item := range tables {
 		// evaluate numerically
 		delta := 0.000001
-		w_jk := network.GetWeight(item.i, item.j, item.layer)
-		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
+		w_jk := network.GetWeights(item.layer)
+		w_jk.Set(item.i, item.j, w_jk.Get(item.i, item.j)-delta)
 		c1 := costFunction.Evaluate(network, lambda, ts)
-		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
+		w_jk.Set(item.i, item.j, w_jk.Get(item.i, item.j)+delta)
 		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
@@ -85,10 +86,10 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	for _, item := range tables {
 		// evaluate numerically
 		delta := 0.000001
-		b_j := network.GetBias(item.i, item.layer)
-		network.SetBias(b_j-delta, item.i, item.layer)
+		b_j := network.GetBias(item.layer)
+		b_j.Set(item.i, b_j.Get(item.i)-delta)
 		c1 := costFunction.Evaluate(network, lambda, ts)
-		network.SetBias(b_j+delta, item.i, item.layer)
+		b_j.Set(item.i, b_j.Get(item.i)+delta)
 		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
@@ -103,33 +104,44 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 
 func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	network := CreateNetwork([]int{1, 1})
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
-	network.biases[network.GetBiasIndex(0, 1)] = 2
-	mb := CreateMiniBatch(2)
-	mb.a[network.GetNodeIndex(0, 0)] = 1
+	network.GetWeights(1).Set(0, 0, 2)
+	network.GetBias(1).Set(0, 2)
+	mb := CreateMiniBatch([]int{2})
+	mb.a[0].Set(0, 1)
 	costFunction := CrossEntropyCostFunction{}
 	lambda := float64(1)
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
+	y := LinAlg.MakeVector([]float64{0})
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), y)}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, &ts[0].OutputActivations, &mb)
 
-	C := func(z float64, y float64) float64 {
-		a := Sigmoid(z)
-		return -(y*math.Log(a) + (1-y)*math.Log(1-a))
+	C := func(z *LinAlg.Vector, y *LinAlg.Vector) float64 {
+		a := z.F(Sigmoid)
+		var cost float64
+		for j := 0; j < a.Size(); j++ {
+			yj := y.Get(j)
+			aj := a.Get(j)
+			var term float64
+			term = yj*math.Log(aj) + (1-yj)*math.Log(1-aj)
+			cost += term
+		}
+		return cost
 	}
 	delta := 0.000001
-	z_j := network.CalculateZ(0, 1, &mb)
-	c1 := C(z_j-delta, 0)
-	c2 := C(z_j+delta, 0)
+	z_j := mb.z[0]
+	z_j.Set(0, z_j.Get(0)-delta)
+	c1 := C(&z_j, &y)
+	z_j.Set(0, z_j.Get(0)+delta)
+	c2 := C(&z_j, &y)
 	dCdb_numeric := (c2 - c1) / 2 / delta
 
 	// evaluate analytically
-	delta_L := network.GetDelta(0, 1, &mb)
+	delta_L := network.GetDelta(0, &mb)
 
-	if floatEquals(dCdb_numeric, delta_L, EPSILON) == false {
+	if floatEquals(dCdb_numeric, delta_L.Get(0), EPSILON) == false {
 		t.Error("Networks not equal")
 	}
 }

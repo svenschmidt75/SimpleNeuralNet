@@ -28,7 +28,7 @@ func TestNumberOfWeights(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs, 0)
+		network := CreateNetwork(item.xs)
 		nWeights := len(network.weights)
 		if nWeights != item.nWeights {
 			t.Errorf("Expected 2, but is %v", nWeights)
@@ -48,7 +48,7 @@ func TestNumberOfBiases(t *testing.T) {
 	}
 
 	for _, item := range tables {
-		network := CreateNetwork(item.xs, 0)
+		network := CreateNetwork(item.xs)
 		nBiases := len(network.biases)
 		if nBiases != item.nBiases {
 			t.Errorf("Expected 2, but is %v", nBiases)
@@ -76,7 +76,7 @@ func TestActivationIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 0)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetNodeIndex(as.i, as.layer)
 			if ai != as.index {
@@ -106,7 +106,7 @@ func TestBiasIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 0)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetBiasIndex(as.i, as.layer)
 			if ai != as.index {
@@ -147,7 +147,7 @@ func TestWeightIndex(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 0)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.GetWeightIndex(as.i, as.j, as.layer)
 			if ai != as.index {
@@ -178,7 +178,7 @@ func TestNumberOfWeightsPerLayer(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network := CreateNetwork(ts.xs, 0)
+		network := CreateNetwork(ts.xs)
 		for _, as := range ts.ais {
 			ai := network.nWeightsInLayer(as.layer)
 			if ai != as.expected {
@@ -189,27 +189,27 @@ func TestNumberOfWeightsPerLayer(t *testing.T) {
 }
 
 func CreateTestNetwork() (Network, Minibatch) {
-	network := CreateNetwork([]int{2, 3, 2}, 0)
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 1
-	network.weights[network.GetWeightIndex(0, 1, 1)] = 2
-	network.weights[network.GetWeightIndex(1, 0, 1)] = 3
-	network.weights[network.GetWeightIndex(1, 1, 1)] = 4
-	network.weights[network.GetWeightIndex(2, 0, 1)] = 5
-	network.weights[network.GetWeightIndex(2, 1, 1)] = 6
-	network.weights[network.GetWeightIndex(0, 0, 2)] = 7
-	network.weights[network.GetWeightIndex(0, 1, 2)] = 8
-	network.weights[network.GetWeightIndex(0, 2, 2)] = 9
-	network.weights[network.GetWeightIndex(1, 0, 2)] = 10
-	network.weights[network.GetWeightIndex(1, 1, 2)] = 11
-	network.weights[network.GetWeightIndex(1, 2, 2)] = 12
+	network := CreateNetwork([]int{2, 3, 2})
+	network.GetWeights(1).Set(0, 0, 1)
+	network.GetWeights(1).Set(0, 1, 2)
+	network.GetWeights(1).Set(1, 0, 3)
+	network.GetWeights(1).Set(1, 1, 4)
+	network.GetWeights(1).Set(2, 0, 5)
+	network.GetWeights(1).Set(2, 1, 6)
+	network.GetWeights(2).Set(0, 0, 7)
+	network.GetWeights(2).Set(0, 1, 8)
+	network.GetWeights(2).Set(0, 2, 9)
+	network.GetWeights(2).Set(1, 0, 10)
+	network.GetWeights(2).Set(1, 1, 11)
+	network.GetWeights(2).Set(1, 2, 12)
 
-	network.biases[network.GetBiasIndex(0, 1)] = 1
-	network.biases[network.GetBiasIndex(1, 1)] = 2
-	network.biases[network.GetBiasIndex(2, 1)] = 3
-	network.biases[network.GetBiasIndex(0, 2)] = 4
-	network.biases[network.GetBiasIndex(1, 2)] = 5
+	network.GetBias(1).Set(0, 1)
+	network.GetBias(1).Set(1, 2)
+	network.GetBias(1).Set(2, 3)
+	network.GetBias(2).Set(0, 4)
+	network.GetBias(2).Set(1, 5)
 
-	mb := CreateMiniBatch(7, 12)
+	mb := CreateMiniBatch([]int{7, 12})
 	mb.a[network.GetNodeIndex(0, 0)] = 1
 	mb.a[network.GetNodeIndex(1, 0)] = 2
 

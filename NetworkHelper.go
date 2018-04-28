@@ -2,7 +2,6 @@ package main
 
 import (
 	"SimpleNeuralNet/LinAlg"
-	"math"
 	"math/rand"
 )
 
@@ -28,15 +27,7 @@ func GenerateRandomIndices(size int) []int {
 
 func GetError(outputActivations *LinAlg.Vector, a *LinAlg.Vector) float64 {
 	e := LinAlg.SubtractVectors(outputActivations, a)
-	return e.Norm()
-
-	var err float64
-	for idx := range a {
-		d1 := outputActivations[idx]
-		d2 := a[idx]
-		err += (d1 - d2) * (d1 - d2)
-	}
-	return math.Sqrt(err)
+	return e.EuklideanNorm()
 }
 
 func GetClass(a LinAlg.Vector) int {

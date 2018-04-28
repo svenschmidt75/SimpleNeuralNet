@@ -108,7 +108,7 @@ func (CrossEntropyCostFunction) GradWeight(layer int, lambda float64, network *N
 	// add the regularization term
 	w := network.GetWeights(layer)
 	w.ScalarMultiplication(lambda / float64(len(trainingSamples)))
-	dCdw.Add(&w)
+	dCdw.Add(w)
 
 	return dCdw
 }
