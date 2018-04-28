@@ -157,8 +157,8 @@ func (n Network) GetNodeIndex(index int, layer int) int {
 	return bi + index
 }
 
-func (n *Network) GetActivation(layer int, mb *Minibatch) LinAlg.Vector {
-	return mb.a[layer]
+func (n *Network) GetActivation(layer int, mb *Minibatch) *LinAlg.Vector {
+	return &mb.a[layer]
 }
 
 func (n *Network) SetActivation(a LinAlg.Vector, layer int, mb *Minibatch) {
@@ -202,18 +202,20 @@ func (n *Network) GetBiasIndex(index int, layer int) int {
 	return bi + index
 }
 
-func (n Network) GetBias(index int, layer int) float64 {
-	biasIndex := n.GetBiasIndex(index, layer)
-	return n.biases[biasIndex]
+func (n *Network) GetBias(layer int) *LinAlg.Vector {
+	return &n.biases[layer]
 }
 
-func (n *Network) SetBias(b float64, index int, layer int) {
-	biasIndex := n.GetBiasIndex(index, layer)
-	n.biases[biasIndex] = b
+func (n *Network) SetBias(layer int, b *LinAlg.Vector) {
+	n.biases[layer] = *b
 }
 
 func (n *Network) GetWeights(layer int) LinAlg.Matrix {
 	return n.weights[layer]
+}
+
+func (n *Network) SetWeights(layer int, w *LinAlg.Matrix) {
+	n.weights[layer] = *w
 }
 
 // Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
@@ -326,7 +328,7 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 	}
 }
 
-func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Vector, []LinAlg.Vector) {
+func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Matrix, []LinAlg.Vector) {
 	/* We use Stochastic Gradient Descent to update the weights and biases.
 	 * The idea is that we sample m trainings samples from the entire set
 	 * and feed forward, then backpropagate. We then update the weights and
@@ -350,71 +352,53 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Vector, []LinA
 	 */
 
 	// d C_x / d_wjk^l
-	dw := make([]float64, n.nWeights())
+	dw := make([]LinAlg.Matrix, n.getOutputLayerIndex()+1)
 
 	// d C_x / d_bj^l
-	db := make([]float64, n.nNodes())
+	db := make([]LinAlg.Vector, n.getOutputLayerIndex()+1)
 
 	nMiniBatches := len(mbs)
 	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
-		nNodes := n.nNodesInLayer(layer)
-		nPrevNodes := n.nNodesInLayer(layer - 1)
-		for j := 0; j < nNodes; j++ {
-			for k := 0; k < nPrevNodes; k++ {
-				// w_jk^l
-				var dw_jk float64
-				for mbIdx := range mbs {
-					mb := mbs[mbIdx]
-					a := n.GetActivation(k, layer-1, &mb)
-					delta := n.GetDelta(j, layer, &mb)
-					dCx_dw := a * delta
-					dw_jk += dCx_dw
-				}
-				dw_jk /= float64(nMiniBatches)
-				wIdx := n.GetWeightIndex(j, k, layer)
-				dw[wIdx] = dw_jk
-			}
-			// b_j^l
-			var db_j float64
-			for mbIdx := range mbs {
-				mb := mbs[mbIdx]
-				delta := n.GetDelta(j, layer, &mb)
-				db_j += delta
-			}
-			db_j /= float64(nMiniBatches)
-			bIdx := n.GetBiasIndex(j, layer)
-			db[bIdx] = db_j
+
+		i := n.nodes[layer]
+		dCdw := LinAlg.MakeEmptyMatrix(i, i)
+		dCdb := LinAlg.MakeEmptyVector(i)
+		for mbIdx := range mbs {
+			mb := mbs[mbIdx]
+			a := n.GetActivation(layer-1, &mb)
+			delta := n.GetDelta(layer, &mb)
+			tmp := LinAlg.OuterProduct(a, delta)
+			dCdw.Add(&tmp)
+			dCdb.Add(delta)
 		}
+		dCdw.ScalarMultiplication(1 / float64(nMiniBatches))
+		dw[layer] = dCdw
+		dCdb.ScalarMultiplication(1 / float64(nMiniBatches))
+		db[layer] = dCdb
 	}
 	return dw, db
 }
 
-func (n *Network) UpdateNetwork(eta float32, dw []float64, db []float64, nTrainingSamples int) {
+func (n *Network) UpdateNetwork(eta float32, lambda float64, dw []LinAlg.Matrix, db []LinAlg.Vector, nTrainingSamples int) {
 	for layer := range n.nodes {
 		if layer == 0 {
 			continue
 		}
-		nNodes := n.nNodesInLayer(layer)
-		nPrevNodes := n.nNodesInLayer(layer - 1)
-		for j := 0; j < nNodes; j++ {
-			for k := 0; k < nPrevNodes; k++ {
-				// w_jk^l
-				wIdx := n.GetWeightIndex(j, k, layer)
-				dw_jk := dw[wIdx]
-				w_jk := n.GetWeight(j, k, layer)
-				update := (1-float64(eta)*n.Lambda/float64(nTrainingSamples))*w_jk - float64(eta)*dw_jk
-				n.SetWeight(update, j, k, layer)
-			}
-			// b_j^l
-			bIdx := n.GetBiasIndex(j, layer)
-			db_j := db[bIdx]
-			b_j := n.GetBias(j, layer)
-			b_j -= float64(eta) * db_j
-			n.SetBias(b_j, j, layer)
-		}
+		w := n.GetWeights(layer)
+		w.ScalarMultiplication(1 - float64(eta)*lambda/float64(nTrainingSamples))
+		tmp2 := dw[layer]
+		tmp2.ScalarMultiplication(float64(eta))
+		w.Sub(&tmp2)
+		n.SetWeights(layer, &w)
+
+		b := n.GetBias(layer)
+		tmp3 := db[layer]
+		tmp3.ScalarMultiplication(-float64(eta))
+		LinAlg.SubtractVectors(b, &tmp3)
+		n.SetBias(layer, b)
 	}
 }
 

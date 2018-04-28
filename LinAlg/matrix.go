@@ -141,3 +141,20 @@ func (m *Matrix) Add(other *Matrix) {
 		}
 	}
 }
+
+func (m *Matrix) Sub(other *Matrix) {
+	if m.Rows != other.Rows {
+		panic(fmt.Sprintf("LinAlg.Matrix.Sub: Matrix number of rows %d and %d must equal", m.Rows, other.Rows))
+	}
+	if m.Cols != other.Cols {
+		panic(fmt.Sprintf("LinAlg.Matrix.Sub: Matrix number of columns %d and %d must equal", m.Cols, other.Cols))
+	}
+	for row := 0; row < m.Rows; row++ {
+		for col := 0; col < m.Cols; col++ {
+			e1 := m.Get(row, col)
+			e2 := other.Get(row, col)
+			value := e1 - e2
+			m.Set(row, col, value)
+		}
+	}
+}

@@ -100,7 +100,7 @@ func (CrossEntropyCostFunction) GradWeight(layer int, lambda float64, network *N
 		network.Feedforward(&mb)
 		a_k := network.GetActivation(layer-1, &mb)
 		delta_j := caculateDeltaCrossEntropy(layer, network, &mb, &x)
-		tmp := LinAlg.OuterProduct(&a_k, &delta_j)
+		tmp := LinAlg.OuterProduct(a_k, &delta_j)
 		dCdw.Add(&tmp)
 	}
 	dCdw.ScalarMultiplication(1 / float64(len(trainingSamples)))
