@@ -90,154 +90,33 @@ func createBiasVector(layers []int) []LinAlg.Vector {
 	return result
 }
 
-func sum(xs []int) int {
-	sum := 0
-	for _, i := range xs {
-		sum += i
-	}
-	return sum
-}
-
-func nWeights(xs []int) int {
-	n := 0
-	x1 := xs[0]
-	for i := 1; i < len(xs); i++ {
-		x2 := xs[i]
-		n += x1 * x2
-		x1 = x2
-	}
-	return n
-}
-
 func (n *Network) GetLayers() []int {
 	return n.nodes
-}
-
-func (n Network) nWeights() int {
-	return nWeights(n.nodes)
-}
-
-func (n Network) nWeightsInLayer(layer int) int {
-	if layer == 0 {
-		panic("Layer 0 has no weights")
-	}
-	idx1 := nWeights(n.nodes[0:layer])
-	idx2 := nWeights(n.nodes[0 : layer+1])
-	return idx2 - idx1
 }
 
 func (n Network) getOutputLayerIndex() int {
 	return len(n.nodes) - 1
 }
 
-func (n Network) nNodes() int {
-	return sum(n.nodes)
-}
-
-func (n Network) nNodesInLayer(layer int) int {
-	if l := len(n.nodes); layer >= l {
-		panic(fmt.Sprintf("Layer index %v must be <= %v", layer, l))
-	}
-	return sum(n.nodes[layer : layer+1])
-}
-
-func (n Network) getNodeBaseIndex(layer int) int {
-	bi := sum(n.nodes[0:layer])
-	return bi
-}
-
-func (n Network) GetNodeIndex(index int, layer int) int {
-	if layer >= len(n.nodes) {
-		panic(fmt.Sprintf("Layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
-	}
-	if index >= n.nodes[layer] {
-		panic(fmt.Sprintf("Node index i=%v must be smaller than the number of nodes=%v in layer %v", index, n.nodes[layer], layer))
-	}
-	bi := n.getNodeBaseIndex(layer)
-	return bi + index
-}
-
-func (n *Network) GetActivation(layer int, mb *Minibatch) LinAlg.Vector {
-	return mb.a[layer]
-}
-
-func (n Network) getDeltaBaseIndex(layer int) int {
-	return n.getNodeBaseIndex(layer)
-}
-
-func (n Network) getDeltaIndex(index int, layer int) int {
-	return n.GetNodeIndex(index, layer)
-}
-
-func (n *Network) GetDelta(layer int, mb *Minibatch) LinAlg.Vector {
-	return mb.delta[layer]
-}
-
-func (n *Network) SetDelta(layer int, delta LinAlg.Vector, mb *Minibatch) {
-	mb.delta[layer] = delta
-}
-
-func (n Network) nBiases() int {
-	return sum(n.nodes[1:])
-}
-
-func (n *Network) getBiasBaseIndex(layer int) int {
-	bi := sum(n.nodes[1:layer])
-	return bi
-}
-
-func (n *Network) GetBiasIndex(index int, layer int) int {
-	if layer >= len(n.nodes) {
-		panic(fmt.Sprintf("Bias layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
-	}
-	if index >= n.nodes[layer] {
-		panic(fmt.Sprintf("Bias index i=%v must be smaller than the number of activations=%v in layer %v", index, n.nodes[layer], layer))
-	}
-	bi := n.getBiasBaseIndex(layer)
-	return bi + index
-}
-
 func (n *Network) GetBias(layer int) *LinAlg.Vector {
 	return &n.biases[layer]
 }
 
-func (n *Network) SetBias(layer int, b LinAlg.Vector) {
-	n.biases[layer] = b
+func (n *Network) SetBias(layer int, b *LinAlg.Vector) {
+	n.biases[layer] = *b
 }
 
 func (n *Network) GetWeights(layer int) *LinAlg.Matrix {
 	return &n.weights[layer]
 }
 
-func (n *Network) SetWeights(layer int, w LinAlg.Matrix) {
-	n.weights[layer] = w
+func (n *Network) SetWeights(layer int, w *LinAlg.Matrix) {
+	n.weights[layer] = *w
 }
 
-// Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
-// n.weights
-func (n Network) getWeightBaseIndex(layer int) int {
-	return nWeights(n.nodes[0:layer])
-}
-
-func (n Network) GetWeightIndex(i int, j int, layer int) int {
-	// Remember the meaning of the indices: w_ij^{l) is the weight from
-	// neuron a_j^{l-1} to neuron a_i^{l}.
-	if layer == 0 {
-		panic(fmt.Sprintf("Weight layer index=%v must be bigger than 0 and smaller than the number of nodes=%v", layer, len(n.nodes)))
-	}
-	if layer >= len(n.nodes) {
-		panic(fmt.Sprintf("Weight layer index=%v must be smaller than the number of nodes=%v", layer, len(n.nodes)))
-	}
-	if i >= n.nodes[layer] {
-		panic(fmt.Sprintf("Weight index i=%v must be smaller than the number of activations=%v in layer %v", i, n.nodes[layer], layer))
-	}
-	if j >= n.nodes[layer-1] {
-		panic(fmt.Sprintf("Weight index j=%v must be smaller than the number of activations=%v in layer %v", j, n.nodes[layer-1], layer-1))
-	}
-	bi := n.getWeightBaseIndex(layer)
-	nl1 := n.nNodesInLayer(layer - 1)
-	bi = bi + i*nl1
-	return bi + j
+func (n *Network) GetOutputLayerActivations(mb *Minibatch) *LinAlg.Vector {
+	idx := n.getOutputLayerIndex()
+	return &mb.a[idx]
 }
 
 func Sigmoid(z float64) float64 {
@@ -251,12 +130,7 @@ func SigmoidPrime(z float64) float64 {
 }
 
 func (n *Network) CalculateZ(layer int, mb *Minibatch) {
-	w := n.weights[layer]
-	a := mb.a[layer-1]
-	b := n.biases[layer]
-	wa := w.Ax(&a)
-	z := LinAlg.AddVectors(wa, &b)
-	mb.z[layer] = *z
+	mb.z[layer] = *LinAlg.AddVectors(n.GetWeights(layer).Ax(&mb.a[layer-1]), n.GetBias(layer))
 }
 
 func (n *Network) FeedforwardLayer(layer int, mb *Minibatch) {
@@ -365,13 +239,13 @@ func (n *Network) UpdateNetwork(eta float32, lambda float64, dw []LinAlg.Matrix,
 		tmp2 := dw[layer]
 		tmp2.Scalar(float64(eta))
 		w.Sub(&tmp2)
-		n.SetWeights(layer, *w)
+		n.SetWeights(layer, w)
 
 		b := n.GetBias(layer)
 		tmp3 := db[layer]
 		tmp3.Scalar(-float64(eta))
 		LinAlg.SubtractVectors(b, &tmp3)
-		n.SetBias(layer, *b)
+		n.SetBias(layer, b)
 	}
 }
 
@@ -422,11 +296,6 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 		output += fmt.Sprintf(" - cost %f\n", cost)
 		fmt.Print(output)
 	}
-}
-
-func (n *Network) GetOutputLayerActivations(mb *Minibatch) *LinAlg.Vector {
-	idx := n.getOutputLayerIndex()
-	return &mb.a[idx]
 }
 
 func (n *Network) RunSamples(trainingSamples []MNISTImport.TrainingSample, showFailures bool) float32 {

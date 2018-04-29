@@ -57,138 +57,6 @@ func TestNumberOfBiases(t *testing.T) {
 	}
 }
 
-func TestActivationIndex(t *testing.T) {
-	type Activation struct {
-		i     int
-		layer int
-		index int
-	}
-
-	tables := []struct {
-		xs       []int
-		nBiases  int
-		nWeights int
-		ais      []Activation
-	}{
-		{[]int{2, 3, 2}, 5, 12, []Activation{
-			{0, 1, 2},
-			{1, 2, 6},
-		}},
-	}
-
-	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
-		for _, as := range ts.ais {
-			ai := network.GetNodeIndex(as.i, as.layer)
-			if ai != as.index {
-				t.Errorf("Expected %v, but is %v", as.index, ai)
-			}
-		}
-	}
-}
-
-func TestBiasIndex(t *testing.T) {
-	type Bias struct {
-		i     int
-		layer int
-		index int
-	}
-
-	tables := []struct {
-		xs       []int
-		nBiases  int
-		nWeights int
-		ais      []Bias
-	}{
-		{[]int{2, 3, 2}, 5, 12, []Bias{
-			{1, 1, 1},
-			{0, 2, 3},
-		}},
-	}
-
-	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
-		for _, as := range ts.ais {
-			ai := network.GetBiasIndex(as.i, as.layer)
-			if ai != as.index {
-				t.Errorf("Expected %v, but is %v", as.index, ai)
-			}
-		}
-	}
-}
-
-func TestWeightIndex(t *testing.T) {
-	type Weight struct {
-		i     int
-		j     int
-		layer int
-		index int
-	}
-
-	tables := []struct {
-		xs       []int
-		nBiases  int
-		nWeights int
-		ais      []Weight
-	}{
-		{[]int{2, 3, 2}, 5, 12, []Weight{
-			{0, 0, 1, 0},
-			{0, 1, 1, 1},
-			{1, 0, 1, 2},
-			{1, 1, 1, 3},
-			{2, 0, 1, 4},
-			{2, 1, 1, 5},
-			{0, 0, 2, 6},
-			{0, 1, 2, 7},
-			{0, 2, 2, 8},
-			{1, 0, 2, 9},
-			{1, 1, 2, 10},
-			{1, 2, 2, 11},
-		}},
-	}
-
-	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
-		for _, as := range ts.ais {
-			ai := network.GetWeightIndex(as.i, as.j, as.layer)
-			if ai != as.index {
-				t.Errorf("Expected %v, but is %v", as.index, ai)
-			}
-		}
-	}
-}
-
-func TestNumberOfWeightsPerLayer(t *testing.T) {
-	type Layer struct {
-		layer    int
-		expected int
-	}
-
-	tables := []struct {
-		xs  []int
-		ais []Layer
-	}{
-		{[]int{2, 3, 2}, []Layer{
-			{1, 6},
-			{2, 6},
-		}},
-		{[]int{28 * 28, 100, 10}, []Layer{
-			{1, 100 * 28 * 28},
-			{2, 10 * 100},
-		}},
-	}
-
-	for _, ts := range tables {
-		network := CreateNetwork(ts.xs)
-		for _, as := range ts.ais {
-			ai := network.nWeightsInLayer(as.layer)
-			if ai != as.expected {
-				t.Errorf("Expected %v weights in layer %v, but is %v", as.expected, as.layer, ai)
-			}
-		}
-	}
-}
-
 func CreateTestNetwork() (Network, Minibatch) {
 	network := CreateNetwork([]int{2, 3, 2})
 	network.GetWeights(1).Set(0, 0, 1)
@@ -291,7 +159,7 @@ func TestFeedforwardActivation(t *testing.T) {
 
 	for _, ts := range tables {
 		network.FeedforwardLayer(ts.layer, &mb)
-		a := network.GetActivation(ts.layer, &mb)
+		a := mb.a[ts.layer]
 		if floatEquals(a.Get(ts.index), ts.value, EPSILON) == false {
 			t.Errorf("Expected %v, but is %v", ts.value, a.Get(ts.index))
 		}
@@ -315,23 +183,10 @@ func TestFeedforward(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		v := network.GetActivation(ts.layer, &mb)
-		if floatEquals(v.Get(ts.index), ts.value, EPSILON) == false {
-			t.Errorf("Expected %v, but is %v", ts.value, v)
+		a := mb.a[ts.layer]
+		if floatEquals(a.Get(ts.index), ts.value, EPSILON) == false {
+			t.Errorf("Expected %v, but is %v", ts.value, a.Get(ts.index))
 		}
-	}
-}
-
-func TestSetInputActivations(t *testing.T) {
-	network, mb := CreateTestNetwork()
-	mb.a[0] = *LinAlg.MakeVector([]float64{4.9, 3.2})
-
-	if a := network.GetActivation(0, &mb); floatEquals(4.9, a.Get(0), EPSILON) == false {
-		t.Errorf("Expected 4.9, but is %v", a)
-	}
-
-	if a := network.GetActivation(0, &mb); floatEquals(3.2, a.Get(1), EPSILON) == false {
-		t.Errorf("Expected 3.2, but is %v", a)
 	}
 }
 
@@ -355,10 +210,10 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	for _, ts := range tables {
 		mb.a[outputLayerIdx] = *LinAlg.MakeVector(ts.initialOutputActivations)
 		costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector(ts.expectedOutputActivations), &mb)
-		if delta := network.GetDelta(outputLayerIdx, &mb); floatEquals(ts.error[0], delta.Get(0), EPSILON) == false {
+		if delta := mb.delta[outputLayerIdx]; floatEquals(ts.error[0], delta.Get(0), EPSILON) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], delta.Get(0))
 		}
-		if delta := network.GetDelta(outputLayerIdx, &mb); floatEquals(ts.error[1], delta.Get(1), EPSILON) == false {
+		if delta := mb.delta[outputLayerIdx]; floatEquals(ts.error[1], delta.Get(1), EPSILON) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[1], delta.Get(1))
 		}
 	}
@@ -374,17 +229,17 @@ func TestBackpropagateError(t *testing.T) {
 	network.BackpropagateError(&mb)
 
 	expected := -0.0010048637687567257
-	if delta := network.GetDelta(1, &mb); floatEquals(expected, delta.Get(0), EPSILON) == false {
+	if delta := mb.delta[1]; floatEquals(expected, delta.Get(0), EPSILON) == false {
 		t.Errorf("Expected %v, but was %v", expected, delta.Get(0))
 	}
 
 	expected = 0.018229366486609905
-	if delta := network.GetDelta(1, &mb); floatEquals(expected, delta.Get(1), EPSILON) == false {
+	if delta := mb.delta[1]; floatEquals(expected, delta.Get(1), EPSILON) == false {
 		t.Errorf("Expected %v, but was %v", expected, delta.Get(1))
 	}
 
 	expected = 0.018229366486609905
-	if delta := network.GetDelta(1, &mb); floatEquals(0.0010172359440642931, delta.Get(2), EPSILON) == false {
+	if delta := mb.delta[1]; floatEquals(0.0010172359440642931, delta.Get(2), EPSILON) == false {
 		t.Errorf("Expected %v, but was %v", 0.0010172359440642931, delta.Get(2))
 	}
 }
@@ -418,12 +273,12 @@ func TestTrain(t *testing.T) {
 
 	// Assert
 	expected := 0.999999999998501
-	if a := network.GetActivation(2, &mb); floatEquals(expected, a.Get(0), EPSILON) == false {
+	if a := mb.a[2]; floatEquals(expected, a.Get(0), EPSILON) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a.Get(0))
 	}
 
 	expected = 0.999999999998501
-	if a := network.GetActivation(2, &mb); floatEquals(1, a.Get(1), EPSILON) == false {
+	if a := mb.a[2]; floatEquals(1, a.Get(1), EPSILON) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", 1, a.Get(1))
 	}
 }
@@ -443,7 +298,7 @@ func TestSingleNeuronQuadraticCostTrain(t *testing.T) {
 
 	// Assert
 	expected := 0.20284840518811262
-	if a := network.GetActivation(1, &mb); floatEquals(expected, a.Get(0), EPSILON) == false {
+	if a := mb.a[1]; floatEquals(expected, a.Get(0), EPSILON) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a.Get(0))
 	}
 }
@@ -463,7 +318,7 @@ func TestSingleNeuronCrossEntropyCostTrain(t *testing.T) {
 
 	// Assert
 	expected := 0.0033988511270660214
-	if a := network.GetActivation(1, &mb); floatEquals(expected, a.Get(0), EPSILON) == false {
+	if a := mb.a[1]; floatEquals(expected, a.Get(0), EPSILON) == false {
 		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a.Get(0))
 	}
 }

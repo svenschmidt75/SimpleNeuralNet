@@ -141,7 +141,7 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	dCdb_numeric := (c2 - c1) / 2 / delta
 
 	// evaluate analytically
-	delta_L := network.GetDelta(0, &mb)
+	delta_L := mb.delta[0]
 
 	if floatEquals(dCdb_numeric, delta_L.Get(0), EPSILON) == false {
 		t.Error("Networks not equal")
