@@ -25,7 +25,7 @@ func GenerateRandomIndices(size int) []int {
 	return perm
 }
 
-func GetError(outputActivations *LinAlg.Vector, a *LinAlg.Vector) float64 {
+func GetError(outputActivations LinAlg.Vector, a LinAlg.Vector) float64 {
 	e := LinAlg.SubtractVectors(outputActivations, a)
 	return e.EuklideanNorm()
 }

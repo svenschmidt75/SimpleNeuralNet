@@ -40,9 +40,10 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 		// evaluate numerically
 		delta := 0.000001
 		w_jk := network.GetWeights(item.layer)
-		w_jk.Set(item.i, item.j, w_jk.Get(item.i, item.j)-delta)
+		value := w_jk.Get(item.i, item.j)
+		w_jk.Set(item.i, item.j, value-delta)
 		c1 := costFunction.Evaluate(network, lambda, ts)
-		w_jk.Set(item.i, item.j, w_jk.Get(item.i, item.j)+delta)
+		w_jk.Set(item.i, item.j, value+delta)
 		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
@@ -86,10 +87,11 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	for _, item := range tables {
 		// evaluate numerically
 		delta := 0.000001
-		b_j := network.GetBias(item.layer)
-		b_j.Set(item.i, b_j.Get(item.i)-delta)
+		b := network.GetBias(item.layer)
+		value := b.Get(item.i)
+		b.Set(item.i, value-delta)
 		c1 := costFunction.Evaluate(network, lambda, ts)
-		b_j.Set(item.i, b_j.Get(item.i)+delta)
+		b.Set(item.i, value+delta)
 		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
@@ -116,7 +118,7 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, &ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
 
 	C := func(z *LinAlg.Vector, y *LinAlg.Vector) float64 {
 		a := z.F(Sigmoid)

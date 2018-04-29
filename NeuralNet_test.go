@@ -1,13 +1,13 @@
 package main
 
 import (
+	"SimpleNeuralNet/LinAlg"
 	"SimpleNeuralNet/MNISTImport"
 	"SimpleNeuralNet/Utility"
 	"bytes"
 	"fmt"
 	"math"
 	"testing"
-	"SimpleNeuralNet/LinAlg"
 )
 
 func TestSigmoid(t *testing.T) {
@@ -293,7 +293,7 @@ func TestFeedforwardActivation(t *testing.T) {
 		network.FeedforwardLayer(ts.layer, &mb)
 		a := network.GetActivation(ts.layer, &mb)
 		if floatEquals(a.Get(ts.index), ts.value, EPSILON) == false {
-			t.Errorf("Expected %v, but is %v", ts.value, v)
+			t.Errorf("Expected %v, but is %v", ts.value, a.Get(ts.index))
 		}
 	}
 }
@@ -338,10 +338,7 @@ func TestSetInputActivations(t *testing.T) {
 func TestCalculateErrorInOutputLayer(t *testing.T) {
 	network := CreateTestNetwork2()
 	mb := CreateMiniBatch([]int{7, 12})
-
-	network.SetActivation(1, 0, 1, &mb)
-	network.SetActivation(2, 1, 1, &mb)
-	network.SetActivation(3, 2, 1, &mb)
+	network.SetActivation(LinAlg.MakeVector([]float64{1, 2, 3}), 1, &mb)
 	outputLayerIdx := network.getOutputLayerIndex()
 	costFunction := QuadraticCostFunction{}
 
@@ -356,41 +353,39 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network.SetActivation(ts.initialOutputActivations[0], 0, outputLayerIdx, &mb)
-		network.SetActivation(ts.initialOutputActivations[1], 1, outputLayerIdx, &mb)
-		costFunction.CalculateErrorInOutputLayer(&network, ts.expectedOutputActivations, &mb)
-		if delta := network.GetDelta(0, outputLayerIdx, &mb); floatEquals(ts.error[0], delta, EPSILON) == false {
-			t.Errorf("Expected %v, but was %v", ts.error[0], delta)
+		network.SetActivation(LinAlg.MakeVector(ts.initialOutputActivations), outputLayerIdx, &mb)
+		costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector(ts.expectedOutputActivations), &mb)
+		if delta := network.GetDelta(outputLayerIdx, &mb); floatEquals(ts.error[0], delta.Get(0), EPSILON) == false {
+			t.Errorf("Expected %v, but was %v", ts.error[0], delta.Get(0))
 		}
-		if nabla := network.GetDelta(1, outputLayerIdx, &mb); floatEquals(ts.error[1], nabla, EPSILON) == false {
-			t.Errorf("Expected %v, but was %v", ts.error[1], nabla)
+		if delta := network.GetDelta(outputLayerIdx, &mb); floatEquals(ts.error[1], delta.Get(1), EPSILON) == false {
+			t.Errorf("Expected %v, but was %v", ts.error[1], delta.Get(1))
 		}
 	}
 }
 
 func TestBackpropagateError(t *testing.T) {
 	network := CreateTestNetwork2()
-	mb := CreateMiniBatch(7, 12)
-	network.SetActivation(0.32, 0, 0, &mb)
-	network.SetActivation(0.56, 1, 0, &mb)
+	mb := CreateMiniBatch([]int{7, 12})
+	network.SetActivation(LinAlg.MakeVector([]float64{0.32, 0.56}), 0, &mb)
 	costFunction := QuadraticCostFunction{}
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, []float64{1, 0}, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector([]float64{1, 0}), &mb)
 	network.BackpropagateError(&mb)
 
 	expected := -0.0010048637687567257
-	if delta := network.GetDelta(0, 1, &mb); floatEquals(expected, delta, EPSILON) == false {
-		t.Errorf("Expected %v, but was %v", expected, delta)
+	if delta := network.GetDelta(1, &mb); floatEquals(expected, delta.Get(0), EPSILON) == false {
+		t.Errorf("Expected %v, but was %v", expected, delta.Get(0))
 	}
 
 	expected = 0.018229366486609905
-	if delta := network.GetDelta(1, 1, &mb); floatEquals(expected, delta, EPSILON) == false {
-		t.Errorf("Expected %v, but was %v", expected, delta)
+	if delta := network.GetDelta(1, &mb); floatEquals(expected, delta.Get(1), EPSILON) == false {
+		t.Errorf("Expected %v, but was %v", expected, delta.Get(1))
 	}
 
 	expected = 0.018229366486609905
-	if delta := network.GetDelta(2, 1, &mb); floatEquals(0.0010172359440642931, delta, EPSILON) == false {
-		t.Errorf("Expected %v, but was %v", 0.0010172359440642931, delta, EPSILON)
+	if delta := network.GetDelta(1, &mb); floatEquals(0.0010172359440642931, delta.Get(2), EPSILON) == false {
+		t.Errorf("Expected %v, but was %v", 0.0010172359440642931, delta.Get(2))
 	}
 }
 
@@ -398,94 +393,94 @@ func TestCalculateDerivatives(t *testing.T) {
 	network, mb := CreateTestNetwork()
 	costFunction := QuadraticCostFunction{}
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, []float64{0, 1}, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector([]float64{0, 1}), &mb)
 	network.BackpropagateError(&mb)
 
 	dw, db := network.CalculateDerivatives([]Minibatch{mb})
 
-	if wIdx := network.GetWeightIndex(0, 0, 1); floatEquals(0, dw[wIdx], EPSILON) == false {
-		t.Errorf("dw(%v, %v), layer %v, does not equal to %v, but instead %v", 0, 0, 1, 0, dw[wIdx])
+	if floatEquals(0, dw[1].Get(0, 0), EPSILON) == false {
+		t.Errorf("dw(%v, %v), layer %v, does not equal to %v, but instead %v", 0, 0, 1, 0, dw[1].Get(0, 0))
 	}
-	if bIdx := network.GetBiasIndex(0, 1); floatEquals(0, db[bIdx], EPSILON) == false {
-		t.Errorf("db(%v), layer %v, does not equal to %v, but instead %v", 0, 0, 0, db[bIdx])
+	if floatEquals(0, db[1].Get(0), EPSILON) == false {
+		t.Errorf("db(%v), layer %v, does not equal to %v, but instead %v", 0, 0, 0, db[1].Get(0))
 	}
 }
 
 func TestTrain(t *testing.T) {
 	network, _ := CreateTestNetwork()
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{0.34, 0.43}, []float64{0, 1}), MNISTImport.CreateTrainingSample([]float64{0.14, 0.03}, []float64{0, 1})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 10, QuadtraticCostFunction{})
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{0.34, 0.43}), LinAlg.MakeVector([]float64{0, 1})), MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{0.14, 0.03}), LinAlg.MakeVector([]float64{0, 1}))}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 0, 10, QuadraticCostFunction{})
 
-	mb := CreateMiniBatch(12, 7)
-	network.SetInputActivations([]float64{0.34, 0.43}, &mb)
+	mb := CreateMiniBatch([]int{12, 7})
+	network.SetInputActivations(LinAlg.MakeVector([]float64{0.34, 0.43}), &mb)
 	network.Feedforward(&mb)
 
 	// Assert
 	expected := 0.999999999998501
-	if a := network.GetActivation(0, 2, &mb); floatEquals(expected, a, EPSILON) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
+	if a := network.GetActivation(2, &mb); floatEquals(expected, a.Get(0), EPSILON) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a.Get(0))
 	}
 
 	expected = 0.999999999998501
-	if a := network.GetActivation(1, 2, &mb); floatEquals(1, a, EPSILON) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", 1, a)
+	if a := network.GetActivation(2, &mb); floatEquals(1, a.Get(1), EPSILON) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", 1, a.Get(1))
 	}
 }
 
 func TestSingleNeuronQuadraticCostTrain(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, 0)
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
-	network.biases[network.GetBiasIndex(0, 1)] = 2
-	mb := CreateMiniBatch(2, 1)
-	mb.a[network.GetNodeIndex(0, 0)] = 1
+	network := CreateNetwork([]int{1, 1})
+	network.GetWeights(1).Set(0, 0, 2)
+	network.GetBias(1).Set(0, 2)
+	mb := CreateMiniBatch([]int{2, 1})
+	mb.a[0].Set(0, 1)
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 10, QuadraticCostFunction{})
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 0, 10, QuadraticCostFunction{})
 
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
 
 	// Assert
 	expected := 0.20284840518811262
-	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a, EPSILON) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
+	if a := network.GetActivation(1, &mb); floatEquals(expected, a.Get(0), EPSILON) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a.Get(0))
 	}
 }
 
 func TestSingleNeuronCrossEntropyCostTrain(t *testing.T) {
-	network := CreateNetwork([]int{1, 1}, 0)
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
-	network.biases[network.GetBiasIndex(0, 1)] = 2
-	mb := CreateMiniBatch(2, 1)
-	mb.a[network.GetNodeIndex(0, 0)] = 1
+	network := CreateNetwork([]int{1, 1})
+	network.GetWeights(1).Set(0, 00, 2)
+	network.GetBias(1).Set(0, 2)
+	mb := CreateMiniBatch([]int{2, 1})
+	mb.a[0].Set(0, 1)
 
-	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample([]float64{1}, []float64{0})}
-	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.5, 10, CrossEntropyCostFunction{})
+	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
+	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.5, 0, 10, CrossEntropyCostFunction{})
 
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
 
 	// Assert
 	expected := 0.0033988511270660214
-	if a := network.GetActivation(0, 1, &mb); floatEquals(expected, a, EPSILON) == false {
-		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a)
+	if a := network.GetActivation(1, &mb); floatEquals(expected, a.Get(0), EPSILON) == false {
+		t.Errorf("Network gave wrong answer. Expected %v, was %v", expected, a.Get(0))
 	}
 }
 
 func TestTrainWithMNIST(t *testing.T) {
-	network := CreateNetwork([]int{28 * 28, 100, 10}, 0)
+	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
 	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
-	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10, QuadraticCostFunction{})
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 0, 10, QuadraticCostFunction{})
 
 	// Assert
 	testData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/MNIST", "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 	ts2 := testData.GenerateTrainingSamples(100)
 
-	mb := CreateMiniBatch(network.nNodes(), network.nWeights())
+	mb := CreateMiniBatch(network.GetLayers())
 	for index := 0; index < len(ts2); index++ {
 		network.SetInputActivations(ts2[index].InputActivations, &mb)
 		network.Feedforward(&mb)
@@ -496,12 +491,12 @@ func TestTrainWithMNIST(t *testing.T) {
 }
 
 func TestSerialization(t *testing.T) {
-	network := CreateNetwork([]int{28 * 28, 100, 10}, 0)
+	network := CreateNetwork([]int{28 * 28, 100, 10})
 	network.InitializeNetworkWeightsAndBiases()
 
 	trainingData := MNISTImport.ImportData("/home/svenschmidt75/Develop/Go/go/src/SimpleNeuralNet/test_data/", "train-images50.idx3-ubyte", "train-labels50.idx1-ubyte")
 	ts := trainingData.GenerateTrainingSamples(trainingData.Length())
-	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 10, QuadraticCostFunction{})
+	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.5, 0, 10, QuadraticCostFunction{})
 
 	var buf bytes.Buffer
 	err := Utility.WriteGob(&buf, &network)
@@ -515,9 +510,9 @@ func TestSerialization(t *testing.T) {
 		t.Error("Error deserializing network")
 	}
 
-	a1 := network.GetWeight(1, 1, 1)
-	a2 := readNetwork.GetWeight(1, 1, 1)
-	if floatEquals(a1, a2, EPSILON) == false {
+	a1 := network.GetWeights(1)
+	a2 := readNetwork.GetWeights(1)
+	if floatEquals(a1.Get(1, 1), a2.Get(1, 1), EPSILON) == false {
 		t.Error("Networks not equal")
 	}
 }

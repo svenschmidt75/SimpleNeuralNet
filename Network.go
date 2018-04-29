@@ -157,8 +157,8 @@ func (n Network) GetNodeIndex(index int, layer int) int {
 	return bi + index
 }
 
-func (n *Network) GetActivation(layer int, mb *Minibatch) *LinAlg.Vector {
-	return &mb.a[layer]
+func (n *Network) GetActivation(layer int, mb *Minibatch) LinAlg.Vector {
+	return mb.a[layer]
 }
 
 func (n *Network) SetActivation(a LinAlg.Vector, layer int, mb *Minibatch) {
@@ -173,12 +173,12 @@ func (n Network) getDeltaIndex(index int, layer int) int {
 	return n.GetNodeIndex(index, layer)
 }
 
-func (n *Network) GetDelta(layer int, mb *Minibatch) *LinAlg.Vector {
-	return &mb.delta[layer]
+func (n *Network) GetDelta(layer int, mb *Minibatch) LinAlg.Vector {
+	return mb.delta[layer]
 }
 
-func (n *Network) SetDelta(layer int, delta *LinAlg.Vector, mb *Minibatch) {
-	mb.delta[layer] = *delta
+func (n *Network) SetDelta(layer int, delta LinAlg.Vector, mb *Minibatch) {
+	mb.delta[layer] = delta
 }
 
 func (n Network) nBiases() int {
@@ -205,16 +205,16 @@ func (n *Network) GetBias(layer int) *LinAlg.Vector {
 	return &n.biases[layer]
 }
 
-func (n *Network) SetBias(layer int, b *LinAlg.Vector) {
-	n.biases[layer] = *b
+func (n *Network) SetBias(layer int, b LinAlg.Vector) {
+	n.biases[layer] = b
 }
 
 func (n *Network) GetWeights(layer int) *LinAlg.Matrix {
 	return &n.weights[layer]
 }
 
-func (n *Network) SetWeights(layer int, w *LinAlg.Matrix) {
-	n.weights[layer] = *w
+func (n *Network) SetWeights(layer int, w LinAlg.Matrix) {
+	n.weights[layer] = w
 }
 
 // Start index of w^{l}_ij, i.e. linear index of w^{layer}_00 in
@@ -258,8 +258,8 @@ func (n *Network) CalculateZ(layer int, mb *Minibatch) {
 	w := n.weights[layer]
 	a := mb.a[layer-1]
 	b := n.biases[layer]
-	wa := w.Ax(&a)
-	z := LinAlg.AddVectors(&wa, &b)
+	wa := w.Ax(a)
+	z := LinAlg.AddVectors(wa, b)
 	mb.z[layer] = z
 }
 
@@ -310,7 +310,7 @@ func (n *Network) BackpropagateError(mb *Minibatch) {
 		weights := n.GetWeights(layer + 1)
 		w_transpose := weights.Transpose()
 		delta := mb.delta[layer+1]
-		ax := w_transpose.Ax(&delta)
+		ax := w_transpose.Ax(delta)
 		s := mb.z[layer].F(SigmoidPrime)
 		d := ax.Hadamard(&s)
 		mb.delta[layer] = d
@@ -360,7 +360,7 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Matrix, []LinA
 			a := n.GetActivation(layer-1, &mb)
 			delta := n.GetDelta(layer, &mb)
 			tmp := LinAlg.OuterProduct(a, delta)
-			dCdw.Add(&tmp)
+			dCdw.Add(tmp)
 			dCdb.Add(delta)
 		}
 		dCdw.ScalarMultiplication(1 / float64(nMiniBatches))
@@ -381,13 +381,13 @@ func (n *Network) UpdateNetwork(eta float32, lambda float64, dw []LinAlg.Matrix,
 		tmp2 := dw[layer]
 		tmp2.ScalarMultiplication(float64(eta))
 		w.Sub(&tmp2)
-		n.SetWeights(layer, w)
+		n.SetWeights(layer, *w)
 
 		b := n.GetBias(layer)
 		tmp3 := db[layer]
 		tmp3.ScalarMultiplication(-float64(eta))
-		LinAlg.SubtractVectors(b, &tmp3)
-		n.SetBias(layer, b)
+		LinAlg.SubtractVectors(*b, tmp3)
+		n.SetBias(layer, *b)
 	}
 }
 
@@ -412,7 +412,7 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 			x := trainingSamples[index]
 			n.SetInputActivations(x.InputActivations, &mb)
 			n.Feedforward(&mb)
-			costFunction.CalculateErrorInOutputLayer(n, &x.OutputActivations, &mb)
+			costFunction.CalculateErrorInOutputLayer(n, x.OutputActivations, &mb)
 			n.BackpropagateError(&mb)
 		}
 		dw, db := n.CalculateDerivatives(mbs)

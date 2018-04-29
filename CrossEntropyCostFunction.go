@@ -59,13 +59,13 @@ func weightsSquared(n *Network) float64 {
 
 func caculateDeltaCrossEntropy(layer int, n *Network, mb *Minibatch, ts *MNISTImport.TrainingSample) LinAlg.Vector {
 	if layer == n.getOutputLayerIndex() {
-		dCda := LinAlg.SubtractVectors(&mb.a[layer], &ts.OutputActivations)
+		dCda := LinAlg.SubtractVectors(mb.a[layer], ts.OutputActivations)
 		return dCda
 	}
 	weights := n.GetWeights(layer + 1)
 	w_transpose := weights.Transpose()
 	delta := caculateDeltaCrossEntropy(layer+1, n, mb, ts)
-	ax := w_transpose.Ax(&delta)
+	ax := w_transpose.Ax(delta)
 	s := mb.z[layer].F(SigmoidPrime)
 	d := ax.Hadamard(&s)
 	return d
@@ -82,7 +82,7 @@ func (CrossEntropyCostFunction) GradBias(layer int, network *Network, trainingSa
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		delta_j := caculateDeltaCrossEntropy(layer, network, &mb, &x)
-		delta.Add(&delta_j)
+		delta.Add(delta_j)
 	}
 	delta.ScalarMultiplication(1 / float64(len(trainingSamples)))
 	return delta
@@ -100,21 +100,21 @@ func (CrossEntropyCostFunction) GradWeight(layer int, lambda float64, network *N
 		network.Feedforward(&mb)
 		a_k := network.GetActivation(layer-1, &mb)
 		delta_j := caculateDeltaCrossEntropy(layer, network, &mb, &x)
-		tmp := LinAlg.OuterProduct(a_k, &delta_j)
-		dCdw.Add(&tmp)
+		tmp := LinAlg.OuterProduct(a_k, delta_j)
+		dCdw.Add(tmp)
 	}
 	dCdw.ScalarMultiplication(1 / float64(len(trainingSamples)))
 
 	// add the regularization term
 	w := network.GetWeights(layer)
 	w.ScalarMultiplication(lambda / float64(len(trainingSamples)))
-	dCdw.Add(w)
+	dCdw.Add(*w)
 
 	return dCdw
 }
 
-func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {
+func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations LinAlg.Vector, mb *Minibatch) {
 	// Equation (68), Chapter 3 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
-	mb.delta[outputLayerIdx] = LinAlg.SubtractVectors(&mb.a[outputLayerIdx], outputActivations)
+	mb.delta[outputLayerIdx] = LinAlg.SubtractVectors(mb.a[outputLayerIdx], outputActivations)
 }

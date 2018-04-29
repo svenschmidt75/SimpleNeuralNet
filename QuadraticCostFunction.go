@@ -23,7 +23,7 @@ func (QuadraticCostFunction) Evaluate(network *Network, lambda float64, training
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		a := network.GetOutputLayerActivations(&mb)
-		diff := GetError(&x.OutputActivations, &a)
+		diff := GetError(x.OutputActivations, a)
 		cost += diff * diff
 	}
 	fac := float64(2 * len(trainingSamples))
@@ -37,7 +37,7 @@ func (QuadraticCostFunction) Evaluate(network *Network, lambda float64, training
 
 func caculateDeltaCost(layer int, n *Network, mb *Minibatch, ts *MNISTImport.TrainingSample) LinAlg.Vector {
 	if layer == n.getOutputLayerIndex() {
-		dCda := LinAlg.SubtractVectors(&mb.a[layer], &ts.OutputActivations)
+		dCda := LinAlg.SubtractVectors(mb.a[layer], ts.OutputActivations)
 		s := mb.z[layer].F(SigmoidPrime)
 		d := dCda.Hadamard(&s)
 		return d
@@ -45,7 +45,7 @@ func caculateDeltaCost(layer int, n *Network, mb *Minibatch, ts *MNISTImport.Tra
 	w_transpose := n.GetWeights(layer + 1).Transpose()
 	delta := caculateDeltaCost(layer+1, n, mb, ts)
 	s := mb.z[layer].F(SigmoidPrime)
-	ax := w_transpose.Ax(&delta)
+	ax := w_transpose.Ax(delta)
 	d := ax.Hadamard(&s)
 	return d
 }
@@ -60,7 +60,7 @@ func (QuadraticCostFunction) GradBias(layer int, network *Network, trainingSampl
 		network.SetInputActivations(x.InputActivations, &mb)
 		network.Feedforward(&mb)
 		delta_j := caculateDeltaCost(layer, network, &mb, &x)
-		delta.Add(&delta_j)
+		delta.Add(delta_j)
 	}
 	delta.ScalarMultiplication(1 / float64(len(trainingSamples)))
 	return delta
@@ -77,23 +77,23 @@ func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Netw
 		network.Feedforward(&mb)
 		a_k := network.GetActivation(layer-1, &mb)
 		delta_j := caculateDeltaCost(layer, network, &mb, &x)
-		tmp := LinAlg.OuterProduct(a_k, &delta_j)
-		dCdw.Add(&tmp)
+		tmp := LinAlg.OuterProduct(a_k, delta_j)
+		dCdw.Add(tmp)
 	}
 	dCdw.ScalarMultiplication(1 / float64(len(trainingSamples)))
 
 	// add the regularization term
 	w := network.GetWeights(layer)
 	w.ScalarMultiplication(lambda / float64(len(trainingSamples)))
-	dCdw.Add(w)
+	dCdw.Add(*w)
 
 	return dCdw
 }
 
-func (QuadraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {
+func (QuadraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations LinAlg.Vector, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
-	delta := LinAlg.SubtractVectors(&mb.a[outputLayerIdx], outputActivations)
+	delta := LinAlg.SubtractVectors(mb.a[outputLayerIdx], outputActivations)
 	s := mb.z[outputLayerIdx].F(SigmoidPrime)
 	d := delta.Hadamard(&s)
 	mb.delta[outputLayerIdx] = d

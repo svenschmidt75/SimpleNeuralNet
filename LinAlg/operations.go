@@ -2,7 +2,7 @@ package LinAlg
 
 import "fmt"
 
-func binopVectors(v1 *Vector, v2 *Vector, binop func(float64, float64) float64) Vector {
+func binopVectors(v1 Vector, v2 Vector, binop func(float64, float64) float64) Vector {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.AddVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
@@ -16,7 +16,7 @@ func binopVectors(v1 *Vector, v2 *Vector, binop func(float64, float64) float64) 
 	return result
 }
 
-func AddVectors(v1 *Vector, v2 *Vector) Vector {
+func AddVectors(v1 Vector, v2 Vector) Vector {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.AddVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
@@ -25,7 +25,7 @@ func AddVectors(v1 *Vector, v2 *Vector) Vector {
 	})
 }
 
-func SubtractVectors(v1 *Vector, v2 *Vector) Vector {
+func SubtractVectors(v1 Vector, v2 Vector) Vector {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.AddVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
@@ -34,7 +34,7 @@ func SubtractVectors(v1 *Vector, v2 *Vector) Vector {
 	})
 }
 
-func OuterProduct(v1 *Vector, v2 *Vector) Matrix {
+func OuterProduct(v1 Vector, v2 Vector) Matrix {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.OuterProduct: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}

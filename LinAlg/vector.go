@@ -45,7 +45,7 @@ func (v *Vector) Size() int {
 	return len(v.data)
 }
 
-func (v *Vector) Set(index int, value float64) {
+func (v Vector) Set(index int, value float64) {
 	v.data[index] = value
 }
 
@@ -53,7 +53,7 @@ func (v *Vector) Get(index int) float64 {
 	return v.data[index]
 }
 
-func (v1 *Vector) DotProduct(v2 *Vector) float64 {
+func (v1 *Vector) DotProduct(v2 Vector) float64 {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.DotProduct: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
@@ -66,7 +66,7 @@ func (v1 *Vector) DotProduct(v2 *Vector) float64 {
 	return d
 }
 
-func (v *Vector) Add(other *Vector) {
+func (v *Vector) Add(other Vector) {
 	if v.Size() != other.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v.Size(), other.Size()))
 	}

@@ -66,7 +66,7 @@ func (m *Matrix) index(row int, col int) int {
 	return row*m.Cols + col
 }
 
-func (m *Matrix) Set(row int, col int, value float64) {
+func (m Matrix) Set(row int, col int, value float64) {
 	idx := m.index(row, col)
 	m.data[idx] = value
 }
@@ -76,7 +76,7 @@ func (m *Matrix) Get(row int, col int) float64 {
 	return m.data[idx]
 }
 
-func (m *Matrix) Transpose() Matrix {
+func (m Matrix) Transpose() Matrix {
 	t := MakeEmptyMatrix(m.Cols, m.Rows)
 	for row := 0; row < m.Rows; row++ {
 		for col := 0; col < m.Cols; col++ {
@@ -87,7 +87,7 @@ func (m *Matrix) Transpose() Matrix {
 	return t
 }
 
-func (m *Matrix) Ax(v *Vector) Vector {
+func (m *Matrix) Ax(v Vector) Vector {
 	if m.Cols != v.Size() {
 		panic(fmt.Sprintf("LinAlg.Matrix.Ax: Matrix number of columns %d must equal vector size %d", m.Cols, v.Size()))
 	}
@@ -102,7 +102,7 @@ func (m *Matrix) Ax(v *Vector) Vector {
 	return result
 }
 
-func (m *Matrix) Am(other *Matrix) Matrix {
+func (m *Matrix) Am(other Matrix) Matrix {
 	if m.Cols != other.Rows {
 		panic(fmt.Sprint("LinAlg.Matrix.Am: Matrices not compatible"))
 	}
@@ -125,7 +125,7 @@ func (m *Matrix) ScalarMultiplication(scalar float64) {
 	}
 }
 
-func (m *Matrix) Add(other *Matrix) {
+func (m *Matrix) Add(other Matrix) {
 	if m.Rows != other.Rows {
 		panic(fmt.Sprintf("LinAlg.Matrix.Add: Matrix number of rows %d and %d must equal", m.Rows, other.Rows))
 	}

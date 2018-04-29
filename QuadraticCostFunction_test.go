@@ -38,10 +38,11 @@ func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	for _, item := range tables {
 		// evaluate numerically
 		delta := 0.000001
-		w_jk := network.GetWeight(item.i, item.j, item.layer)
-		network.SetWeight(w_jk-delta, item.i, item.j, item.layer)
+		w_jk := network.GetWeights(item.layer)
+		value := w_jk.Get(item.i, item.j)
+		w_jk.Set(item.i, item.j, value-delta)
 		c1 := costFunction.Evaluate(network, lambda, ts)
-		network.SetWeight(w_jk+delta, item.i, item.j, item.layer)
+		w_jk.Set(item.i, item.j, value+delta)
 		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdw_numeric := (c2 - c1) / 2 / delta
 
@@ -85,10 +86,11 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 	for _, item := range tables {
 		// evaluate numerically
 		delta := 0.000001
-		b_j := network.GetBias(item.i, item.layer)
-		network.SetBias(b_j-delta, item.i, item.layer)
+		b := network.GetBias(item.layer)
+		value := b.Get(item.i)
+		b.Set(item.i, value-delta)
 		c1 := costFunction.Evaluate(network, lambda, ts)
-		network.SetBias(b_j+delta, item.i, item.layer)
+		b.Set(item.i, value+delta)
 		c2 := costFunction.Evaluate(network, lambda, ts)
 		dCdb_numeric := (c2 - c1) / 2 / delta
 
@@ -103,10 +105,10 @@ func TestQuadraticCostDerivativeBiasNumerical(t *testing.T) {
 
 func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	network := CreateNetwork([]int{1, 1})
-	network.weights[network.GetWeightIndex(0, 0, 1)] = 2
-	network.biases[network.GetBiasIndex(0, 1)] = 2
-	mb := CreateMiniBatch(2)
-	mb.a[network.GetNodeIndex(0, 0)] = 1
+	network.GetWeights(1).Set(0, 0, 2)
+	network.GetBias(1).Set(0, 2)
+	mb := CreateMiniBatch([]int{2})
+	mb.a[0].Set(0, 1)
 	costFunction := QuadraticCostFunction{}
 	lambda := float64(1)
 
@@ -114,11 +116,11 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
 	network.SetInputActivations(ts[0].InputActivations, &mb)
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, &ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
 
 	C := func(z *LinAlg.Vector) float64 {
 		a := z.F(Sigmoid)
-		return 0.5 * a.DotProduct(&a)
+		return 0.5 * a.DotProduct(a)
 	}
 	delta := 0.000001
 	z_j := mb.z[0]
