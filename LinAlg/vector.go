@@ -66,16 +66,38 @@ func (v1 *Vector) DotProduct(v2 Vector) float64 {
 	return d
 }
 
-func (v *Vector) Add(other *Vector) {
-	if v.Size() != other.Size() {
-		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v.Size(), other.Size()))
+func binopVectors(v1 *Vector, v2 *Vector, binop func(float64, float64) float64) *Vector {
+	if v1.Size() != v2.Size() {
+		panic(fmt.Sprintf("LinAlg.AddVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
-	for i := 0; i < v.Size(); i++ {
-		e1 := v.Get(i)
-		e2 := other.Get(i)
-		d := e1 * e2
-		v.Set(i, d)
+	result := MakeEmptyVector(v1.Size())
+	for i := 0; i < v1.Size(); i++ {
+		e1 := v1.Get(i)
+		e2 := v2.Get(i)
+		r := binop(e1, e2)
+		result.Set(i, r)
 	}
+	return result
+}
+
+func (v1 *Vector) Add(v2 *Vector) *Vector {
+	if v1.Size() != v2.Size() {
+		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
+	}
+	binopVectors(v1, v2, func(e1 float64, e2 float64) float64 {
+		return e1 + e2
+	})
+	return v1
+}
+
+func (v1 *Vector) Sub(v2 *Vector) *Vector {
+	if v1.Size() != v2.Size() {
+		panic(fmt.Sprintf("LinAlg.Vector.Sub: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
+	}
+	binopVectors(v1, v2, func(e1 float64, e2 float64) float64 {
+		return e1 - e2
+	})
+	return v1
 }
 
 func (v *Vector) Scalar(scalar float64) {
