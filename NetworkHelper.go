@@ -25,12 +25,12 @@ func GenerateRandomIndices(size int) []int {
 	return perm
 }
 
-func GetError(outputActivations LinAlg.Vector, a LinAlg.Vector) float64 {
-	e := LinAlg.SubtractVectors(outputActivations, a)
+func GetError(outputActivations LinAlg.Vector, a *LinAlg.Vector) float64 {
+	e := LinAlg.SubtractVectors(&outputActivations, a)
 	return e.EuklideanNorm()
 }
 
-func GetClass(a LinAlg.Vector) int {
+func GetClass(a *LinAlg.Vector) int {
 	var index int
 	var value float64 = -1
 	for idx := 0; idx < a.Size(); idx++ {
@@ -38,7 +38,6 @@ func GetClass(a LinAlg.Vector) int {
 			value = a.Get(idx)
 			index = idx
 		}
-
 	}
 	return index
 }

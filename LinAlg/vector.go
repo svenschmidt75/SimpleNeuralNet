@@ -33,12 +33,12 @@ func (v *Vector) GobDecode(buf []byte) error {
 	return decoder.Decode(&v.data)
 }
 
-func MakeVector(data []float64) Vector {
-	return Vector{data: data}
+func MakeVector(data []float64) *Vector {
+	return &Vector{data: data}
 }
 
-func MakeEmptyVector(size int) Vector {
-	return Vector{data: make([]float64, size)}
+func MakeEmptyVector(size int) *Vector {
+	return &Vector{data: make([]float64, size)}
 }
 
 func (v *Vector) Size() int {
@@ -66,7 +66,7 @@ func (v1 *Vector) DotProduct(v2 Vector) float64 {
 	return d
 }
 
-func (v *Vector) Add(other Vector) {
+func (v *Vector) Add(other *Vector) {
 	if v.Size() != other.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v.Size(), other.Size()))
 	}
@@ -78,13 +78,13 @@ func (v *Vector) Add(other Vector) {
 	}
 }
 
-func (v *Vector) ScalarMultiplication(scalar float64) {
+func (v *Vector) Scalar(scalar float64) {
 	for idx := range v.data {
 		v.data[idx] *= scalar
 	}
 }
 
-func (v *Vector) F(f func(float64) float64) Vector {
+func (v *Vector) F(f func(float64) float64) *Vector {
 	result := MakeEmptyVector(v.Size())
 	for idx := range v.data {
 		value := v.data[idx]
@@ -94,7 +94,7 @@ func (v *Vector) F(f func(float64) float64) Vector {
 	return result
 }
 
-func (v *Vector) Hadamard(other *Vector) Vector {
+func (v *Vector) Hadamard(other *Vector) *Vector {
 	if v.Size() != other.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Hadamard: Vectors must have same size, but is %d and %d", v.Size(), other.Size()))
 	}

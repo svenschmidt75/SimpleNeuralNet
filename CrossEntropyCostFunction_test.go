@@ -116,9 +116,9 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	y := LinAlg.MakeVector([]float64{0})
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), y)}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
-	network.SetInputActivations(ts[0].InputActivations, &mb)
+	mb.a[0] = ts[0].InputActivations
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, &ts[0].OutputActivations, &mb)
 
 	C := func(z *LinAlg.Vector, y *LinAlg.Vector) float64 {
 		a := z.F(Sigmoid)
@@ -135,9 +135,9 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	delta := 0.000001
 	z_j := mb.z[0]
 	z_j.Set(0, z_j.Get(0)-delta)
-	c1 := C(&z_j, &y)
+	c1 := C(&z_j, y)
 	z_j.Set(0, z_j.Get(0)+delta)
-	c2 := C(&z_j, &y)
+	c2 := C(&z_j, y)
 	dCdb_numeric := (c2 - c1) / 2 / delta
 
 	// evaluate analytically

@@ -30,7 +30,7 @@ func CreateMiniBatches(size int, layers []int) []Minibatch {
 func createVectors(layers []int) []LinAlg.Vector {
 	result := make([]LinAlg.Vector, len(layers))
 	for idx, nNodes := range layers[1:] {
-		result[idx] = LinAlg.MakeEmptyVector(nNodes)
+		result[idx] = *LinAlg.MakeEmptyVector(nNodes)
 	}
 	return result
 }

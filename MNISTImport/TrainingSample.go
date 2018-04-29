@@ -10,7 +10,7 @@ type TrainingSample struct {
 	OutputActivations LinAlg.Vector
 }
 
-func CreateTrainingSample(inputActivations LinAlg.Vector, outputActivations LinAlg.Vector) TrainingSample {
-	ts := TrainingSample{inputActivations, outputActivations}
+func CreateTrainingSample(inputActivations *LinAlg.Vector, outputActivations *LinAlg.Vector) TrainingSample {
+	ts := TrainingSample{*inputActivations, *outputActivations}
 	return ts
 }

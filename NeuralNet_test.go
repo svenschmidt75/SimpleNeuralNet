@@ -261,7 +261,7 @@ func TestCalculateZ(t *testing.T) {
 		v := mb.z[ts.layer]
 
 		// for this test, we assume the activation function is the identity
-		network.SetActivation(v, ts.layer, &mb)
+		mb.a[ts.layer] = v
 		if v.Get(ts.index) != ts.value {
 			t.Errorf("Expected %v, but is %v", ts.value, v)
 		}
@@ -324,7 +324,7 @@ func TestFeedforward(t *testing.T) {
 
 func TestSetInputActivations(t *testing.T) {
 	network, mb := CreateTestNetwork()
-	network.SetInputActivations(LinAlg.MakeVector([]float64{4.9, 3.2}), &mb)
+	mb.a[0] = *LinAlg.MakeVector([]float64{4.9, 3.2})
 
 	if a := network.GetActivation(0, &mb); floatEquals(4.9, a.Get(0), EPSILON) == false {
 		t.Errorf("Expected 4.9, but is %v", a)
@@ -338,7 +338,7 @@ func TestSetInputActivations(t *testing.T) {
 func TestCalculateErrorInOutputLayer(t *testing.T) {
 	network := CreateTestNetwork2()
 	mb := CreateMiniBatch([]int{7, 12})
-	network.SetActivation(LinAlg.MakeVector([]float64{1, 2, 3}), 1, &mb)
+	mb.a[1] = *LinAlg.MakeVector([]float64{1, 2, 3})
 	outputLayerIdx := network.getOutputLayerIndex()
 	costFunction := QuadraticCostFunction{}
 
@@ -353,7 +353,7 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 	}
 
 	for _, ts := range tables {
-		network.SetActivation(LinAlg.MakeVector(ts.initialOutputActivations), outputLayerIdx, &mb)
+		mb.a[outputLayerIdx] = *LinAlg.MakeVector(ts.initialOutputActivations)
 		costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector(ts.expectedOutputActivations), &mb)
 		if delta := network.GetDelta(outputLayerIdx, &mb); floatEquals(ts.error[0], delta.Get(0), EPSILON) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], delta.Get(0))
@@ -367,7 +367,7 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 func TestBackpropagateError(t *testing.T) {
 	network := CreateTestNetwork2()
 	mb := CreateMiniBatch([]int{7, 12})
-	network.SetActivation(LinAlg.MakeVector([]float64{0.32, 0.56}), 0, &mb)
+	mb.a[0] = *LinAlg.MakeVector([]float64{0.32, 0.56})
 	costFunction := QuadraticCostFunction{}
 	network.Feedforward(&mb)
 	costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector([]float64{1, 0}), &mb)
@@ -413,7 +413,7 @@ func TestTrain(t *testing.T) {
 	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 0, 10, QuadraticCostFunction{})
 
 	mb := CreateMiniBatch([]int{12, 7})
-	network.SetInputActivations(LinAlg.MakeVector([]float64{0.34, 0.43}), &mb)
+	mb.a[0] = *LinAlg.MakeVector([]float64{0.34, 0.43})
 	network.Feedforward(&mb)
 
 	// Assert
@@ -438,7 +438,7 @@ func TestSingleNeuronQuadraticCostTrain(t *testing.T) {
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, 0, 10, QuadraticCostFunction{})
 
-	network.SetInputActivations(ts[0].InputActivations, &mb)
+	mb.a[0] = ts[0].InputActivations
 	network.Feedforward(&mb)
 
 	// Assert
@@ -458,7 +458,7 @@ func TestSingleNeuronCrossEntropyCostTrain(t *testing.T) {
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.5, 0, 10, CrossEntropyCostFunction{})
 
-	network.SetInputActivations(ts[0].InputActivations, &mb)
+	mb.a[0] = ts[0].InputActivations
 	network.Feedforward(&mb)
 
 	// Assert
@@ -482,10 +482,10 @@ func TestTrainWithMNIST(t *testing.T) {
 
 	mb := CreateMiniBatch(network.GetLayers())
 	for index := 0; index < len(ts2); index++ {
-		network.SetInputActivations(ts2[index].InputActivations, &mb)
+		mb.a[0] = ts2[index].InputActivations
 		network.Feedforward(&mb)
 		as := network.GetOutputLayerActivations(&mb)
-		expectedClass := GetClass(ts2[index].OutputActivations)
+		expectedClass := GetClass(&ts2[index].OutputActivations)
 		fmt.Printf("should %d: %v\n", expectedClass, as)
 	}
 }

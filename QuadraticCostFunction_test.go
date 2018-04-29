@@ -114,13 +114,13 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
-	network.SetInputActivations(ts[0].InputActivations, &mb)
+	mb.a[0] = ts[0].InputActivations
 	network.Feedforward(&mb)
-	costFunction.CalculateErrorInOutputLayer(&network, ts[0].OutputActivations, &mb)
+	costFunction.CalculateErrorInOutputLayer(&network, &ts[0].OutputActivations, &mb)
 
 	C := func(z *LinAlg.Vector) float64 {
 		a := z.F(Sigmoid)
-		return 0.5 * a.DotProduct(a)
+		return 0.5 * a.DotProduct(*a)
 	}
 	delta := 0.000001
 	z_j := mb.z[0]

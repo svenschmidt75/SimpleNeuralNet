@@ -50,16 +50,16 @@ func (m *Matrix) GobDecode(buf []byte) error {
 	return decoder.Decode(&m.data)
 }
 
-func MakeMatrix(rows int, cols int, data []float64) Matrix {
+func MakeMatrix(rows int, cols int, data []float64) *Matrix {
 	if size := rows * cols; size != len(data) {
 		panic(fmt.Sprintf("LinAlg.Matrix.MakeMatrix: Matrix data has size %d, but %d expected", len(data), size))
 	}
-	return Matrix{Rows: rows, Cols: cols, data: data}
+	return &Matrix{Rows: rows, Cols: cols, data: data}
 }
 
-func MakeEmptyMatrix(rows int, cols int) Matrix {
+func MakeEmptyMatrix(rows int, cols int) *Matrix {
 	size := rows * cols
-	return Matrix{Rows: rows, Cols: cols, data: make([]float64, size)}
+	return &Matrix{Rows: rows, Cols: cols, data: make([]float64, size)}
 }
 
 func (m *Matrix) index(row int, col int) int {
@@ -76,7 +76,7 @@ func (m *Matrix) Get(row int, col int) float64 {
 	return m.data[idx]
 }
 
-func (m Matrix) Transpose() Matrix {
+func (m *Matrix) Transpose() *Matrix {
 	t := MakeEmptyMatrix(m.Cols, m.Rows)
 	for row := 0; row < m.Rows; row++ {
 		for col := 0; col < m.Cols; col++ {
@@ -87,7 +87,7 @@ func (m Matrix) Transpose() Matrix {
 	return t
 }
 
-func (m *Matrix) Ax(v Vector) Vector {
+func (m *Matrix) Ax(v *Vector) *Vector {
 	if m.Cols != v.Size() {
 		panic(fmt.Sprintf("LinAlg.Matrix.Ax: Matrix number of columns %d must equal vector size %d", m.Cols, v.Size()))
 	}
@@ -102,7 +102,7 @@ func (m *Matrix) Ax(v Vector) Vector {
 	return result
 }
 
-func (m *Matrix) Am(other Matrix) Matrix {
+func (m *Matrix) Am(other *Matrix) *Matrix {
 	if m.Cols != other.Rows {
 		panic(fmt.Sprint("LinAlg.Matrix.Am: Matrices not compatible"))
 	}
@@ -119,13 +119,14 @@ func (m *Matrix) Am(other Matrix) Matrix {
 	return result
 }
 
-func (m *Matrix) ScalarMultiplication(scalar float64) {
+func (m *Matrix) Scalar(scalar float64) *Matrix {
 	for idx := range m.data {
 		m.data[idx] *= scalar
 	}
+	return m
 }
 
-func (m *Matrix) Add(other Matrix) {
+func (m *Matrix) Add(other *Matrix) {
 	if m.Rows != other.Rows {
 		panic(fmt.Sprintf("LinAlg.Matrix.Add: Matrix number of rows %d and %d must equal", m.Rows, other.Rows))
 	}
