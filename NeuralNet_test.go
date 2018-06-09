@@ -83,7 +83,7 @@ func CreateTestNetwork() (Network, Minibatch) {
 	network.GetBias(2).Set(0, 4)
 	network.GetBias(2).Set(1, 5)
 
-	mb := CreateMiniBatch([]int{7, 12})
+	mb := CreateMiniBatch([]int{2, 3, 2})
 	mb.a[0].Set(0, 1)
 	mb.a[0].Set(1, 2)
 
