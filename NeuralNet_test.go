@@ -32,10 +32,10 @@ func TestNumberOfWeights(t *testing.T) {
 		for idx, dim := range item.ndims {
 			w := network.GetWeights(idx + 1)
 			if w.Rows != dim[0] {
-				t.Errorf("Expected %d rows for weight matrix in index %d, but is %d", dim[0], idx+1, w.Rows)
+				t.Errorf("Expected %d rows for weight matrix in layer %d, but is %d", dim[0], idx+1, w.Rows)
 			}
 			if w.Cols != dim[1] {
-				t.Errorf("Expected %d cols for weight matrix in index %d, but is %d", dim[1], idx+1, w.Cols)
+				t.Errorf("Expected %d cols for weight matrix in layer %d, but is %d", dim[1], idx+1, w.Cols)
 			}
 		}
 	}
@@ -43,20 +43,21 @@ func TestNumberOfWeights(t *testing.T) {
 
 func TestNumberOfBiases(t *testing.T) {
 	tables := []struct {
-		xs       []int
-		nBiases  int
-		nWeights int
+		xs      []int
+		nBiases []int
 	}{
-		{[]int{1, 1, 1}, 2, 2},
-		{[]int{2, 1, 2}, 3, 4},
-		{[]int{2, 3, 2}, 5, 12},
+		{[]int{1, 1, 1}, []int{1, 1}},
+		{[]int{2, 1, 2}, []int{1, 2}},
+		{[]int{2, 3, 2}, []int{3, 2}},
 	}
 
 	for _, item := range tables {
 		network := CreateNetwork(item.xs)
-		nBiases := len(network.biases)
-		if nBiases != item.nBiases {
-			t.Errorf("Expected 2, but is %v", nBiases)
+		for idx, nBias := range item.nBiases {
+			b := network.GetBias(idx + 1)
+			if b.Size() != nBias {
+				t.Errorf("Expected %d rows for bias vector in layer %d, but is %d", nBias, idx+1, b.Size())
+			}
 		}
 	}
 }

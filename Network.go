@@ -85,7 +85,7 @@ func createWeightMatrices(layers []int) []LinAlg.Matrix {
 func createBiasVector(layers []int) []LinAlg.Vector {
 	result := make([]LinAlg.Vector, len(layers))
 	for idx, nNodes := range layers[1:] {
-		result[idx] = *LinAlg.MakeEmptyVector(nNodes)
+		result[idx+1] = *LinAlg.MakeEmptyVector(nNodes)
 	}
 	return result
 }
