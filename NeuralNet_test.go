@@ -214,6 +214,7 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 
 	for _, ts := range tables {
 		mb.a[outputLayerIdx] = *LinAlg.MakeVector(ts.initialOutputActivations)
+		network.CalculateZ(outputLayerIdx, &mb)
 		costFunction.CalculateErrorInOutputLayer(&network, LinAlg.MakeVector(ts.expectedOutputActivations), &mb)
 		if delta := mb.delta[outputLayerIdx]; floatEquals(ts.error[0], delta.Get(0), EPSILON) == false {
 			t.Errorf("Expected %v, but was %v", ts.error[0], delta.Get(0))

@@ -87,7 +87,7 @@ func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Netw
 func (QuadraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {
 	// Equation (BP1) and (30), Chapter 2 of http://neuralnetworksanddeeplearning.com
 	outputLayerIdx := n.getOutputLayerIndex()
-	n.CalculateZ(outputLayerIdx, mb)
+	// Note: We assume that the output layer z has already been calculated in the feedforward step
 	delta := LinAlg.SubtractVectors(&mb.a[outputLayerIdx], outputActivations).Hadamard(mb.z[outputLayerIdx].F(SigmoidPrime))
 	mb.delta[outputLayerIdx] = *delta
 }
