@@ -227,7 +227,7 @@ func TestCalculateErrorInOutputLayer(t *testing.T) {
 
 func TestBackpropagateError(t *testing.T) {
 	network := CreateTestNetwork2()
-	mb := CreateMiniBatch([]int{7, 12})
+	mb := CreateMiniBatch([]int{2, 3, 2})
 	mb.a[0] = *LinAlg.MakeVector([]float64{0.32, 0.56})
 	costFunction := QuadraticCostFunction{}
 	network.Feedforward(&mb)
