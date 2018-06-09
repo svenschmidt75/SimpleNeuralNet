@@ -10,9 +10,9 @@ import (
 func TestQuadraticCostDerivativeWeightNumerical(t *testing.T) {
 	// Arrange
 	network := new(Network)
-	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
+	err := Utility.ReadGobFromFile("./54000_30_3_25 - 28^2 x 200 x 10_CE.gob", network)
 	if err != nil {
-		t.Error("Error deserializing network")
+		t.Fatal("Error deserializing network")
 	}
 	costFunction := QuadraticCostFunction{}
 	var lambda float64

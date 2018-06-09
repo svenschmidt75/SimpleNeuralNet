@@ -255,7 +255,13 @@ func (n *Network) Train(trainingSamples []MNISTImport.TrainingSample, validation
 	nMiniBatches := len(trainingSamples) / sizeMiniBatch
 	mbs := CreateMiniBatches(sizeMiniBatch, n.GetLayers())
 
-	fmt.Printf("\nTraining batch size: %d\n", len(trainingSamples))
+	configuration := ""
+	for i := 0; i < len(n.nodes)-1; i++ {
+		configuration += fmt.Sprintf("%d x ", n.nodes[i])
+	}
+	configuration += fmt.Sprintf("%d\n", n.nodes[len(n.nodes)-1])
+	fmt.Print("\nNetwork configuration: ", configuration)
+	fmt.Printf("Training batch size: %d\n", len(trainingSamples))
 	fmt.Printf("Validation batch size: %d\n", len(validationSamples))
 	fmt.Printf("Minibatch size: %d\n", sizeMiniBatch)
 	fmt.Printf("Number of minibatches: %d\n", nMiniBatches)

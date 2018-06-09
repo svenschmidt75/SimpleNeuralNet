@@ -19,20 +19,24 @@ func TestSigmoid(t *testing.T) {
 
 func TestNumberOfWeights(t *testing.T) {
 	tables := []struct {
-		xs       []int
-		nBiases  int
-		nWeights int
+		xs    []int
+		ndims [][]int
 	}{
-		{[]int{1, 1, 1}, 2, 2},
-		{[]int{2, 1, 2}, 3, 4},
-		{[]int{2, 3, 2}, 5, 12},
+		{[]int{1, 1, 1}, [][]int{{1, 1}, {1, 1}}},
+		{[]int{2, 1, 2}, [][]int{{1, 2}, {2, 1}}},
+		{[]int{2, 3, 2}, [][]int{{3, 2}, {2, 3}}},
 	}
 
 	for _, item := range tables {
 		network := CreateNetwork(item.xs)
-		nWeights := len(network.weights)
-		if nWeights != item.nWeights {
-			t.Errorf("Expected 2, but is %v", nWeights)
+		for idx, dim := range item.ndims {
+			w := network.GetWeights(idx + 1)
+			if w.Rows != dim[0] {
+				t.Errorf("Expected %d rows for weight matrix in index %d, but is %d", dim[0], idx+1, w.Rows)
+			}
+			if w.Cols != dim[1] {
+				t.Errorf("Expected %d cols for weight matrix in index %d, but is %d", dim[1], idx+1, w.Cols)
+			}
 		}
 	}
 }
