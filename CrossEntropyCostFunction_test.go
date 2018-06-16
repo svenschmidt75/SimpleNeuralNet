@@ -128,7 +128,7 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 			aj := a.Get(j)
 			var term float64
 			term = yj*math.Log(aj) + (1-yj)*math.Log(1-aj)
-			cost += term
+			cost -= term
 		}
 		return cost
 	}
@@ -137,7 +137,7 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	z_j := mb.z[1]
 	z_j.Set(0, z_j.Get(0)-delta)
 	c1 := C(&z_j, y)
-	z_j.Set(0, z_j.Get(0)+delta)
+	z_j.Set(0, z_j.Get(0)+2*delta)
 	c2 := C(&z_j, y)
 	dCdb_numeric := (c2 - c1) / 2 / delta
 

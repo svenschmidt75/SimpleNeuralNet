@@ -107,7 +107,7 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	network := CreateNetwork([]int{1, 1})
 	network.GetWeights(1).Set(0, 0, 2)
 	network.GetBias(1).Set(0, 2)
-	mb := CreateMiniBatch([]int{2})
+	mb := CreateMiniBatch([]int{1, 1})
 	mb.a[0].Set(0, 1)
 	costFunction := QuadraticCostFunction{}
 	lambda := float64(1)
@@ -123,10 +123,11 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 		return 0.5 * a.DotProduct(a)
 	}
 	delta := 0.000001
+	network.CalculateZ(1, &mb)
 	z_j := mb.z[0]
 	z_j.Set(0, z_j.Get(0)-delta)
 	c1 := C(&z_j)
-	z_j.Set(0, z_j.Get(0)+delta)
+	z_j.Set(0, z_j.Get(0)+2*delta)
 	c2 := C(&z_j)
 	dCdb_numeric := (c2 - c1) / 2 / delta
 
