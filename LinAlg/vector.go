@@ -84,7 +84,7 @@ func (v *Vector) Add(v2 *Vector) *Vector {
 	if v.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v.Size(), v2.Size()))
 	}
-	binopVectors(v, v2, func(e1 float64, e2 float64) float64 {
+	*v = *binopVectors(v, v2, func(e1 float64, e2 float64) float64 {
 		return e1 + e2
 	})
 	return v
@@ -94,16 +94,17 @@ func (v *Vector) Sub(v2 *Vector) *Vector {
 	if v.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Sub: Vector sizes %d and %d must be the same", v.Size(), v2.Size()))
 	}
-	binopVectors(v, v2, func(e1 float64, e2 float64) float64 {
+	*v = *binopVectors(v, v2, func(e1 float64, e2 float64) float64 {
 		return e1 - e2
 	})
 	return v
 }
 
-func (v *Vector) Scalar(scalar float64) {
+func (v *Vector) Scalar(scalar float64) *Vector {
 	for idx := range v.data {
 		v.data[idx] *= scalar
 	}
+	return v
 }
 
 func (v *Vector) F(f func(float64) float64) *Vector {

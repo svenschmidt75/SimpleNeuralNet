@@ -236,17 +236,10 @@ func (n *Network) UpdateNetwork(eta float32, lambda float64, dw []LinAlg.Matrix,
 			continue
 		}
 		w := n.GetWeights(layer)
-		w.Scalar(1 - float64(eta)*lambda/float64(nTrainingSamples))
-		tmp2 := dw[layer]
-		tmp2.Scalar(float64(eta))
-		w.Sub(&tmp2)
-		n.SetWeights(layer, w)
+		n.SetWeights(layer, w.Scalar(1-float64(eta)*lambda/float64(nTrainingSamples)).Sub(dw[layer].Scalar(float64(eta))))
 
 		b := n.GetBias(layer)
-		tmp3 := db[layer]
-		tmp3.Scalar(-float64(eta))
-		LinAlg.SubtractVectors(b, &tmp3)
-		n.SetBias(layer, b)
+		n.SetBias(layer, b.Sub(db[layer].Scalar(-float64(eta))))
 	}
 }
 

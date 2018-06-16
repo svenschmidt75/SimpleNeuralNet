@@ -126,7 +126,7 @@ func (m *Matrix) Scalar(scalar float64) *Matrix {
 	return m
 }
 
-func (m *Matrix) Add(other *Matrix) {
+func (m *Matrix) Add(other *Matrix) *Matrix {
 	if m.Rows != other.Rows {
 		panic(fmt.Sprintf("LinAlg.Matrix.Add: Matrix number of rows %d and %d must equal", m.Rows, other.Rows))
 	}
@@ -141,9 +141,10 @@ func (m *Matrix) Add(other *Matrix) {
 			m.Set(row, col, value)
 		}
 	}
+	return m
 }
 
-func (m *Matrix) Sub(other *Matrix) {
+func (m *Matrix) Sub(other *Matrix) *Matrix {
 	if m.Rows != other.Rows {
 		panic(fmt.Sprintf("LinAlg.Matrix.Sub: Matrix number of rows %d and %d must equal", m.Rows, other.Rows))
 	}
@@ -158,4 +159,5 @@ func (m *Matrix) Sub(other *Matrix) {
 			m.Set(row, col, value)
 		}
 	}
+	return m
 }
