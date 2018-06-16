@@ -124,7 +124,7 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	}
 	delta := 0.000001
 	network.CalculateZ(1, &mb)
-	z_j := mb.z[0]
+	z_j := mb.z[1]
 	z_j.Set(0, z_j.Get(0)-delta)
 	c1 := C(&z_j)
 	z_j.Set(0, z_j.Get(0)+2*delta)
