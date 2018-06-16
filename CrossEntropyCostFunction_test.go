@@ -13,7 +13,7 @@ func TestCrossEntropyCostDerivativeWeightNumerical(t *testing.T) {
 	network := new(Network)
 	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
-		t.Error("Error deserializing network")
+		t.Fatal("Error deserializing network")
 	}
 	costFunction := CrossEntropyCostFunction{}
 	var lambda float64
@@ -61,7 +61,7 @@ func TestCrossEntropyCostDerivativeBiasNumerical(t *testing.T) {
 	network := new(Network)
 	err := Utility.ReadGobFromFile("./50000_30_3_10.gob", network)
 	if err != nil {
-		t.Error("Error deserializing network")
+		t.Fatal("Error deserializing network")
 	}
 	costFunction := CrossEntropyCostFunction{}
 	var lambda float64

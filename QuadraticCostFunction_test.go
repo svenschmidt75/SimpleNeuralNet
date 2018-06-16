@@ -110,7 +110,7 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 	mb := CreateMiniBatch([]int{1, 1})
 	mb.a[0].Set(0, 1)
 	costFunction := QuadraticCostFunction{}
-	lambda := float64(1)
+	lambda := float64(0)
 
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{1}), LinAlg.MakeVector([]float64{0}))}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 300, 0.15, lambda, 10, costFunction)
