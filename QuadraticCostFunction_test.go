@@ -120,7 +120,7 @@ func TestQuadraticCostErrorOutputLayerNumerically(t *testing.T) {
 
 	C := func(z *LinAlg.Vector) float64 {
 		a := z.F(Sigmoid)
-		return 0.5 * a.DotProduct(*a)
+		return 0.5 * a.DotProduct(a)
 	}
 	delta := 0.000001
 	z_j := mb.z[0]

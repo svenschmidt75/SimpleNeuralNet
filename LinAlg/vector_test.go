@@ -12,7 +12,7 @@ func Test_Dotproduct(t *testing.T) {
 	v2 := MakeVector([]float64{3, 4})
 
 	// Act
-	dp := v1.DotProduct(&v2)
+	dp := v1.DotProduct(v2)
 
 	// Assert
 	var expected float64 = 11
@@ -27,7 +27,7 @@ func Test_Hadamard(t *testing.T) {
 	v2 := MakeVector([]float64{-5, -9})
 
 	// Act
-	r := v1.Hadamard(&v2)
+	r := v1.Hadamard(v2)
 
 	// Assert
 	if r.Size() != 2 {
@@ -65,7 +65,7 @@ func TestVectorSerialization(t *testing.T) {
 
 	// Act
 	var buf bytes.Buffer
-	err := Utility.WriteGob(&buf, &v1)
+	err := Utility.WriteGob(&buf, v1)
 	if err != nil {
 		t.Errorf("Error serializing vector")
 	}

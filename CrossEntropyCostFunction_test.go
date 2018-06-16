@@ -108,7 +108,7 @@ func TestCrossEntropyErrorOutputLayerNumerically(t *testing.T) {
 	network := CreateNetwork([]int{1, 1})
 	network.GetWeights(1).Set(0, 0, 2)
 	network.GetBias(1).Set(0, 2)
-	mb := CreateMiniBatch([]int{2})
+	mb := CreateMiniBatch([]int{1, 1})
 	mb.a[0].Set(0, 1)
 	costFunction := CrossEntropyCostFunction{}
 	lambda := float64(1)

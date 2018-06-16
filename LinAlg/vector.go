@@ -53,7 +53,7 @@ func (v *Vector) Get(index int) float64 {
 	return v.data[index]
 }
 
-func (v *Vector) DotProduct(v2 Vector) float64 {
+func (v *Vector) DotProduct(v2 *Vector) float64 {
 	if v.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.DotProduct: Vector sizes %d and %d must be the same", v.Size(), v2.Size()))
 	}

@@ -19,7 +19,7 @@ func Test_AddVectors(t *testing.T) {
 	v2 := MakeVector([]float64{3, 4})
 
 	// Act
-	r := AddVectors(&v1, &v2)
+	r := AddVectors(v1, v2)
 
 	// Assert
 	if expected := float64(4); floatEquals(r.Get(0), expected, EPSILON) == false {
@@ -36,7 +36,7 @@ func Test_SubtractVectors(t *testing.T) {
 	v2 := MakeVector([]float64{3, 4})
 
 	// Act
-	r := SubtractVectors(&v1, &v2)
+	r := SubtractVectors(v1, v2)
 
 	// Assert
 	if expected := float64(-2); floatEquals(r.Get(0), expected, EPSILON) == false {

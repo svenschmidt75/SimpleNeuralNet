@@ -12,7 +12,7 @@ func Test_MatrixVectorMultiplication(t *testing.T) {
 	m := MakeMatrix(1, 2, []float64{3, 4})
 
 	// Act
-	r := m.Ax(&v)
+	r := m.Ax(v)
 
 	// Assert
 	if r.Size() != 1 {
@@ -29,7 +29,7 @@ func Test_MatrixVectorMultiplication2(t *testing.T) {
 	m := MakeMatrix(2, 2, []float64{3, 4, -2, -9})
 
 	// Act
-	r := m.Ax(&v)
+	r := m.Ax(v)
 
 	// Assert
 	if r.Size() != 2 {
@@ -38,7 +38,7 @@ func Test_MatrixVectorMultiplication2(t *testing.T) {
 	if expected := float64(11); floatEquals(r.Get(0), expected, EPSILON) == false {
 		t.Errorf("Matrix-Vector multiplication error, %f != %f", expected, r.Get(0))
 	}
-	if expected := float64(16); floatEquals(r.Get(1), expected, EPSILON) == false {
+	if expected := float64(-20); floatEquals(r.Get(1), expected, EPSILON) == false {
 		t.Errorf("Matrix-Vector multiplication error, %f != %f", expected, r.Get(1))
 	}
 }
@@ -83,7 +83,7 @@ func TestMatrixSerialization(t *testing.T) {
 
 	// Act
 	var buf bytes.Buffer
-	err := Utility.WriteGob(&buf, &m1)
+	err := Utility.WriteGob(&buf, m1)
 	if err != nil {
 		t.Errorf("Error serializing matrix")
 	}
