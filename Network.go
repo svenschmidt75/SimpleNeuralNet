@@ -212,12 +212,13 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Matrix, []LinA
 		}
 
 		i := n.nodes[layer]
-		dCdw := LinAlg.MakeEmptyMatrix(i, i)
+		j := n.nodes[layer-1]
+		dCdw := LinAlg.MakeEmptyMatrix(i, j)
 		dCdb := LinAlg.MakeEmptyVector(i)
 		for mbIdx := range mbs {
 			mb := mbs[mbIdx]
 			delta := mb.delta[layer]
-			tmp := LinAlg.OuterProduct(&mb.a[layer-1], &delta)
+			tmp := LinAlg.OuterProduct(&delta, &mb.a[layer-1])
 			dCdw.Add(tmp)
 			dCdb.Add(&delta)
 		}

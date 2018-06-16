@@ -273,7 +273,7 @@ func TestTrain(t *testing.T) {
 	ts := []MNISTImport.TrainingSample{MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{0.34, 0.43}), LinAlg.MakeVector([]float64{0, 1})), MNISTImport.CreateTrainingSample(LinAlg.MakeVector([]float64{0.14, 0.03}), LinAlg.MakeVector([]float64{0, 1}))}
 	network.Train(ts, []MNISTImport.TrainingSample{}, 2, 0.001, 0, 10, QuadraticCostFunction{})
 
-	mb := CreateMiniBatch([]int{12, 7})
+	mb := CreateMiniBatch([]int{2, 3, 2})
 	mb.a[0] = *LinAlg.MakeVector([]float64{0.34, 0.43})
 	network.Feedforward(&mb)
 
