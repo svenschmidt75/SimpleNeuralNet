@@ -218,14 +218,12 @@ func (n *Network) CalculateDerivatives(mbs []Minibatch) ([]LinAlg.Matrix, []LinA
 		for mbIdx := range mbs {
 			mb := mbs[mbIdx]
 			delta := mb.delta[layer]
+			dCdb.Add(&delta)
 			tmp := LinAlg.OuterProduct(&delta, &mb.a[layer-1])
 			dCdw.Add(tmp)
-			dCdb.Add(&delta)
 		}
-		dCdw.Scalar(1 / float64(nMiniBatches))
-		dw[layer] = *dCdw
-		dCdb.Scalar(1 / float64(nMiniBatches))
-		db[layer] = *dCdb
+		dw[layer] = *dCdw.Scalar(1 / float64(nMiniBatches))
+		db[layer] = *dCdb.Scalar(1 / float64(nMiniBatches))
 	}
 	return dw, db
 }
@@ -236,10 +234,12 @@ func (n *Network) UpdateNetwork(eta float32, lambda float64, dw []LinAlg.Matrix,
 			continue
 		}
 		w := n.GetWeights(layer)
-		n.SetWeights(layer, w.Scalar(1-float64(eta)*lambda/float64(nTrainingSamples)).Sub(dw[layer].Scalar(float64(eta))))
+		updatedWeight := w.Scalar(1 - float64(eta)*lambda/float64(nTrainingSamples)).Sub(dw[layer].Scalar(float64(eta)))
+		n.SetWeights(layer, updatedWeight)
 
 		b := n.GetBias(layer)
-		n.SetBias(layer, b.Add(db[layer].Scalar(-float64(eta))))
+		updatedBias := b.Add(db[layer].Scalar(-float64(eta)))
+		n.SetBias(layer, updatedBias)
 	}
 }
 
