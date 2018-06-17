@@ -66,27 +66,15 @@ func (v *Vector) DotProduct(v2 *Vector) float64 {
 	return d
 }
 
-func binopVectors(v1 *Vector, v2 *Vector, binop func(float64, float64) float64) *Vector {
-	if v1.Size() != v2.Size() {
-		panic(fmt.Sprintf("LinAlg.AddVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
-	}
-	result := MakeEmptyVector(v1.Size())
-	for i := 0; i < v1.Size(); i++ {
-		e1 := v1.Get(i)
-		e2 := v2.Get(i)
-		r := binop(e1, e2)
-		result.Set(i, r)
-	}
-	return result
-}
-
 func (v *Vector) Add(v2 *Vector) *Vector {
 	if v.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Add: Vector sizes %d and %d must be the same", v.Size(), v2.Size()))
 	}
-	*v = *binopVectors(v, v2, func(e1 float64, e2 float64) float64 {
-		return e1 + e2
-	})
+	for idx := range v.data {
+		e1 := v.data[idx]
+		e2 := v2.data[idx]
+		v.data[idx] = e1 + e2
+	}
 	return v
 }
 
@@ -94,9 +82,11 @@ func (v *Vector) Sub(v2 *Vector) *Vector {
 	if v.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.Vector.Sub: Vector sizes %d and %d must be the same", v.Size(), v2.Size()))
 	}
-	*v = *binopVectors(v, v2, func(e1 float64, e2 float64) float64 {
-		return e1 - e2
-	})
+	for idx := range v.data {
+		e1 := v.data[idx]
+		e2 := v2.data[idx]
+		v.data[idx] = e1 - e2
+	}
 	return v
 }
 

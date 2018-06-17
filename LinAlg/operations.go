@@ -6,18 +6,26 @@ func AddVectors(v1 *Vector, v2 *Vector) *Vector {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.AddVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
-	return binopVectors(v1, v2, func(e1 float64, e2 float64) float64 {
-		return e1 + e2
-	})
+	result := MakeEmptyVector(v1.Size())
+	for idx := range result.data {
+		e1 := v1.data[idx]
+		e2 := v2.data[idx]
+		result.data[idx] = e1 + e2
+	}
+	return result
 }
 
 func SubtractVectors(v1 *Vector, v2 *Vector) *Vector {
 	if v1.Size() != v2.Size() {
 		panic(fmt.Sprintf("LinAlg.SubVectors: Vector sizes %d and %d must be the same", v1.Size(), v2.Size()))
 	}
-	return binopVectors(v1, v2, func(e1 float64, e2 float64) float64 {
-		return e1 - e2
-	})
+	result := MakeEmptyVector(v1.Size())
+	for idx := range result.data {
+		e1 := v1.data[idx]
+		e2 := v2.data[idx]
+		result.data[idx] = e1 - e2
+	}
+	return result
 }
 
 func OuterProduct(v1 *Vector, v2 *Vector) *Matrix {
