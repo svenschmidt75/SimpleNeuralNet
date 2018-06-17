@@ -30,7 +30,7 @@ func (QuadraticCostFunction) Evaluate(network *Network, lambda float64, training
 	cost /= fac
 
 	// add the regularization term
-	l2 := weightsSquared(network)
+	l2 := network.weightsSquared()
 	l2 *= lambda / fac
 	return cost + l2
 }

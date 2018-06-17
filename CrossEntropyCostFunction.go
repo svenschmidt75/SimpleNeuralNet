@@ -38,23 +38,9 @@ func (CrossEntropyCostFunction) Evaluate(network *Network, lambda float64, train
 	cost /= -float64(len(trainingSamples))
 
 	// add the regularization term
-	l2 := weightsSquared(network)
+	l2 := network.weightsSquared()
 	l2 *= lambda / float64(2*len(trainingSamples))
 	return cost + l2
-}
-
-func weightsSquared(n *Network) float64 {
-	var l2 float64
-	for layer := range n.GetLayers() {
-		w := n.GetWeights(layer)
-		for row := 0; row < w.Rows; row++ {
-			for col := 0; col < w.Cols; col++ {
-				v := w.Get(row, col)
-				l2 += v
-			}
-		}
-	}
-	return l2
 }
 
 func calculateDeltaCrossEntropy(layer int, n *Network, mb *Minibatch, ts *MNISTImport.TrainingSample) *LinAlg.Vector {

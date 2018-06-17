@@ -114,6 +114,20 @@ func (n *Network) SetWeights(layer int, w *LinAlg.Matrix) {
 	n.weights[layer] = *w
 }
 
+func (n *Network) weightsSquared() float64 {
+	var l2 float64
+	for layer := range n.GetLayers() {
+		w := n.GetWeights(layer)
+		for row := 0; row < w.Rows; row++ {
+			for col := 0; col < w.Cols; col++ {
+				v := w.Get(row, col)
+				l2 += v * v
+			}
+		}
+	}
+	return l2
+}
+
 func (n *Network) GetOutputLayerActivations(mb *Minibatch) *LinAlg.Vector {
 	idx := n.getOutputLayerIndex()
 	return &mb.a[idx]
