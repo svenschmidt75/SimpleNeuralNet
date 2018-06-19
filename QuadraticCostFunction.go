@@ -50,7 +50,7 @@ func (QuadraticCostFunction) GradBias(layer int, network *Network, trainingSampl
 	if layer == 0 {
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
-	var delta LinAlg.Vector
+	delta := LinAlg.MakeEmptyVector(network.GetLayers()[layer])
 	mb := CreateMiniBatch(network.GetLayers())
 	for _, x := range trainingSamples {
 		mb.a[0] = x.InputActivations
@@ -59,20 +59,20 @@ func (QuadraticCostFunction) GradBias(layer int, network *Network, trainingSampl
 		delta.Add(delta_j)
 	}
 	delta.Scalar(1 / float64(len(trainingSamples)))
-	return &delta
+	return delta
 }
 
 func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Network, trainingSamples []MNISTImport.TrainingSample) *LinAlg.Matrix {
 	if layer == 0 {
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
-	var dCdw LinAlg.Matrix
+	dCdw := LinAlg.MakeEmptyMatrix(network.GetLayers()[layer], network.GetLayers()[layer-1])
 	mb := CreateMiniBatch(network.GetLayers())
 	for _, x := range trainingSamples {
 		mb.a[0] = x.InputActivations
 		network.Feedforward(&mb)
 		delta_j := calculateDeltaCost(layer, network, &mb, &x)
-		tmp := LinAlg.OuterProduct(&mb.a[layer-1], delta_j)
+		tmp := LinAlg.OuterProduct(delta_j, &mb.a[layer-1])
 		dCdw.Add(tmp)
 	}
 	dCdw.Scalar(1 / float64(len(trainingSamples)))
@@ -81,7 +81,7 @@ func (QuadraticCostFunction) GradWeight(layer int, lambda float64, network *Netw
 	l2 := network.GetWeights(layer).Scalar(lambda / float64(len(trainingSamples)))
 	dCdw.Add(l2)
 
-	return &dCdw
+	return dCdw
 }
 
 func (QuadraticCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {

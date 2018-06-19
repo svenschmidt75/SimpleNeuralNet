@@ -59,7 +59,7 @@ func (CrossEntropyCostFunction) GradBias(layer int, network *Network, trainingSa
 	if layer == 0 {
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
-	var delta LinAlg.Vector
+	delta := LinAlg.MakeEmptyVector(network.GetLayers()[layer])
 	mb := CreateMiniBatch(network.GetLayers())
 	for _, x := range trainingSamples {
 		mb.a[0] = x.InputActivations
@@ -68,7 +68,7 @@ func (CrossEntropyCostFunction) GradBias(layer int, network *Network, trainingSa
 		delta.Add(delta_j)
 	}
 	delta.Scalar(1 / float64(len(trainingSamples)))
-	return &delta
+	return delta
 }
 
 func (CrossEntropyCostFunction) GradWeight(layer int, lambda float64, network *Network, trainingSamples []MNISTImport.TrainingSample) *LinAlg.Matrix {
@@ -76,13 +76,13 @@ func (CrossEntropyCostFunction) GradWeight(layer int, lambda float64, network *N
 	if layer == 0 {
 		panic(fmt.Sprintf("Layer must be > 0"))
 	}
-	var dCdw LinAlg.Matrix
+	dCdw := LinAlg.MakeEmptyMatrix(network.GetLayers()[layer], network.GetLayers()[layer-1])
 	mb := CreateMiniBatch(network.GetLayers())
 	for _, x := range trainingSamples {
 		mb.a[0] = x.InputActivations
 		network.Feedforward(&mb)
 		delta_j := calculateDeltaCrossEntropy(layer, network, &mb, &x)
-		tmp := LinAlg.OuterProduct(&mb.a[layer-1], delta_j)
+		tmp := LinAlg.OuterProduct(delta_j, &mb.a[layer-1])
 		dCdw.Add(tmp)
 	}
 	dCdw.Scalar(1 / float64(len(trainingSamples)))
@@ -91,7 +91,7 @@ func (CrossEntropyCostFunction) GradWeight(layer int, lambda float64, network *N
 	l2 := network.GetWeights(layer).Scalar(lambda / float64(len(trainingSamples)))
 	dCdw.Add(l2)
 
-	return &dCdw
+	return dCdw
 }
 
 func (CrossEntropyCostFunction) CalculateErrorInOutputLayer(n *Network, outputActivations *LinAlg.Vector, mb *Minibatch) {
