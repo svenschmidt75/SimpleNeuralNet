@@ -593,7 +593,7 @@ Accuracy: 0.977500
 54000_30_3_25 - 28^2 x 200 x 10
 ===============================
 
-04/24/18
+06/19/18
 
 1. Train neural network with MNIST data
 2. Run neural network on MNIST test data
@@ -605,247 +605,226 @@ Read 10000 test images
 Generating 54000 training samples...
 Generating 6000 validation samples...
 
+Network configuration: 784 x 200 x 10
 Training batch size: 54000
 Validation batch size: 6000
-Minibatch size: 10
-Number of minibatches: 5400
-Learning rate: 0.5
+Minibatch size: 25
+Number of minibatches: 2160
+Learning rate: 0.500000
 Cost function: Cross-Entropy
-L2 regularization: 2.0
+L2 regularization: 2.000000
 
-Epoch 1 - training accuracy 0.960519 - validation accuracy 0.958000 - cost 0.299400
-Epoch 2 - training accuracy 0.969093 - validation accuracy 0.960833 - cost 0.263938
-Epoch 3 - training accuracy 0.979333 - validation accuracy 0.967333 - cost 0.219235
-Epoch 4 - training accuracy 0.983704 - validation accuracy 0.976500 - cost 0.197628
-Epoch 5 - training accuracy 0.986315 - validation accuracy 0.972000 - cost 0.186496
-Epoch 6 - training accuracy 0.987463 - validation accuracy 0.973833 - cost 0.189337
-Epoch 7 - training accuracy 0.990167 - validation accuracy 0.978000 - cost 0.173142
-Epoch 8 - training accuracy 0.990259 - validation accuracy 0.978500 - cost 0.172558
-Epoch 9 - training accuracy 0.992722 - validation accuracy 0.977833 - cost 0.164229
-Epoch 10 - training accuracy 0.988593 - validation accuracy 0.972000 - cost 0.189566
-Epoch 11 - training accuracy 0.992722 - validation accuracy 0.979667 - cost 0.157173
-Epoch 12 - training accuracy 0.992741 - validation accuracy 0.974500 - cost 0.161541
-Epoch 13 - training accuracy 0.995222 - validation accuracy 0.979333 - cost 0.150766
-Epoch 14 - training accuracy 0.993981 - validation accuracy 0.979167 - cost 0.155500
-Epoch 15 - training accuracy 0.995593 - validation accuracy 0.980833 - cost 0.150347
-Epoch 16 - training accuracy 0.995907 - validation accuracy 0.980000 - cost 0.142327
-Epoch 17 - training accuracy 0.994130 - validation accuracy 0.974833 - cost 0.158805
-Epoch 18 - training accuracy 0.996259 - validation accuracy 0.979500 - cost 0.141659
-Epoch 19 - training accuracy 0.996389 - validation accuracy 0.979500 - cost 0.141273
-Epoch 20 - training accuracy 0.996370 - validation accuracy 0.980667 - cost 0.140710
-Epoch 21 - training accuracy 0.995963 - validation accuracy 0.980833 - cost 0.149332
-Epoch 22 - training accuracy 0.995519 - validation accuracy 0.977000 - cost 0.147120
-Epoch 23 - training accuracy 0.996537 - validation accuracy 0.980333 - cost 0.139043
-Epoch 24 - training accuracy 0.994611 - validation accuracy 0.978500 - cost 0.151577
-Epoch 25 - training accuracy 0.996685 - validation accuracy 0.977833 - cost 0.140194
-Epoch 26 - training accuracy 0.993759 - validation accuracy 0.978833 - cost 0.157511
-Epoch 27 - training accuracy 0.997019 - validation accuracy 0.978833 - cost 0.138093
-Epoch 28 - training accuracy 0.995537 - validation accuracy 0.977667 - cost 0.144893
-Epoch 29 - training accuracy 0.997352 - validation accuracy 0.982667 - cost 0.135469
-Epoch 30 - training accuracy 0.996259 - validation accuracy 0.981000 - cost 0.147829
+Epoch 1 - training accuracy 0.938704 - validation accuracy 0.931833 - cost 0.426045
+Epoch 2 - training accuracy 0.962259 - validation accuracy 0.952333 - cost 0.291324
+Epoch 3 - training accuracy 0.971574 - validation accuracy 0.961833 - cost 0.244818
+Epoch 4 - training accuracy 0.977556 - validation accuracy 0.965667 - cost 0.211376
+Epoch 5 - training accuracy 0.981981 - validation accuracy 0.968167 - cost 0.191988
+Epoch 6 - training accuracy 0.983500 - validation accuracy 0.971167 - cost 0.175939
+Epoch 7 - training accuracy 0.986278 - validation accuracy 0.971167 - cost 0.170238
+Epoch 8 - training accuracy 0.988944 - validation accuracy 0.975833 - cost 0.157493
+Epoch 9 - training accuracy 0.990852 - validation accuracy 0.974500 - cost 0.153069
+Epoch 10 - training accuracy 0.991648 - validation accuracy 0.976333 - cost 0.144623
+Epoch 11 - training accuracy 0.992426 - validation accuracy 0.976167 - cost 0.140509
+Epoch 12 - training accuracy 0.993259 - validation accuracy 0.975333 - cost 0.138027
+Epoch 13 - training accuracy 0.994241 - validation accuracy 0.976500 - cost 0.136359
+Epoch 14 - training accuracy 0.994130 - validation accuracy 0.976833 - cost 0.137973
+Epoch 15 - training accuracy 0.994352 - validation accuracy 0.977333 - cost 0.134222
+Epoch 16 - training accuracy 0.996222 - validation accuracy 0.978833 - cost 0.126268
+Epoch 17 - training accuracy 0.996593 - validation accuracy 0.978500 - cost 0.123391
+Epoch 18 - training accuracy 0.996926 - validation accuracy 0.977833 - cost 0.122384
+Epoch 19 - training accuracy 0.997111 - validation accuracy 0.979333 - cost 0.120918
+Epoch 20 - training accuracy 0.996667 - validation accuracy 0.978667 - cost 0.127245
+Epoch 21 - training accuracy 0.997556 - validation accuracy 0.977667 - cost 0.119100
+Epoch 22 - training accuracy 0.997704 - validation accuracy 0.977667 - cost 0.120435
+Epoch 23 - training accuracy 0.998093 - validation accuracy 0.979333 - cost 0.118163
+Epoch 24 - training accuracy 0.997963 - validation accuracy 0.978667 - cost 0.120261
+Epoch 25 - training accuracy 0.998222 - validation accuracy 0.978333 - cost 0.117301
+Epoch 26 - training accuracy 0.998167 - validation accuracy 0.979333 - cost 0.118854
+Epoch 27 - training accuracy 0.997907 - validation accuracy 0.979000 - cost 0.120324
+Epoch 28 - training accuracy 0.998185 - validation accuracy 0.979000 - cost 0.116742
+Epoch 29 - training accuracy 0.998759 - validation accuracy 0.979667 - cost 0.113881
+Epoch 30 - training accuracy 0.998796 - validation accuracy 0.980167 - cost 0.114253
 
 Generating 10000 training samples for test data...
-Image 247: is 4, classified as 2
-Image 259: is 6, classified as 0
+Image 247: is 4, classified as 6
 Image 321: is 2, classified as 7
 Image 340: is 5, classified as 3
 Image 445: is 6, classified as 0
 Image 449: is 3, classified as 5
-Image 495: is 8, classified as 0
+Image 495: is 8, classified as 2
 Image 551: is 7, classified as 1
 Image 582: is 8, classified as 2
-Image 583: is 2, classified as 8
-Image 605: is 7, classified as 9
-Image 613: is 2, classified as 8
-Image 619: is 1, classified as 8
-Image 628: is 3, classified as 9
 Image 646: is 2, classified as 6
+Image 659: is 2, classified as 8
 Image 684: is 7, classified as 3
 Image 691: is 8, classified as 4
 Image 720: is 5, classified as 8
 Image 740: is 4, classified as 9
-Image 846: is 7, classified as 9
-Image 947: is 8, classified as 9
+Image 844: is 8, classified as 7
+Image 938: is 3, classified as 5
 Image 951: is 5, classified as 4
 Image 956: is 1, classified as 2
-Image 965: is 6, classified as 5
+Image 965: is 6, classified as 0
+Image 982: is 3, classified as 2
 Image 1014: is 6, classified as 5
-Image 1039: is 7, classified as 2
-Image 1044: is 6, classified as 2
+Image 1044: is 6, classified as 8
 Image 1112: is 4, classified as 6
+Image 1114: is 3, classified as 8
 Image 1156: is 7, classified as 8
-Image 1191: is 0, classified as 7
-Image 1194: is 7, classified as 9
+Image 1182: is 6, classified as 8
 Image 1226: is 7, classified as 2
 Image 1232: is 9, classified as 4
 Image 1242: is 4, classified as 9
-Image 1247: is 9, classified as 3
+Image 1247: is 9, classified as 5
 Image 1260: is 7, classified as 1
 Image 1299: is 5, classified as 7
 Image 1319: is 8, classified as 3
-Image 1326: is 7, classified as 9
+Image 1326: is 7, classified as 1
 Image 1328: is 7, classified as 9
+Image 1337: is 2, classified as 6
+Image 1378: is 5, classified as 6
 Image 1393: is 5, classified as 3
-Image 1433: is 8, classified as 9
-Image 1494: is 7, classified as 0
-Image 1496: is 7, classified as 9
+Image 1414: is 9, classified as 7
 Image 1500: is 7, classified as 1
 Image 1522: is 7, classified as 9
+Image 1530: is 8, classified as 7
 Image 1549: is 4, classified as 6
-Image 1553: is 9, classified as 3
-Image 1559: is 9, classified as 3
-Image 1581: is 7, classified as 9
-Image 1609: is 2, classified as 3
+Image 1609: is 2, classified as 6
 Image 1678: is 2, classified as 0
 Image 1681: is 3, classified as 7
-Image 1721: is 7, classified as 4
-Image 1754: is 7, classified as 1
-Image 1878: is 8, classified as 3
+Image 1709: is 9, classified as 3
+Image 1717: is 8, classified as 0
+Image 1754: is 7, classified as 2
 Image 1901: is 9, classified as 4
 Image 1941: is 7, classified as 2
-Image 1987: is 0, classified as 9
-Image 2004: is 8, classified as 9
+Image 2016: is 7, classified as 2
 Image 2024: is 7, classified as 9
-Image 2033: is 0, classified as 4
 Image 2035: is 5, classified as 3
 Image 2044: is 2, classified as 7
-Image 2058: is 2, classified as 3
-Image 2070: is 7, classified as 1
+Image 2053: is 4, classified as 9
 Image 2093: is 8, classified as 1
-Image 2109: is 3, classified as 9
-Image 2118: is 6, classified as 4
+Image 2118: is 6, classified as 0
 Image 2130: is 4, classified as 9
 Image 2135: is 6, classified as 1
 Image 2182: is 1, classified as 2
 Image 2224: is 5, classified as 6
-Image 2299: is 2, classified as 8
-Image 2369: is 5, classified as 9
+Image 2266: is 1, classified as 6
+Image 2272: is 8, classified as 0
+Image 2293: is 9, classified as 0
+Image 2326: is 0, classified as 5
+Image 2369: is 5, classified as 3
 Image 2387: is 9, classified as 1
-Image 2408: is 3, classified as 9
-Image 2422: is 6, classified as 4
+Image 2462: is 2, classified as 0
 Image 2488: is 2, classified as 4
-Image 2526: is 5, classified as 3
-Image 2578: is 7, classified as 9
+Image 2607: is 7, classified as 1
 Image 2648: is 9, classified as 5
 Image 2654: is 6, classified as 1
 Image 2720: is 9, classified as 4
 Image 2771: is 4, classified as 9
 Image 2810: is 5, classified as 3
-Image 2877: is 4, classified as 7
+Image 2896: is 8, classified as 0
+Image 2907: is 4, classified as 9
+Image 2921: is 3, classified as 2
 Image 2927: is 3, classified as 2
 Image 2939: is 9, classified as 7
 Image 2953: is 3, classified as 5
+Image 3030: is 6, classified as 8
+Image 3060: is 9, classified as 1
 Image 3073: is 1, classified as 2
 Image 3117: is 5, classified as 9
 Image 3225: is 7, classified as 9
-Image 3289: is 8, classified as 3
-Image 3333: is 7, classified as 9
+Image 3289: is 8, classified as 9
+Image 3384: is 2, classified as 6
+Image 3405: is 4, classified as 9
 Image 3422: is 6, classified as 0
 Image 3503: is 9, classified as 1
-Image 3511: is 2, classified as 3
 Image 3520: is 6, classified as 4
-Image 3533: is 4, classified as 9
+Image 3549: is 3, classified as 2
 Image 3558: is 5, classified as 0
-Image 3559: is 8, classified as 5
 Image 3597: is 9, classified as 3
 Image 3751: is 7, classified as 3
 Image 3780: is 4, classified as 6
-Image 3818: is 0, classified as 6
+Image 3811: is 2, classified as 3
+Image 3818: is 0, classified as 4
 Image 3853: is 6, classified as 5
-Image 3871: is 8, classified as 3
 Image 3906: is 1, classified as 3
-Image 3941: is 4, classified as 2
+Image 3941: is 4, classified as 6
 Image 3976: is 7, classified as 1
 Image 3985: is 9, classified as 4
-Image 4027: is 7, classified as 1
-Image 4065: is 0, classified as 3
+Image 4007: is 7, classified as 4
+Image 4065: is 0, classified as 9
+Image 4075: is 8, classified as 0
 Image 4078: is 9, classified as 3
-Image 4163: is 9, classified as 0
 Image 4176: is 2, classified as 7
 Image 4199: is 7, classified as 9
 Image 4201: is 1, classified as 7
+Image 4224: is 9, classified as 7
 Image 4248: is 2, classified as 8
 Image 4289: is 2, classified as 7
+Image 4294: is 9, classified as 5
+Image 4306: is 3, classified as 7
+Image 4437: is 3, classified as 2
+Image 4443: is 3, classified as 2
+Image 4477: is 0, classified as 6
 Image 4497: is 8, classified as 7
 Image 4536: is 6, classified as 5
-Image 4571: is 6, classified as 8
 Image 4575: is 4, classified as 9
-Image 4578: is 7, classified as 9
 Image 4601: is 8, classified as 4
-Image 4620: is 6, classified as 2
-Image 4639: is 8, classified as 9
+Image 4635: is 3, classified as 5
 Image 4690: is 7, classified as 2
+Image 4731: is 8, classified as 7
 Image 4807: is 8, classified as 3
-Image 4814: is 6, classified as 4
 Image 4823: is 9, classified as 4
-Image 4860: is 4, classified as 9
-Image 4861: is 7, classified as 3
 Image 4880: is 0, classified as 8
 Image 4956: is 8, classified as 4
 Image 4966: is 7, classified as 9
-Image 5246: is 7, classified as 9
+Image 4990: is 3, classified as 2
 Image 5331: is 1, classified as 6
 Image 5457: is 1, classified as 8
-Image 5600: is 7, classified as 9
 Image 5642: is 1, classified as 5
-Image 5676: is 4, classified as 3
 Image 5734: is 3, classified as 2
-Image 5749: is 8, classified as 5
 Image 5887: is 7, classified as 0
-Image 5926: is 4, classified as 9
 Image 5936: is 4, classified as 9
 Image 5937: is 5, classified as 3
 Image 5955: is 3, classified as 8
-Image 5973: is 3, classified as 9
-Image 5982: is 5, classified as 3
-Image 6009: is 3, classified as 9
+Image 5973: is 3, classified as 8
 Image 6011: is 3, classified as 9
 Image 6023: is 3, classified as 9
-Image 6045: is 3, classified as 9
 Image 6059: is 3, classified as 9
-Image 6166: is 9, classified as 3
-Image 6532: is 0, classified as 5
+Image 6065: is 3, classified as 8
 Image 6555: is 8, classified as 9
 Image 6571: is 9, classified as 7
-Image 6576: is 7, classified as 1
-Image 6597: is 0, classified as 9
-Image 6598: is 5, classified as 3
+Image 6597: is 0, classified as 7
 Image 6625: is 8, classified as 4
-Image 6641: is 8, classified as 5
+Image 6651: is 0, classified as 5
 Image 6783: is 1, classified as 6
 Image 6847: is 6, classified as 4
-Image 6926: is 6, classified as 4
 Image 7216: is 0, classified as 6
-Image 7268: is 7, classified as 4
-Image 7434: is 4, classified as 8
-Image 7492: is 2, classified as 3
-Image 7902: is 7, classified as 9
+Image 8020: is 1, classified as 8
 Image 8094: is 2, classified as 8
-Image 8246: is 3, classified as 9
-Image 8408: is 8, classified as 2
+Image 8325: is 0, classified as 6
+Image 8456: is 8, classified as 0
+Image 8520: is 4, classified as 9
 Image 8522: is 8, classified as 6
-Image 8527: is 4, classified as 9
 Image 9009: is 7, classified as 2
 Image 9015: is 7, classified as 2
-Image 9016: is 0, classified as 5
 Image 9024: is 7, classified as 2
 Image 9280: is 8, classified as 5
 Image 9587: is 9, classified as 4
-Image 9634: is 0, classified as 1
+Image 9634: is 0, classified as 8
+Image 9642: is 9, classified as 7
 Image 9664: is 2, classified as 7
-Image 9716: is 2, classified as 3
+Image 9679: is 6, classified as 3
+Image 9700: is 2, classified as 8
 Image 9729: is 5, classified as 6
-Image 9745: is 4, classified as 0
-Image 9768: is 2, classified as 0
+Image 9745: is 4, classified as 2
+Image 9749: is 5, classified as 6
 Image 9770: is 5, classified as 0
 Image 9777: is 5, classified as 0
-Image 9792: is 4, classified as 1
+Image 9792: is 4, classified as 9
 Image 9808: is 9, classified as 4
-Image 9839: is 2, classified as 3
-Image 9867: is 2, classified as 8
-Image 9941: is 5, classified as 8
-Image 9944: is 3, classified as 8
-Accuracy: 0.980000
+Image 9839: is 2, classified as 7
+Accuracy: 0.982200
 
 ------------------------------------------------------------------------------------
 
