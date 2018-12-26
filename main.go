@@ -16,7 +16,7 @@ func main() {
 		network := CreateNetwork([]int{28 * 28, 100, 10})
 		network.InitializeNetworkWeightsAndBiases()
 
-		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"
+		userDataDir := "/home/svenschmidt75/Develop/go/src/MNIST"
 		fmt.Printf("Importing training data from %s...\n", userDataDir)
 		totalDataSet := MNISTImport.ImportData(userDataDir, "train-images.idx3-ubyte", "train-labels.idx1-ubyte")
 		fmt.Printf("Read %d train images\n", totalDataSet.Length())
@@ -58,7 +58,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		userDataDir := "/home/svenschmidt75/Develop/Go/MNIST"
+		userDataDir := "/home/svenschmidt75/Develop/go/src/MNIST"
 		fmt.Printf("Importing test data from %s...\n", userDataDir)
 		testData := MNISTImport.ImportData(userDataDir, "t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte")
 		fmt.Printf("Read %d test images\n", testData.Length())
